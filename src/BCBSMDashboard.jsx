@@ -1272,13 +1272,18 @@ function TrendChart({ entries, filterChannel }) {
 
   const allDates = allTrend.map((t) => t.date);
   const x = (i) => PX + (i / (allDates.length - 1)) * plotW;
-  const dataMinMs = new Date(allDates[0]).getTime();
-  const dataMaxMs = new Date(allDates[allDates.length - 1]).getTime();
-  const dataRange = dataMaxMs - dataMinMs || 1;
   const xByDate = (dateStr) => {
-    const ms = new Date(dateStr).getTime();
-    const ratio = (ms - dataMinMs) / dataRange;
-    return PX + ratio * plotW;
+    for (let i = 0; i < allDates.length - 1; i++) {
+      if (dateStr >= allDates[i] && dateStr <= allDates[i + 1]) {
+        const d0 = new Date(allDates[i]).getTime();
+        const d1 = new Date(allDates[i + 1]).getTime();
+        const dt = new Date(dateStr).getTime();
+        const frac = d1 === d0 ? 0 : (dt - d0) / (d1 - d0);
+        return x(i + frac);
+      }
+    }
+    if (dateStr < allDates[0]) return x(0);
+    return x(allDates.length - 1);
   };
   const y = (v) => PY + ((yMax - v) / (yMax - yMin)) * plotH;
   const zeroY = y(0);
