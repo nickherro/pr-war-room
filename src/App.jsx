@@ -7,7 +7,7 @@ const DASHBOARDS = [
   { id: "mtsinai", label: "Mt Sinai vs Anthem BCBS", short: "Mt Sinai v. Anthem" },
 ];
 
-export default function App() {
+export default function App({ onLogout }) {
   const [active, setActive] = useState("bcbsm");
 
   return (
@@ -40,6 +40,7 @@ export default function App() {
         >
           WAR ROOM
         </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
         {DASHBOARDS.map((d) => (
           <button
             key={d.id}
@@ -60,6 +61,25 @@ export default function App() {
             {d.short}
           </button>
         ))}
+        </div>
+        <button
+          onClick={onLogout}
+          style={{
+            padding: "6px 14px",
+            fontSize: 10,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontWeight: 600,
+            borderRadius: 4,
+            border: "1px solid rgba(255,255,255,0.15)",
+            cursor: "pointer",
+            background: "transparent",
+            color: "rgba(255,255,255,0.4)",
+            letterSpacing: 1,
+            transition: "all 0.15s ease",
+          }}
+        >
+          LOGOUT
+        </button>
       </div>
 
       {/* Dashboard content */}

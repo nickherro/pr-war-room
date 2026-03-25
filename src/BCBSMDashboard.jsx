@@ -930,20 +930,6 @@ const INITIAL_ENTRIES = [
   },
   // === NEW ENTRIES: Web-Researched Round 2 ===
   {
-    id: 67,
-    date: "2025-06-13",
-    source: "Crain's Detroit Business",
-    sourceType: "news",
-    channel: "media",
-    headline: "Crain's: 'Blue Cross is entangled in the most important contract talks in its existence'",
-    frameAdoption: "balanced",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "high",
-    notes: "Dustin Walsh deep investigation June 2025. Three health systems (HFH, Corewell, MM) grew from 30% to 64% market share since 2019 — now represent 61% of BCBSM's $20.7B medical spend. BCBSM 86-year history's most consequential negotiations. $600M restructuring: 200 buyouts this week, 400 unfilled positions. GLP-1 drugs cost $1.1B (29% YoY increase). Pharmacy costs up $900M vs 2023. Daily claims: $107M (up 21.6% from 2023). Susan Moore (healthcare consultant) quoted on negotiation dynamics. Michigan per capita healthcare: $9,023 (up 34% from 2020). FTC: hospital mergers → prices up to 50%. Michigan Health Purchasers Coalition: 7-10% post-merger cost rise. BCBSM value-based programs avoided $6.3B in claims over two decades. Most comprehensive single piece on the systemic context.",
-  },
-  {
     id: 68,
     date: "2026-03-10",
     source: "Crain's Detroit Business",
@@ -1026,20 +1012,6 @@ const INITIAL_ENTRIES = [
     blameDirection: "bcbs",
     reachEstimate: "high",
     notes: "Patient stories not in earlier coverage. Julie Graber: daughter pregnant, seeing OB-GYN at Michigan Medicine, due in July — exactly when contract would expire. Haley Murphy: 9-month-old daughter has rare genetic disorder preventing protein processing, sees MM doctor every 3 months. Kristin Formo: chronic illness patient who found MM doctors who 'listen with empathy.' Three distinct patient stories in single segment — most patient-focused local TV coverage of BCBSM dispute.",
-  },
-  {
-    id: 74,
-    date: "2025-06-13",
-    source: "Crain's Detroit Business",
-    sourceType: "news",
-    channel: "media",
-    headline: "Crain's: GLP-1 drug costs $1.1B for BCBSM — 29% YoY increase, pharmaceutical pressure context",
-    frameAdoption: "bcbs",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "medium",
-    notes: "From the June 2025 deep dive. GLP-1 (Ozempic, Wegovy) costs alone: $1.1B for BCBSM. Up 29% year-over-year. Total pharmacy costs up $900M vs 2023. Paul Mozak (BCBS CFO) cited. Context: BCBS financial strain is not fabricated — pharmaceutical costs are genuinely devastating. U.S. per capita healthcare spending ~$13K. Projected 4.3%+ annual increase. This data point is Anthem's strongest sympathetic argument — they ARE facing real cost pressures beyond hospital reimbursement.",
   },
   {
     id: 75,
@@ -1770,167 +1742,6 @@ function EntryRow({ entry, onDelete }) {
   );
 }
 
-function AddEntryForm({ onAdd }) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
-    source: "",
-    sourceType: "news",
-    channel: "media",
-    headline: "",
-    frameAdoption: "balanced",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "medium",
-    notes: "",
-  });
-
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  const submit = () => {
-    if (!form.source) return;
-    onAdd({ ...form, id: Date.now() });
-    setForm({
-      date: new Date().toISOString().split("T")[0],
-      source: "",
-      sourceType: "news",
-      channel: "media",
-      headline: "",
-      frameAdoption: "balanced",
-      sentiment: "neutral",
-      patientStory: false,
-      blameDirection: "both",
-      reachEstimate: "medium",
-      notes: "",
-    });
-    setOpen(false);
-  };
-
-  if (!open)
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          width: "100%",
-          padding: "12px",
-          background: COLORS.surface,
-          border: `1px dashed ${COLORS.border}`,
-          borderRadius: 6,
-          color: COLORS.amber,
-          cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 600,
-          fontFamily: "'JetBrains Mono', monospace",
-        }}
-      >
-        + LOG NEW ENTRY
-      </button>
-    );
-
-  const selectStyle = {
-    background: COLORS.bg,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 4,
-    color: COLORS.text,
-    padding: "6px 8px",
-    fontSize: 12,
-    flex: 1,
-    minWidth: 0,
-  };
-  const inputStyle = { ...selectStyle };
-
-  return (
-    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: 16 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.amber, marginBottom: 12, fontFamily: "'JetBrains Mono', monospace" }}>
-        NEW ENTRY
-      </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} style={{ ...inputStyle, maxWidth: 150 }} />
-        <input placeholder="Source (e.g. Detroit News)" value={form.source} onChange={(e) => update("source", e.target.value)} style={inputStyle} />
-        <select value={form.sourceType} onChange={(e) => update("sourceType", e.target.value)} style={selectStyle}>
-          {Object.entries(LABELS.sourceType).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.channel} onChange={(e) => update("channel", e.target.value)} style={selectStyle}>
-          {Object.entries(LABELS.channel).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-      </div>
-      <input
-        placeholder="Headline or post summary"
-        value={form.headline}
-        onChange={(e) => update("headline", e.target.value)}
-        style={{ ...inputStyle, width: "100%", boxSizing: "border-box", marginBottom: 8 }}
-      />
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <select value={form.frameAdoption} onChange={(e) => update("frameAdoption", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Frame adoption</option>
-          {Object.entries(LABELS.frameAdoption).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.sentiment} onChange={(e) => update("sentiment", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Sentiment</option>
-          {Object.entries(LABELS.sentiment).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.blameDirection} onChange={(e) => update("blameDirection", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Blame direction</option>
-          {Object.entries(LABELS.blameDirection).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.reachEstimate} onChange={(e) => update("reachEstimate", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Reach</option>
-          {Object.entries(LABELS.reachEstimate).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-      </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
-        <label style={{ fontSize: 12, color: COLORS.textMuted, display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
-          <input type="checkbox" checked={form.patientStory} onChange={(e) => update("patientStory", e.target.checked)} />
-          Includes patient story
-        </label>
-      </div>
-      <textarea
-        placeholder="Analyst notes (optional)"
-        value={form.notes}
-        onChange={(e) => update("notes", e.target.value)}
-        rows={2}
-        style={{ ...inputStyle, width: "100%", boxSizing: "border-box", marginBottom: 10, resize: "vertical" }}
-      />
-      <div style={{ display: "flex", gap: 8 }}>
-        <button
-          onClick={submit}
-          style={{
-            padding: "8px 20px",
-            background: COLORS.amber,
-            color: COLORS.bg,
-            border: "none",
-            borderRadius: 4,
-            fontWeight: 700,
-            cursor: "pointer",
-            fontSize: 12,
-          }}
-        >
-          ADD ENTRY
-        </button>
-        <button
-          onClick={() => setOpen(false)}
-          style={{ padding: "8px 16px", background: "none", color: COLORS.textMuted, border: `1px solid ${COLORS.border}`, borderRadius: 4, cursor: "pointer", fontSize: 12 }}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function PRWarRoom() {
   const [entries, setEntries] = useState(INITIAL_ENTRIES);
   const [filterChannel, setFilterChannel] = useState("all");
@@ -1941,7 +1752,6 @@ export default function PRWarRoom() {
   );
   const scores = useMemo(() => computeScores(filtered), [filtered]);
 
-  const addEntry = useCallback((entry) => setEntries((prev) => [...prev, entry]), []);
   const deleteEntry = useCallback((id) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
 
   const compositeColor = scores.composite > 15 ? COLORS.red : scores.composite < -15 ? "#2F65A7" : COLORS.amber;
@@ -1992,6 +1802,9 @@ export default function PRWarRoom() {
           <div>
             <div style={{ fontSize: 10, letterSpacing: 2, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6 }}>
               COMPOSITE NARRATIVE ADVANTAGE
+            </div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
+              Monitoring period: Jan 1, 2026 — Present
             </div>
             <div style={{ fontSize: 40, fontWeight: 700, color: compositeColor, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>
               {scores.composite > 0 ? "+" : ""}
@@ -2131,8 +1944,6 @@ export default function PRWarRoom() {
         );
       })}
 
-      {/* Add entry form */}
-      <AddEntryForm onAdd={addEntry} />
     </div>
   );
 }

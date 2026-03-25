@@ -30,7 +30,14 @@ function AuthGate() {
     setLoading(false)
   }, [user, pass])
 
-  if (authed) return <App />
+  const handleLogout = useCallback(() => {
+    sessionStorage.removeItem('_a')
+    setAuthed(false)
+    setUser('')
+    setPass('')
+  }, [])
+
+  if (authed) return <App onLogout={handleLogout} />
 
   return (
     <div style={{

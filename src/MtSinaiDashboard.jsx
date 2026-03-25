@@ -1238,20 +1238,6 @@ const INITIAL_ENTRIES = [
     notes: "AANS (American Association of Neurological Surgeons), ACOI, APMA, and others wrote to Elevance. Anthem's policy penalizes in-network hospitals 10% if any OON provider involved in care. Hospitals could be terminated for using OON specialists they don't employ. Broader industry opposition to Anthem's aggressive cost-control posture. Elevance 'rebuffed' calls to cancel. Context for Mt Sinai dispute: Anthem's national strategy pattern.",
   },
   {
-    id: 89,
-    date: "2025-08-26",
-    source: "KFF Health News",
-    sourceType: "news",
-    channel: "media",
-    headline: "KFF: 'When Hospitals and Insurers Fight, Patients Get Caught in the Middle' — national trend piece",
-    frameAdoption: "balanced",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "high",
-    notes: "Major national health policy coverage. Buxbaum data: 18% of non-federal hospitals had public dispute June 2021-May 2025, 8% went OON. ~500-600 annual disputes. Syndicated by WUWF, WUSF, GBH, InsuranceNewsNet. Notes federal transparency rules now force pricing disclosure — 'nobody wants to be the worst paid on the block.' Trump admin $1T healthcare cuts could accelerate. Mt Sinai dispute cited as illustrative example. Sets national narrative frame.",
-  },
-  {
     id: 90,
     date: "2026-01-01",
     source: "Anthem",
@@ -1278,20 +1264,6 @@ const INITIAL_ENTRIES = [
     blameDirection: "both",
     reachEstimate: "high",
     notes: "NYP and UHC extended in-network through March 31, 2026. Individual/Family Plans already OON Jan 1. April 1 deadline for commercial, Medicaid, most Medicare Advantage. Continuity of care through June 29. CRITICAL context: undermines Anthem's 'every other system works with us' narrative — the OTHER major insurer is having the SAME problem with a DIFFERENT major NYC hospital. Systemic pattern, not Mt Sinai uniquely unreasonable.",
-  },
-  {
-    id: 92,
-    date: "2025-07-01",
-    source: "UHC / Memorial Sloan Kettering",
-    sourceType: "other",
-    channel: "stakeholder",
-    headline: "UHC/Memorial Sloan Kettering missed June 30 deadline — deal reached July 1 after brinkmanship",
-    frameAdoption: "balanced",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "medium",
-    notes: "Referenced in NBC News coverage. UHC and MSK went to the wire — missed deadline by one day but reached deal. Precedent for last-minute resolution. Suggests some disputes DO resolve. But Mt Sinai/Anthem has been much more protracted. Pattern: major NYC academic medical centers vs major insurers as recurring conflict.",
   },
   {
     id: 93,
@@ -1666,6 +1638,189 @@ function TrendChart({ entries, filterChannel }) {
   );
 }
 
+function ExecutiveSummary({ entries, filterChannel, scores }) {
+  // Per-channel scores
+  const channelScores = useMemo(() => {
+    const ch = {};
+    ["media", "social", "stakeholder"].forEach((c) => {
+      const ce = entries.filter((e) => e.channel === c);
+      ch[c] = ce.length >= 2 ? computeScores(ce) : null;
+    });
+    return ch;
+  }, [entries]);
+
+  // Momentum: compare first half vs second half of entries by date
+  const momentum = useMemo(() => {
+    const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+    const mid = Math.floor(sorted.length / 2);
+    if (mid < 3) return null;
+    const early = computeScores(sorted.slice(0, mid));
+    const late = computeScores(sorted.slice(mid));
+    return { early: early.composite, late: late.composite, shift: late.composite - early.composite };
+  }, [entries]);
+
+  // Top patient stories (high-weight entries with patient stories)
+  const topPatientStories = useMemo(() => {
+    return entries
+      .filter((e) => e.patientStory && getWeight(e) >= 1.0)
+      .sort((a, b) => getWeight(b) - getWeight(a))
+      .slice(0, 3);
+  }, [entries]);
+
+  // Channel divergences
+  const divergences = useMemo(() => {
+    const results = [];
+    ["media", "social", "stakeholder"].forEach((c) => {
+      const cs = channelScores[c];
+      if (!cs) return;
+      const diff = cs.composite - scores.composite;
+      if (Math.abs(diff) > 8) {
+        const label = c.charAt(0).toUpperCase() + c.slice(1);
+        const dir = diff > 0 ? "more favorable to Mt Sinai" : "more favorable to Anthem";
+        results.push({ channel: label, diff, dir, score: cs.composite });
+      }
+    });
+    return results;
+  }, [channelScores, scores]);
+
+  // Key messages — look at frame adoption winners by channel
+  const keyMessages = useMemo(() => {
+    const msgs = [];
+    const sinaiFrame = entries.filter((e) => e.frameAdoption === "mtsinai");
+    const anthemFrame = entries.filter((e) => e.frameAdoption === "anthem");
+    const sinaiW = sinaiFrame.reduce((s, e) => s + getWeight(e), 0);
+    const anthemW = anthemFrame.reduce((s, e) => s + getWeight(e), 0);
+    if (sinaiW > anthemW * 1.5) msgs.push("Mt Sinai's narrative frame dominates across credible sources");
+    const patientEntries = entries.filter((e) => e.patientStory);
+    const patientSinai = patientEntries.filter((e) => e.blameDirection === "anthem").length;
+    const patientAnthem = patientEntries.filter((e) => e.blameDirection === "mtsinai").length;
+    if (patientSinai > 0 && patientAnthem === 0) msgs.push("Every named patient story generates sympathy for Mt Sinai — Anthem has zero patient advocates");
+    const owned = entries.filter((e) => getWeight(e) <= 0.3);
+    const sinaiOwned = owned.filter((e) => e.frameAdoption === "mtsinai").length;
+    const anthemOwned = owned.filter((e) => e.frameAdoption === "anthem").length;
+    if (sinaiOwned > anthemOwned * 2) msgs.push("Mt Sinai's owned-media operation far outpaces Anthem's response capacity");
+    return msgs;
+  }, [entries]);
+
+  const fmtScore = (v) => `${v > 0 ? "+" : ""}${v.toFixed(0)}`;
+  const S = { section: { marginBottom: 12 }, label: { fontSize: 9, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6, fontWeight: 700 }, body: { fontSize: 13, color: COLORS.text, lineHeight: 1.7 }, bullet: { fontSize: 12, color: COLORS.text, lineHeight: 1.8, margin: 0, paddingLeft: 16 }, accent: { color: COLORS.accent, fontWeight: 600 }, warn: { color: COLORS.anthem, fontWeight: 600 }, muted: { color: COLORS.textMuted, fontSize: 11 } };
+
+  // Tab-specific content
+  if (filterChannel !== "all") {
+    const cs = channelScores[filterChannel];
+    if (!cs) return null;
+    const label = filterChannel.charAt(0).toUpperCase() + filterChannel.slice(1);
+    const diff = cs.composite - computeScores(entries).composite;
+    const diffDir = diff > 5 ? "stronger for Mt Sinai" : diff < -5 ? "weaker for Mt Sinai" : "roughly aligned with";
+
+    const channelEntries = entries.filter((e) => e.channel === filterChannel);
+    const topSources = {};
+    channelEntries.forEach((e) => { topSources[e.source] = (topSources[e.source] || 0) + getWeight(e); });
+    const sortedSources = Object.entries(topSources).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    const takeaways = [];
+    if (filterChannel === "media") {
+      const tier1_2 = channelEntries.filter((e) => getWeight(e) >= 1.2);
+      const tier1_2Sinai = tier1_2.filter((e) => e.frameAdoption === "mtsinai").length;
+      const tier1_2Anthem = tier1_2.filter((e) => e.frameAdoption === "anthem").length;
+      takeaways.push(`Of ${tier1_2.length} high-credibility media entries (Tier 1–2), ${tier1_2Sinai} adopt Mt Sinai's frame vs ${tier1_2Anthem} for Anthem.`);
+      const patientMedia = channelEntries.filter((e) => e.patientStory);
+      if (patientMedia.length > 0) takeaways.push(`${patientMedia.length} media entries feature named patient stories — all generate sympathy for the provider side.`);
+      takeaways.push("Trade press (Healthcare Dive, Becker's) is framing this as a national systemic trend, not an isolated dispute.");
+    } else if (filterChannel === "social") {
+      const organic = channelEntries.filter((e) => getWeight(e) >= 0.7 && getWeight(e) < 1.0);
+      const comments = channelEntries.filter((e) => getWeight(e) < 0.5);
+      const ownedSocial = channelEntries.filter((e) => getWeight(e) <= 0.3);
+      takeaways.push(`${organic.length} organic social posts (0.7x weight), ${comments.length} comment section entries (0.4x), ${ownedSocial.length} owned/party social (0.3x).`);
+      takeaways.push("Patient-originated content (Lugo TikTok, Facebook groups) is more authentic and persuasive than Mt Sinai's organized campaign.");
+      if (cs.blameScore > 30) takeaways.push("Social sentiment is overwhelmingly anti-Anthem — but this audience skews toward people already affected.");
+    } else if (filterChannel === "stakeholder") {
+      const actions = channelEntries.filter((e) => getWeight(e) >= 1.3);
+      takeaways.push(`${actions.length} stakeholder action entries at 1.3x weight — these move the score more than media or social.`);
+      const proSinai = channelEntries.filter((e) => e.blameDirection === "anthem").length;
+      const proAnthem = channelEntries.filter((e) => e.blameDirection === "mtsinai").length;
+      takeaways.push(`Blame direction: ${proSinai} blame Anthem, ${proAnthem} blame Mt Sinai, ${channelEntries.length - proSinai - proAnthem} blame both.`);
+      takeaways.push("32BJ direct contract is the single most impactful stakeholder move — validates Mt Sinai pricing, undermines Anthem's intermediary value.");
+    }
+
+    return (
+      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
+        <div style={S.label}>EXECUTIVE BRIEF — {label.toUpperCase()} CHANNEL</div>
+        <div style={S.body}>
+          <span style={S.accent}>{label} composite: {fmtScore(cs.composite)}</span> — {diffDir} the overall score ({fmtScore(computeScores(entries).composite)}).
+          {channelEntries.length} entries tracked in this channel.
+        </div>
+        <div style={{ ...S.label, marginTop: 14 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
+        </ul>
+        <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
+        </ul>
+      </div>
+    );
+  }
+
+  // "All" tab — full executive summary
+  return (
+    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
+      <div style={S.label}>EXECUTIVE SUMMARY</div>
+      <div style={{ ...S.body, marginBottom: 14 }}>
+        <span style={S.accent}>Mt Sinai holds a clear narrative advantage</span> with a credibility-weighted composite of <strong>{fmtScore(scores.composite)}</strong>.
+        {momentum && momentum.shift > 5 && <> Momentum is <span style={S.accent}>strengthening</span> — the second half of coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in the first half.</>}
+        {momentum && momentum.shift < -5 && <> Momentum is <span style={S.warn}>softening</span> — the second half of coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in the first half.</>}
+        {momentum && Math.abs(momentum.shift) <= 5 && <> Momentum is <strong>steady</strong> — no significant shift between early and recent coverage.</>}
+      </div>
+
+      {divergences.length > 0 && (
+        <div style={S.section}>
+          <div style={S.label}>CHANNEL DIVERGENCES</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            {divergences.map((d) => (
+              <li key={d.channel} style={{ marginBottom: 2 }}>
+                ▸ <strong>{d.channel}</strong> ({fmtScore(d.score)}) is {d.dir} than the overall composite — {
+                  d.diff > 0 ? "amplifying Mt Sinai's advantage" : "partially offsetting it"
+                }.
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div style={S.section}>
+        <div style={S.label}>KEY MESSAGES RESONATING</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+          <li style={{ marginBottom: 2 }}>▸ "$450M in unpaid claims" is the stickiest message — concrete dollar amount beats Anthem's abstract "consumer protections" frame.</li>
+          <li style={{ marginBottom: 2 }}>▸ Non-profit vs. for-profit framing resonates strongly in post-UHC CEO shooting environment.</li>
+          {topPatientStories.length > 0 && (
+            <li style={{ marginBottom: 2 }}>▸ Top patient stories driving coverage: {topPatientStories.map((e) => e.source).join(", ")}.</li>
+          )}
+        </ul>
+      </div>
+
+      <div style={S.section}>
+        <div style={S.label}>MARCOMM CONSIDERATIONS</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          <li style={{ marginBottom: 2 }}>▸ <strong>Patient story pipeline is critical.</strong> Every named patient has favored Mt Sinai. Anthem needs patient advocates or this dimension stays one-sided.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>32BJ model is the proof point.</strong> If other unions or large employers pursue direct contracts, Anthem's position as middleman erodes further. Track and amplify.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>Molina Medicaid is the vulnerability.</strong> Mt Sinai also dropped low-income plans — this undermines the "patient champion" narrative. Opponents will surface it.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>NYP/UHC April 1 deadline</strong> is a narrative inflection point. If that dispute also breaks down, it validates Mt Sinai's framing as systemic. If it resolves, Anthem can say "others find a way."</li>
+          {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
+            <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
+              channelScores.social.composite > channelScores.media.composite
+                ? "grassroots sentiment is running ahead of press coverage. Owned media may be amplifying beyond what independent outlets reflect."
+                : "media coverage is more favorable than organic social conversation. Consider whether earned media gains are translating to public sentiment."
+            }</li>
+          )}
+          <li style={{ marginBottom: 2 }}>▸ <strong>Spanish-language outreach matters.</strong> El Diario coverage reaches an underserved segment of affected patients that English media misses entirely.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function ScoreGauge({ value, label, subtext }) {
   const clamped = Math.max(-100, Math.min(100, value));
   const pct = ((clamped + 100) / 200) * 100;
@@ -1795,167 +1950,6 @@ function EntryRow({ entry, onDelete }) {
   );
 }
 
-function AddEntryForm({ onAdd }) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
-    source: "",
-    sourceType: "news",
-    channel: "media",
-    headline: "",
-    frameAdoption: "balanced",
-    sentiment: "neutral",
-    patientStory: false,
-    blameDirection: "both",
-    reachEstimate: "medium",
-    notes: "",
-  });
-
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  const submit = () => {
-    if (!form.source) return;
-    onAdd({ ...form, id: Date.now() });
-    setForm({
-      date: new Date().toISOString().split("T")[0],
-      source: "",
-      sourceType: "news",
-      channel: "media",
-      headline: "",
-      frameAdoption: "balanced",
-      sentiment: "neutral",
-      patientStory: false,
-      blameDirection: "both",
-      reachEstimate: "medium",
-      notes: "",
-    });
-    setOpen(false);
-  };
-
-  if (!open)
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          width: "100%",
-          padding: "12px",
-          background: COLORS.surface,
-          border: `1px dashed ${COLORS.border}`,
-          borderRadius: 6,
-          color: COLORS.accent,
-          cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 600,
-          fontFamily: "'JetBrains Mono', monospace",
-        }}
-      >
-        + LOG NEW ENTRY
-      </button>
-    );
-
-  const selectStyle = {
-    background: COLORS.bg,
-    border: `1px solid ${COLORS.border}`,
-    borderRadius: 4,
-    color: COLORS.text,
-    padding: "6px 8px",
-    fontSize: 12,
-    flex: 1,
-    minWidth: 0,
-  };
-  const inputStyle = { ...selectStyle };
-
-  return (
-    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: 16 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.accent, marginBottom: 12, fontFamily: "'JetBrains Mono', monospace" }}>
-        NEW ENTRY
-      </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} style={{ ...inputStyle, maxWidth: 150 }} />
-        <input placeholder="Source (e.g. CBS New York)" value={form.source} onChange={(e) => update("source", e.target.value)} style={inputStyle} />
-        <select value={form.sourceType} onChange={(e) => update("sourceType", e.target.value)} style={selectStyle}>
-          {Object.entries(LABELS.sourceType).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.channel} onChange={(e) => update("channel", e.target.value)} style={selectStyle}>
-          {Object.entries(LABELS.channel).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-      </div>
-      <input
-        placeholder="Headline or post summary"
-        value={form.headline}
-        onChange={(e) => update("headline", e.target.value)}
-        style={{ ...inputStyle, width: "100%", boxSizing: "border-box", marginBottom: 8 }}
-      />
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-        <select value={form.frameAdoption} onChange={(e) => update("frameAdoption", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Frame adoption</option>
-          {Object.entries(LABELS.frameAdoption).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.sentiment} onChange={(e) => update("sentiment", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Sentiment</option>
-          {Object.entries(LABELS.sentiment).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.blameDirection} onChange={(e) => update("blameDirection", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Blame direction</option>
-          {Object.entries(LABELS.blameDirection).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={form.reachEstimate} onChange={(e) => update("reachEstimate", e.target.value)} style={selectStyle}>
-          <option value="" disabled>Reach</option>
-          {Object.entries(LABELS.reachEstimate).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-      </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
-        <label style={{ fontSize: 12, color: COLORS.textMuted, display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
-          <input type="checkbox" checked={form.patientStory} onChange={(e) => update("patientStory", e.target.checked)} />
-          Includes patient story
-        </label>
-      </div>
-      <textarea
-        placeholder="Analyst notes (optional)"
-        value={form.notes}
-        onChange={(e) => update("notes", e.target.value)}
-        rows={2}
-        style={{ ...inputStyle, width: "100%", boxSizing: "border-box", marginBottom: 10, resize: "vertical" }}
-      />
-      <div style={{ display: "flex", gap: 8 }}>
-        <button
-          onClick={submit}
-          style={{
-            padding: "8px 20px",
-            background: COLORS.accent,
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            fontWeight: 700,
-            cursor: "pointer",
-            fontSize: 12,
-          }}
-        >
-          ADD ENTRY
-        </button>
-        <button
-          onClick={() => setOpen(false)}
-          style={{ padding: "8px 16px", background: "none", color: COLORS.textMuted, border: `1px solid ${COLORS.border}`, borderRadius: 4, cursor: "pointer", fontSize: 12 }}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function MtSinaiDashboard() {
   const [entries, setEntries] = useState(INITIAL_ENTRIES);
   const [filterChannel, setFilterChannel] = useState("all");
@@ -1966,7 +1960,6 @@ export default function MtSinaiDashboard() {
   );
   const scores = useMemo(() => computeScores(filtered), [filtered]);
 
-  const addEntry = useCallback((entry) => setEntries((prev) => [...prev, entry]), []);
   const deleteEntry = useCallback((id) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
 
   const compositeColor = scores.composite > 15 ? COLORS.mtsinai : scores.composite < -15 ? COLORS.anthem : "#8A8DB8";
@@ -2018,6 +2011,9 @@ export default function MtSinaiDashboard() {
             <div style={{ fontSize: 10, letterSpacing: 2, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6 }}>
               COMPOSITE NARRATIVE ADVANTAGE
             </div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
+              Monitoring period: Sep 1, 2025 — Present
+            </div>
             <div style={{ fontSize: 40, fontWeight: 700, color: compositeColor, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>
               {scores.composite > 0 ? "+" : ""}
               {scores.composite.toFixed(1)}
@@ -2061,6 +2057,9 @@ export default function MtSinaiDashboard() {
           </button>
         ))}
       </div>
+
+      {/* Executive Summary */}
+      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} />
 
       {/* Gauges + Distributions */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
@@ -2154,8 +2153,6 @@ export default function MtSinaiDashboard() {
         );
       })}
 
-      {/* Add entry form */}
-      <AddEntryForm onAdd={addEntry} />
     </div>
   );
 }
