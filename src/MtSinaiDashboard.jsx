@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine, Tooltip, Legend, ResponsiveContainer, Label } from "recharts";
 
 const INITIAL_ENTRIES = [
   // === MEDIA ENTRIES (19) ===
@@ -1482,86 +1483,60 @@ function TrendChart({ entries, filterChannel }) {
     return computeTrend(channelEntries);
   }, [entries, filterChannel]);
 
-  if (allTrend.length < 2) return null;
+  // Merge allTrend and channelTrend into one dataset keyed by date
+  const chartData = useMemo(() => {
+    const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
+    const volMap = {};
+    source.forEach((e) => { volMap[e.date] = (volMap[e.date] || 0) + 1; });
+    const chMap = {};
+    if (channelTrend) channelTrend.forEach((ct) => { chMap[ct.date] = ct.composite; });
+    return allTrend.map((t) => ({
+      date: t.date,
+      ts: new Date(t.date).getTime(),
+      composite: t.composite,
+      count: t.count,
+      volume: volMap[t.date] || 0,
+      channel: chMap[t.date] ?? null,
+    }));
+  }, [allTrend, channelTrend, entries, filterChannel]);
 
-  const W = 680, H = 160, PX = 50, PY = 24;
-  const plotW = W - PX * 2, plotH = H - PY * 2;
+  if (chartData.length < 2) return null;
 
-  const allVals = allTrend.map((t) => t.composite);
-  const chVals = channelTrend ? channelTrend.map((t) => t.composite) : [];
-  const combined = [...allVals, ...chVals];
-  const maxAbs = Math.max(Math.abs(Math.min(...combined)), Math.abs(Math.max(...combined)), 30);
-  const yMin = -maxAbs, yMax = maxAbs;
-
-  const allDates = allTrend.map((t) => t.date);
-  const x = (i) => PX + (i / (allDates.length - 1)) * plotW;
-  // Map a date to x by interpolating between data point indices
-  const xByDate = (dateStr) => {
-    // Find the two data points this date falls between
-    for (let i = 0; i < allDates.length - 1; i++) {
-      if (dateStr >= allDates[i] && dateStr <= allDates[i + 1]) {
-        const d0 = new Date(allDates[i]).getTime();
-        const d1 = new Date(allDates[i + 1]).getTime();
-        const dt = new Date(dateStr).getTime();
-        const frac = d1 === d0 ? 0 : (dt - d0) / (d1 - d0);
-        return x(i + frac);
-      }
-    }
-    // If before all data, place at first point; if after, at last
-    if (dateStr < allDates[0]) return x(0);
-    return x(allDates.length - 1);
-  };
-  const y = (v) => PY + ((yMax - v) / (yMax - yMin)) * plotH;
-  const zeroY = y(0);
-
-  const aggLinePoints = allTrend.map((t, i) => `${x(i)},${y(t.composite)}`).join(" ");
-
-  const areaAbove = [];
-  const areaBelow = [];
-  allTrend.forEach((t, i) => {
-    const px = x(i), py = y(t.composite);
-    if (t.composite >= 0) {
-      areaAbove.push(`${px},${py}`);
-      areaBelow.push(`${px},${zeroY}`);
-    } else {
-      areaAbove.push(`${px},${zeroY}`);
-      areaBelow.push(`${px},${py}`);
-    }
-  });
-  const areaAbovePath = `M${PX},${zeroY} L${areaAbove.join(" L")} L${x(allTrend.length - 1)},${zeroY} Z`;
-  const areaBelowPath = `M${PX},${zeroY} L${areaBelow.join(" L")} L${x(allTrend.length - 1)},${zeroY} Z`;
-
-  let chLinePoints = "";
-  let chDots = [];
   const chColorMap = { media: "#06ABEB", social: "#00B2A9", stakeholder: "#DC298D" };
   const chColor = chColorMap[filterChannel] || COLORS.accent;
   const chLabelMap = { media: "MEDIA", social: "SOCIAL", stakeholder: "STAKEHOLDER" };
-
-  if (channelTrend) {
-    const mappedPoints = channelTrend.map((ct) => {
-      return { x: xByDate(ct.date), y: y(ct.composite), composite: ct.composite, count: ct.count, date: ct.date };
-    });
-    chLinePoints = mappedPoints.map((p) => `${p.x},${p.y}`).join(" ");
-    chDots = mappedPoints;
-  }
-
-  const gridLines = [-20, 0, 20];
-  const fmtDate = (d) => { const parts = d.split("-"); return `${parseInt(parts[1])}/${parseInt(parts[2])}`; };
   const isOverlay = filterChannel !== "all" && channelTrend;
-  const disputeX = xByDate(DISPUTE_PUBLIC_DATE);
 
-  // Volume bars: when filtered, show only that channel's per-date volume; otherwise show all
-  const volumeData = useMemo(() => {
-    const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
-    const sorted = [...source].sort((a, b) => a.date.localeCompare(b.date));
-    const dMap = {};
-    sorted.forEach((e) => { dMap[e.date] = (dMap[e.date] || 0) + 1; });
-    // Map onto allTrend dates for x-axis alignment
-    return allTrend.map((t) => ({ date: t.date, vol: dMap[t.date] || 0 }));
-  }, [entries, filterChannel, allTrend]);
-  const maxVol = Math.max(...volumeData.map((v) => v.vol), 1);
-  const barMaxH = plotH * 0.55; // bars fill up to 55% of plot height
-  const barW = Math.max(4, Math.min(18, plotW / allTrend.length * 0.6));
+  const allVals = chartData.map((d) => d.composite);
+  const chVals = chartData.filter((d) => d.channel !== null).map((d) => d.channel);
+  const combined = [...allVals, ...chVals];
+  const maxAbs = Math.max(Math.abs(Math.min(...combined)), Math.abs(Math.max(...combined)), 30);
+
+  const fmtDate = (d) => {
+    if (typeof d === "number") { const dt = new Date(d); return `${dt.getMonth() + 1}/${dt.getDate()}`; }
+    const parts = d.split("-"); return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+  };
+
+  const disputeTs = new Date(DISPUTE_PUBLIC_DATE).getTime();
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (!active || !payload || !payload.length) return null;
+    const d = payload[0].payload;
+    return (
+      <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>
+        <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count}</div>
+        <div style={{ color: d.composite > 10 ? COLORS.mtsinai : d.composite < -10 ? COLORS.anthem : COLORS.accent, fontWeight: 700 }}>
+          Composite: {d.composite > 0 ? "+" : ""}{d.composite.toFixed(1)}
+        </div>
+        {d.channel !== null && (
+          <div style={{ color: chColor, fontWeight: 700, marginTop: 2 }}>
+            {chLabelMap[filterChannel]}: {d.channel > 0 ? "+" : ""}{d.channel.toFixed(1)}
+          </div>
+        )}
+        {d.volume > 0 && <div style={{ color: COLORS.textMuted, marginTop: 2 }}>Volume: {d.volume} entries</div>}
+      </div>
+    );
+  };
 
   return (
     <div style={{ marginTop: 16 }}>
@@ -1582,78 +1557,74 @@ function TrendChart({ entries, filterChannel }) {
           </div>
         )}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto" }}>
-        {/* Volume bars — behind everything */}
-        {volumeData.map((v, i) => {
-          if (v.vol === 0) return null;
-          const barH = (v.vol / maxVol) * barMaxH;
-          const bx = x(i) - barW / 2;
-          const by = H - PY - barH;
-          return (
-            <rect key={`vol${i}`} x={bx} y={by} width={barW} height={barH} rx={2} fill="rgba(255,255,255,0.06)" />
-          );
-        })}
-        {gridLines.map((v) => (
-          <g key={v}>
-            <line x1={PX} y1={y(v)} x2={W - PX} y2={y(v)} stroke={v === 0 ? COLORS.textMuted : COLORS.border} strokeWidth={v === 0 ? 1 : 0.5} strokeDasharray={v === 0 ? "" : "4,4"} opacity={v === 0 ? 0.6 : 0.4} />
-            <text x={PX - 6} y={y(v) + 3.5} textAnchor="end" fill={COLORS.textMuted} fontSize="9" fontFamily="'JetBrains Mono', monospace">
-              {v > 0 ? "+" : ""}{v}
-            </text>
-          </g>
-        ))}
-        <text x={PX - 6} y={PY - 8} textAnchor="end" fill={COLORS.mtsinai} fontSize="8" fontFamily="'JetBrains Mono', monospace">SINAI</text>
-        <text x={PX - 6} y={H - PY + 14} textAnchor="end" fill={COLORS.anthem} fontSize="8" fontFamily="'JetBrains Mono', monospace">ANTHEM</text>
-        {allTrend.map((t, i) => (
-          (i === 0 || i === allTrend.length - 1 || (allTrend.length > 5 && i === Math.floor(allTrend.length / 2))) ? (
-            <text key={i} x={x(i)} y={H - 2} textAnchor="middle" fill={COLORS.textMuted} fontSize="8" fontFamily="'JetBrains Mono', monospace">
-              {fmtDate(t.date)}
-            </text>
-          ) : null
-        ))}
-        {/* Dispute goes public marker */}
-        <line x1={disputeX} y1={PY} x2={disputeX} y2={H - PY} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4,3" opacity={0.7} />
-        <text x={disputeX + 4} y={PY + 4} fill="#DC298D" fontSize="7" fontFamily="'JetBrains Mono', monospace" fontWeight="700" opacity={0.8}>
-          DISPUTE PUBLIC
-        </text>
-        <text x={disputeX + 4} y={PY + 12} fill="#DC298D" fontSize="7" fontFamily="'JetBrains Mono', monospace" opacity={0.6}>
-          {fmtDate(DISPUTE_PUBLIC_DATE)}
-        </text>
-        <path d={areaAbovePath} fill={COLORS.mtsinai} opacity={isOverlay ? 0.06 : 0.12} />
-        <path d={areaBelowPath} fill={COLORS.anthem} opacity={isOverlay ? 0.06 : 0.12} />
-        <polyline points={aggLinePoints} fill="none" stroke={COLORS.accent} strokeWidth={isOverlay ? 1.5 : 2.5} strokeLinejoin="round" strokeLinecap="round" opacity={isOverlay ? 0.4 : 1} />
-        {allTrend.map((t, i) => {
-          const dotColor = t.composite > 10 ? COLORS.mtsinai : t.composite < -10 ? COLORS.anthem : COLORS.accent;
-          return (
-            <g key={i} opacity={isOverlay ? 0.3 : 1}>
-              <circle cx={x(i)} cy={y(t.composite)} r={isOverlay ? 3 : 4} fill={COLORS.bg} stroke={dotColor} strokeWidth={2} />
-              {!isOverlay && (
-                <>
-                  <text x={x(i)} y={y(t.composite) - 8} textAnchor="middle" fill={dotColor} fontSize="8" fontWeight="700" fontFamily="'JetBrains Mono', monospace">
-                    {t.composite > 0 ? "+" : ""}{t.composite.toFixed(0)}
-                  </text>
-                  <text x={x(i)} y={y(t.composite) + 12} textAnchor="middle" fill={COLORS.textMuted} fontSize="7" fontFamily="'JetBrains Mono', monospace" opacity={0.6}>
-                    n={t.count}
-                  </text>
-                </>
-              )}
-            </g>
-          );
-        })}
-        {isOverlay && chLinePoints && (
-          <polyline points={chLinePoints} fill="none" stroke={chColor} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
-        )}
-        {isOverlay && chDots.map((p, i) => (
-          <g key={`ch${i}`}>
-            <circle cx={p.x} cy={p.y} r={5} fill={COLORS.bg} stroke={chColor} strokeWidth={2.5} />
-            <text x={p.x} y={p.y - 10} textAnchor="middle" fill={chColor} fontSize="9" fontWeight="700" fontFamily="'JetBrains Mono', monospace">
-              {p.composite > 0 ? "+" : ""}{p.composite.toFixed(0)}
-            </text>
-            <text x={p.x} y={p.y + 14} textAnchor="middle" fill={COLORS.textMuted} fontSize="7" fontFamily="'JetBrains Mono', monospace" opacity={0.7}>
-              n={p.count}
-            </text>
-          </g>
-        ))}
-      </svg>
+      <ResponsiveContainer width="100%" height={180}>
+        <ComposedChart data={chartData} margin={{ top: 12, right: 12, bottom: 4, left: 4 }}>
+          <defs>
+            <linearGradient id="areaGradSinai" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={COLORS.mtsinai} stopOpacity={0.25} />
+              <stop offset="100%" stopColor={COLORS.mtsinai} stopOpacity={0.02} />
+            </linearGradient>
+            <linearGradient id="areaGradAnthem" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor={COLORS.anthem} stopOpacity={0.25} />
+              <stop offset="100%" stopColor={COLORS.anthem} stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} opacity={0.4} vertical={false} />
+          <XAxis
+            dataKey="ts"
+            type="number"
+            domain={["dataMin", "dataMax"]}
+            tickFormatter={fmtDate}
+            tick={{ fill: COLORS.textMuted, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={{ stroke: COLORS.border }}
+            tickLine={false}
+            tickCount={7}
+          />
+          <YAxis
+            domain={[-maxAbs, maxAbs]}
+            tick={{ fill: COLORS.textMuted, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}`}
+            width={36}
+          />
+          <YAxis yAxisId="vol" hide domain={[0, "auto"]} orientation="right" />
+          <Tooltip content={<CustomTooltip />} />
+          <ReferenceLine y={0} stroke={COLORS.textMuted} strokeWidth={1} opacity={0.5} />
+          <ReferenceLine x={disputeTs} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
+            <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#DC298D" fontSize={8} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={4} />
+          </ReferenceLine>
+          <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
+          <Area
+            type="monotone"
+            dataKey="composite"
+            stroke="none"
+            fill="url(#areaGradSinai)"
+            baseValue={0}
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="composite"
+            stroke={COLORS.accent}
+            strokeWidth={isOverlay ? 1.5 : 2.5}
+            dot={{ r: isOverlay ? 2 : 4, fill: COLORS.bg, stroke: COLORS.accent, strokeWidth: 2 }}
+            opacity={isOverlay ? 0.4 : 1}
+            isAnimationActive={false}
+          />
+          {isOverlay && (
+            <Line
+              type="monotone"
+              dataKey="channel"
+              stroke={chColor}
+              strokeWidth={2.5}
+              dot={{ r: 4, fill: COLORS.bg, stroke: chColor, strokeWidth: 2.5 }}
+              connectNulls
+              isAnimationActive={false}
+            />
+          )}
+        </ComposedChart>
+      </ResponsiveContainer>
     </div>
   );
 }
