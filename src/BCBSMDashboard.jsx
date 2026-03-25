@@ -1148,31 +1148,94 @@ const COLORS = {
   amber: "#FFCB05",
 };
 
+// Source credibility weights — credibility-adjusted influence on composite score
+// Tier 1 (1.5x): National record — shapes the frame for everyone else
+// Tier 2 (1.2x): Regional authority — trusted by the affected population
+// Tier 3 (1.0x): Trade/niche — credible but narrower audiences
+// Tier 4 (0.7x): Organic social — authentic sentiment signal, unvetted
+// Tier 5 (0.4x): Comment sections — lowest-effort engagement, selection bias
+// Tier 6 (0.3x): Owned/party media — propaganda, tracks effort not credibility
+// Tier 7 (1.3x): Stakeholder actions — actions > words
+const SOURCE_WEIGHTS = {
+  // Tier 1 — National record (1.5)
+  "KFF Health News": 1.5, "NPR": 1.5,
+  // Tier 2 — Regional authority (1.2)
+  "Detroit News": 1.2, "Bridge Michigan": 1.2, "Crain's Detroit Business": 1.2,
+  "Crain's Grand Rapids / Corewell Health": 1.2,
+  "WXYZ": 1.2, "WXYZ Detroit": 1.2, "CBS Detroit": 1.2,
+  "WNEM / WILX": 1.2, "Michigan Public (NPR)": 1.2, "WEMU": 1.2,
+  "WEMU (NPR affiliate)": 1.2, "Detroit Free Press (via Yahoo/AOL syndication)": 1.2,
+  "ABC12 Flint": 1.2,
+  // Tier 3 — Trade/niche (1.0)
+  "Michigan Advance": 1.0, "Michigan Daily (student newspaper)": 1.0, "Michigan Daily": 1.0,
+  "DBusiness Magazine": 1.0, "ClickOnDetroit (WDIV)": 1.0,
+  "Live Insurance News": 1.0, "Live Insurance News (industry blog/social)": 1.0,
+  "InsuranceNewsNet (syndicated from MI Advance)": 1.0,
+  "WOWO News/Talk (Indiana syndication)": 1.0,
+  "Ann Arbor Today (nationaltoday.com)": 1.0,
+  "Blue Water Healthy Living (syndicated from Free Press/Yahoo)": 1.0,
+  // Tier 4 — Organic social (0.7)
+  "Threads (@michellewhisks)": 0.7, "Threads (various replies)": 0.7,
+  "Threads (dissenting view)": 0.7, "Threads (patient panicking)": 0.7,
+  "Threads (BCBS coverage denial anecdote)": 0.7, "Threads (BCBS strategy callout)": 0.7,
+  "Threads (Corewell/UHC comparison)": 0.7, "Threads (single-payer advocacy cluster)": 0.7,
+  "Threads (CEO pay / nonprofit criticism)": 0.7, "Threads (dismissive/optimistic take)": 0.7,
+  "Threads (Trinity Health user)": 0.7, "Threads (open enrollment frustration)": 0.7,
+  "Reddit r/AnnArbor (referenced in Threads)": 0.7,
+  "Social media (MM #KeepMichiganMedicine campaign)": 0.7,
+  // Tier 5 — Comment sections (0.4)
+  "News article comments (Michigan Advance)": 0.4,
+  "News article comments (ClickOnDetroit/WDIV)": 0.4,
+  // Tier 6 — Owned/party media (0.3)
+  "BCBSM (mibluedaily.com)": 0.3, "Michigan Medicine (Facebook official)": 0.3,
+  "BCBS Financial Results (via Detroit News)": 0.3,
+  "BCBS Financial Results (via Crain's Detroit / Detroit News)": 0.3,
+  "BCBS corporate comms (employer outreach)": 0.3, "BCBS CEO Tricia Keith (via Crain's interview)": 0.3,
+  "MM CEO David Miller (via Crain's interview)": 0.3, "UM HR Department": 0.3,
+  "Mount Sinai newsroom": 0.3,
+  // Tier 7 — Stakeholder actions (1.3)
+  "UM Board of Regents / Interim President Grasso": 1.3,
+  "MSMS (MI State Medical Society)": 1.3, "MSMS (Michigan State Medical Society)": 1.3,
+  "MI Dept of Insurance (DIFS)": 1.3, "DMC / Tenet Healthcare": 1.3,
+  "Corewell Health (via Crain's)": 1.3, "Henry Ford Health (via Crain's)": 1.3,
+  "Henry Ford Health / BCBS (via Crain's Detroit)": 1.3,
+  "Henry Ford Health / BCBSM (joint announcement)": 1.3,
+  "Corewell/UHC parallel (Bridge Michigan context)": 1.3,
+  "MSU Healthcare Expert Greg Gulick": 1.3, "Independent Analyst Allan Baumgarten": 1.3,
+  "Healthcare policy expert Charles Gaba (via Michigan Advance)": 1.3,
+  "Trinity Health / Humana": 1.3,
+};
+const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
+function getWeight(entry) {
+  return SOURCE_WEIGHTS[entry.source] ?? SOURCE_TYPE_WEIGHTS[entry.sourceType] ?? 1.0;
+}
+
 function computeScores(entries) {
-  const total = entries.length || 1;
+  const totalW = entries.reduce((s, e) => s + getWeight(e), 0) || 1;
   const mediaEntries = entries.filter((e) => e.channel === "media");
   const socialEntries = entries.filter((e) => e.channel === "social");
   const stakeholderEntries = entries.filter((e) => e.channel === "stakeholder");
 
-  const frameMM = entries.filter((e) => e.frameAdoption === "mm").length;
-  const frameBCBS = entries.filter((e) => e.frameAdoption === "bcbs").length;
-  const frameScore = ((frameMM - frameBCBS) / total) * 100;
+  const frameMM = entries.filter((e) => e.frameAdoption === "mm").reduce((s, e) => s + getWeight(e), 0);
+  const frameBCBS = entries.filter((e) => e.frameAdoption === "bcbs").reduce((s, e) => s + getWeight(e), 0);
+  const frameScore = ((frameMM - frameBCBS) / totalW) * 100;
 
-  const sentNegBCBS = entries.filter((e) => e.sentiment === "negative_bcbs" || e.sentiment === "positive_mm").length;
-  const sentNegMM = entries.filter((e) => e.sentiment === "negative_mm" || e.sentiment === "positive_bcbs").length;
-  const sentScore = ((sentNegBCBS - sentNegMM) / total) * 100;
+  const sentNegBCBS = entries.filter((e) => e.sentiment === "negative_bcbs" || e.sentiment === "positive_mm").reduce((s, e) => s + getWeight(e), 0);
+  const sentNegMM = entries.filter((e) => e.sentiment === "negative_mm" || e.sentiment === "positive_bcbs").reduce((s, e) => s + getWeight(e), 0);
+  const sentScore = ((sentNegBCBS - sentNegMM) / totalW) * 100;
 
-  const blameBCBS = entries.filter((e) => e.blameDirection === "bcbs").length;
-  const blameMM = entries.filter((e) => e.blameDirection === "mm").length;
-  const blameScore = ((blameBCBS - blameMM) / total) * 100;
+  const blameBCBS = entries.filter((e) => e.blameDirection === "bcbs").reduce((s, e) => s + getWeight(e), 0);
+  const blameMM = entries.filter((e) => e.blameDirection === "mm").reduce((s, e) => s + getWeight(e), 0);
+  const blameScore = ((blameBCBS - blameMM) / totalW) * 100;
 
-  const patientStories = entries.filter((e) => e.patientStory).length;
-  const patientScore = (patientStories / total) * 100;
+  const patientW = entries.filter((e) => e.patientStory).reduce((s, e) => s + getWeight(e), 0);
+  const patientScore = (patientW / totalW) * 100;
 
   const composite = frameScore * 0.3 + sentScore * 0.3 + blameScore * 0.25 + patientScore * 0.15;
 
   return {
-    total,
+    total: entries.length,
+    totalWeighted: totalW,
     mediaCount: mediaEntries.length,
     socialCount: socialEntries.length,
     stakeholderCount: stakeholderEntries.length,
@@ -1181,16 +1244,16 @@ function computeScores(entries) {
     blameScore,
     patientScore,
     composite,
-    frameMM,
-    frameBCBS,
+    frameMM: entries.filter((e) => e.frameAdoption === "mm").length,
+    frameBCBS: entries.filter((e) => e.frameAdoption === "bcbs").length,
     frameBalanced: entries.filter((e) => e.frameAdoption === "balanced").length,
-    sentNegBCBS,
-    sentNegMM,
+    sentNegBCBS: entries.filter((e) => e.sentiment === "negative_bcbs" || e.sentiment === "positive_mm").length,
+    sentNegMM: entries.filter((e) => e.sentiment === "negative_mm" || e.sentiment === "positive_bcbs").length,
     sentNeutral: entries.filter((e) => e.sentiment === "neutral").length,
-    blameBCBS,
-    blameMM,
+    blameBCBS: entries.filter((e) => e.blameDirection === "bcbs").length,
+    blameMM: entries.filter((e) => e.blameDirection === "mm").length,
     blameBoth: entries.filter((e) => e.blameDirection === "both").length,
-    patientStories,
+    patientStories: entries.filter((e) => e.patientStory).length,
   };
 }
 

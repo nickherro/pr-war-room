@@ -1372,31 +1372,92 @@ const COLORS = {
   amber: "#06ABEB",
 };
 
+// Source credibility weights — credibility-adjusted influence on composite score
+// Tier 1 (1.5x): National record — shapes the frame for everyone else
+// Tier 2 (1.2x): Regional authority — trusted by the affected population
+// Tier 3 (1.0x): Trade/niche — credible but narrower audiences
+// Tier 4 (0.7x): Organic social — authentic sentiment signal, unvetted
+// Tier 5 (0.4x): Comment sections — lowest-effort engagement, selection bias
+// Tier 6 (0.3x): Owned/party media — propaganda, tracks effort not credibility
+// Tier 7 (1.3x): Stakeholder actions — actions > words
+const SOURCE_WEIGHTS = {
+  // Tier 1 — National record (1.5)
+  "NBC News": 1.5, "NBC News (national)": 1.5, "KFF Health News": 1.5,
+  // Tier 2 — Regional authority (1.2)
+  "CBS New York": 1.2, "Gothamist / WNYC": 1.2, "Gothamist/WNYC": 1.2, "PIX11": 1.2,
+  "News 12 Long Island": 1.2, "News 12 Bronx": 1.2,
+  "Crain's New York Business": 1.2, "NY Post": 1.2,
+  // Tier 3 — Trade/niche (1.0)
+  "Healthcare Dive": 1.0, "MedCity News": 1.0, "Becker's Hospital Review": 1.0,
+  "Becker's Hospital Review / Payer Issues": 1.0, "Becker's Payer Issues": 1.0,
+  "HR Brew": 1.0, "LI Herald": 1.0, "LI Herald (liherald.com)": 1.0,
+  "El Diario NY": 1.0, "NYC Today": 1.0, "NYC Today (nationaltoday.com)": 1.0,
+  "New York Today (nationaltoday.com)": 1.0,
+  "Manila Times (syndicated via GlobeNewswire)": 1.0,
+  // Tier 4 — Organic social (0.7)
+  "TikTok (@massiellugo)": 0.7, "YouTube / CBS share": 0.7,
+  "Reddit r/nyc": 0.7, "LinkedIn (Leslie Schlachter, PA-C)": 0.7,
+  "Social media (patient switching intent)": 0.7, "Social media (anti-insurer meta-narrative)": 0.7,
+  "Facebook groups (NYC healthcare)": 0.7, "Mt Sinai employee social posts": 0.7,
+  "Medicare patient forum": 0.7, "HR professional community (LinkedIn/forums)": 0.7,
+  "News 12 Long Island (Facebook)": 0.7,
+  // Tier 5 — Comment sections (0.4)
+  "CBS News comment section": 0.4, "Gothamist comment section": 0.4,
+  "PIX11 comment section": 0.4, "Yahoo News comment section": 0.4,
+  // Tier 6 — Owned/party media (0.3)
+  "keepmountsinai.org": 0.3, "keepmountsinai.org (social share)": 0.3,
+  "choosemountsinai.org": 0.3, "choosemountsinai.org / The Vitals podcast": 0.3,
+  "Mount Sinai newsroom": 0.3,
+  "anthem.com/update/mountsinai": 0.3, "anthem.com — Myths vs Facts": 0.3, "Anthem": 0.3,
+  "Mt Sinai official (Facebook)": 0.3, "Mt Sinai official (Instagram)": 0.3,
+  "Mt Sinai official (X/Twitter)": 0.3, "Mt Sinai official (LinkedIn)": 0.3,
+  // Tier 7 — Stakeholder actions (1.3)
+  "32BJ SEIU": 1.3, "Gov. Kathy Hochul": 1.3,
+  "Elisabeth Benjamin / Community Service Society": 1.3,
+  "Jason Buxbaum / Brown University": 1.3,
+  "Caroline Pearson / Peterson Health Technology Institute": 1.3,
+  "UN Health & Life Insurance Section": 1.3, "Hotel Trades Council": 1.3,
+  "Molina Healthcare / Mt Sinai": 1.3, "NYC hospital competitors": 1.3,
+  "Anthem physician direct-contracting": 1.3, "NY State DFS (silence)": 1.3,
+  "UHC/Oxford precedent (2024)": 1.3, "Writers Guild of America East (WGAE)": 1.3,
+  "NY State Dept of Civil Service": 1.3,
+  "American Hospital Association": 1.3, "AANS / ACOI / Multiple Physician Orgs": 1.3,
+  "UnitedHealthcare / NewYork-Presbyterian": 1.3, "UHC / Memorial Sloan Kettering": 1.3,
+  "Memorial Hermann / BCBS Texas": 1.3, "Northwell Health / 32BJ": 1.3,
+  "NewYork-Presbyterian / UnitedHealthcare parallel": 1.3,
+};
+// Fallback by sourceType
+const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
+function getWeight(entry) {
+  return SOURCE_WEIGHTS[entry.source] ?? SOURCE_TYPE_WEIGHTS[entry.sourceType] ?? 1.0;
+}
+
 function computeScores(entries) {
-  const total = entries.length || 1;
+  const totalW = entries.reduce((s, e) => s + getWeight(e), 0) || 1;
   const mediaEntries = entries.filter((e) => e.channel === "media");
   const socialEntries = entries.filter((e) => e.channel === "social");
   const stakeholderEntries = entries.filter((e) => e.channel === "stakeholder");
 
-  const frameMtSinai = entries.filter((e) => e.frameAdoption === "mtsinai").length;
-  const frameAnthem = entries.filter((e) => e.frameAdoption === "anthem").length;
-  const frameScore = ((frameMtSinai - frameAnthem) / total) * 100;
+  const frameMtSinai = entries.filter((e) => e.frameAdoption === "mtsinai").reduce((s, e) => s + getWeight(e), 0);
+  const frameAnthem = entries.filter((e) => e.frameAdoption === "anthem").reduce((s, e) => s + getWeight(e), 0);
+  const frameScore = ((frameMtSinai - frameAnthem) / totalW) * 100;
 
-  const sentNegAnthem = entries.filter((e) => e.sentiment === "negative_anthem" || e.sentiment === "positive_mtsinai").length;
-  const sentNegMtSinai = entries.filter((e) => e.sentiment === "negative_mtsinai" || e.sentiment === "positive_anthem").length;
-  const sentScore = ((sentNegAnthem - sentNegMtSinai) / total) * 100;
+  const sentNegAnthem = entries.filter((e) => e.sentiment === "negative_anthem" || e.sentiment === "positive_mtsinai").reduce((s, e) => s + getWeight(e), 0);
+  const sentNegMtSinai = entries.filter((e) => e.sentiment === "negative_mtsinai" || e.sentiment === "positive_anthem").reduce((s, e) => s + getWeight(e), 0);
+  const sentScore = ((sentNegAnthem - sentNegMtSinai) / totalW) * 100;
 
-  const blameAnthem = entries.filter((e) => e.blameDirection === "anthem").length;
-  const blameMtSinai = entries.filter((e) => e.blameDirection === "mtsinai").length;
-  const blameScore = ((blameAnthem - blameMtSinai) / total) * 100;
+  const blameAnthem = entries.filter((e) => e.blameDirection === "anthem").reduce((s, e) => s + getWeight(e), 0);
+  const blameMtSinai = entries.filter((e) => e.blameDirection === "mtsinai").reduce((s, e) => s + getWeight(e), 0);
+  const blameScore = ((blameAnthem - blameMtSinai) / totalW) * 100;
 
-  const patientStories = entries.filter((e) => e.patientStory).length;
-  const patientScore = (patientStories / total) * 100;
+  const patientW = entries.filter((e) => e.patientStory).reduce((s, e) => s + getWeight(e), 0);
+  const patientScore = (patientW / totalW) * 100;
 
   const composite = frameScore * 0.3 + sentScore * 0.3 + blameScore * 0.25 + patientScore * 0.15;
 
   return {
-    total,
+    total: entries.length,
+    totalWeighted: totalW,
     mediaCount: mediaEntries.length,
     socialCount: socialEntries.length,
     stakeholderCount: stakeholderEntries.length,
@@ -1405,16 +1466,16 @@ function computeScores(entries) {
     blameScore,
     patientScore,
     composite,
-    frameMtSinai,
-    frameAnthem,
+    frameMtSinai: entries.filter((e) => e.frameAdoption === "mtsinai").length,
+    frameAnthem: entries.filter((e) => e.frameAdoption === "anthem").length,
     frameBalanced: entries.filter((e) => e.frameAdoption === "balanced").length,
-    sentNegAnthem,
-    sentNegMtSinai,
+    sentNegAnthem: entries.filter((e) => e.sentiment === "negative_anthem" || e.sentiment === "positive_mtsinai").length,
+    sentNegMtSinai: entries.filter((e) => e.sentiment === "negative_mtsinai" || e.sentiment === "positive_anthem").length,
     sentNeutral: entries.filter((e) => e.sentiment === "neutral").length,
-    blameAnthem,
-    blameMtSinai,
+    blameAnthem: entries.filter((e) => e.blameDirection === "anthem").length,
+    blameMtSinai: entries.filter((e) => e.blameDirection === "mtsinai").length,
     blameBoth: entries.filter((e) => e.blameDirection === "both").length,
-    patientStories,
+    patientStories: entries.filter((e) => e.patientStory).length,
   };
 }
 
