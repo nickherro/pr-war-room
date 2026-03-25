@@ -1483,21 +1483,26 @@ function TrendChart({ entries, filterChannel }) {
     return computeTrend(channelEntries);
   }, [entries, filterChannel]);
 
-  // Merge allTrend and channelTrend into one dataset keyed by date
   const chartData = useMemo(() => {
     const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
     const volMap = {};
     source.forEach((e) => { volMap[e.date] = (volMap[e.date] || 0) + 1; });
     const chMap = {};
     if (channelTrend) channelTrend.forEach((ct) => { chMap[ct.date] = ct.composite; });
-    return allTrend.map((t) => ({
-      date: t.date,
-      ts: new Date(t.date).getTime(),
-      composite: t.composite,
-      count: t.count,
-      volume: volMap[t.date] || 0,
-      channel: chMap[t.date] ?? null,
-    }));
+    return allTrend.map((t) => {
+      const parts = t.date.split("-");
+      const label = `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+      const phase = t.date < DISPUTE_PUBLIC_DATE ? "pre" : "post";
+      return {
+        date: t.date,
+        label,
+        phase,
+        composite: t.composite,
+        count: t.count,
+        volume: volMap[t.date] || 0,
+        channel: chMap[t.date] ?? null,
+      };
+    });
   }, [allTrend, channelTrend, entries, filterChannel]);
 
   if (chartData.length < 2) return null;
@@ -1512,19 +1517,34 @@ function TrendChart({ entries, filterChannel }) {
   const combined = [...allVals, ...chVals];
   const maxAbs = Math.max(Math.abs(Math.min(...combined)), Math.abs(Math.max(...combined)), 30);
 
-  const fmtDate = (d) => {
-    if (typeof d === "number") { const dt = new Date(d); return `${dt.getMonth() + 1}/${dt.getDate()}`; }
-    const parts = d.split("-"); return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
-  };
+  // Find the last pre-public date for the reference line
+  const lastPreDate = chartData.filter((d) => d.phase === "pre").slice(-1)[0]?.date;
+  const firstPostDate = chartData.find((d) => d.phase === "post")?.date;
+  const preCount = chartData.filter((d) => d.phase === "pre").length;
+  const postCount = chartData.filter((d) => d.phase === "post").length;
 
-  const disputeTs = new Date(DISPUTE_PUBLIC_DATE).getTime();
+  // Custom dot with score label
+  const ScoreDot = ({ cx, cy, payload, dataKey, color }) => {
+    if (cx == null || cy == null) return null;
+    const val = payload[dataKey];
+    if (val == null) return null;
+    const dotColor = dataKey === "channel" ? color : (val > 10 ? COLORS.mtsinai : val < -10 ? COLORS.anthem : COLORS.accent);
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={4} fill={COLORS.bg} stroke={dotColor} strokeWidth={2} />
+        <text x={cx} y={cy - 10} textAnchor="middle" fill={dotColor} fontSize="8" fontWeight="700" fontFamily="'JetBrains Mono', monospace">
+          {val > 0 ? "+" : ""}{val.toFixed(0)}
+        </text>
+      </g>
+    );
+  };
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     const d = payload[0].payload;
     return (
       <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>
-        <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count}</div>
+        <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count} {d.phase === "pre" ? "· PRE-PUBLIC" : ""}</div>
         <div style={{ color: d.composite > 10 ? COLORS.mtsinai : d.composite < -10 ? COLORS.anthem : COLORS.accent, fontWeight: 700 }}>
           Composite: {d.composite > 0 ? "+" : ""}{d.composite.toFixed(1)}
         </div>
@@ -1538,47 +1558,58 @@ function TrendChart({ entries, filterChannel }) {
     );
   };
 
+  // Custom x-axis tick that dims pre-public dates
+  const CustomTick = ({ x, y, payload }) => {
+    const d = chartData.find((p) => p.date === payload.value);
+    const isPre = d && d.phase === "pre";
+    return (
+      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(255,255,255,0.2)" : COLORS.textMuted} fontSize={9} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
+        {d ? d.label : ""}
+      </text>
+    );
+  };
+
   return (
     <div style={{ marginTop: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <div style={{ fontSize: 10, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
           NARRATIVE MOMENTUM — CUMULATIVE COMPOSITE OVER TIME
         </div>
-        {isOverlay && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ width: 16, height: 2, background: COLORS.accent, display: "inline-block", borderRadius: 1 }} />
-              <span style={{ color: COLORS.textMuted }}>ALL</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}>
+          {preCount > 0 && (
+            <span style={{ color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>
+              {preCount} pre-public
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ width: 16, height: 3, background: chColor, display: "inline-block", borderRadius: 1 }} />
-              <span style={{ color: chColor, fontWeight: 700 }}>{chLabelMap[filterChannel]}</span>
-            </span>
-          </div>
-        )}
+          )}
+          {isOverlay && (
+            <>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 16, height: 2, background: COLORS.accent, display: "inline-block", borderRadius: 1 }} />
+                <span style={{ color: COLORS.textMuted }}>ALL</span>
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 16, height: 3, background: chColor, display: "inline-block", borderRadius: 1 }} />
+                <span style={{ color: chColor, fontWeight: 700 }}>{chLabelMap[filterChannel]}</span>
+              </span>
+            </>
+          )}
+        </div>
       </div>
-      <ResponsiveContainer width="100%" height={180}>
-        <ComposedChart data={chartData} margin={{ top: 12, right: 12, bottom: 4, left: 4 }}>
+      <ResponsiveContainer width="100%" height={200}>
+        <ComposedChart data={chartData} margin={{ top: 20, right: 12, bottom: 4, left: 4 }}>
           <defs>
             <linearGradient id="areaGradSinai" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={COLORS.mtsinai} stopOpacity={0.25} />
               <stop offset="100%" stopColor={COLORS.mtsinai} stopOpacity={0.02} />
             </linearGradient>
-            <linearGradient id="areaGradAnthem" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stopColor={COLORS.anthem} stopOpacity={0.25} />
-              <stop offset="100%" stopColor={COLORS.anthem} stopOpacity={0.02} />
-            </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} opacity={0.4} vertical={false} />
           <XAxis
-            dataKey="ts"
-            type="number"
-            domain={["dataMin", "dataMax"]}
-            tickFormatter={fmtDate}
-            tick={{ fill: COLORS.textMuted, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+            dataKey="date"
+            tick={<CustomTick />}
             axisLine={{ stroke: COLORS.border }}
             tickLine={false}
-            tickCount={7}
+            interval={chartData.length > 15 ? Math.floor(chartData.length / 8) : 0}
           />
           <YAxis
             domain={[-maxAbs, maxAbs]}
@@ -1591,9 +1622,11 @@ function TrendChart({ entries, filterChannel }) {
           <YAxis yAxisId="vol" hide domain={[0, "auto"]} orientation="right" />
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine y={0} stroke={COLORS.textMuted} strokeWidth={1} opacity={0.5} />
-          <ReferenceLine x={disputeTs} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
-            <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#DC298D" fontSize={8} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={4} />
-          </ReferenceLine>
+          {lastPreDate && firstPostDate && (
+            <ReferenceLine x={firstPostDate} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
+              <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#DC298D" fontSize={8} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
+            </ReferenceLine>
+          )}
           <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
           <Area
             type="monotone"
@@ -1608,7 +1641,7 @@ function TrendChart({ entries, filterChannel }) {
             dataKey="composite"
             stroke={COLORS.accent}
             strokeWidth={isOverlay ? 1.5 : 2.5}
-            dot={{ r: isOverlay ? 2 : 4, fill: COLORS.bg, stroke: COLORS.accent, strokeWidth: 2 }}
+            dot={isOverlay ? { r: 2, fill: COLORS.bg, stroke: COLORS.accent, strokeWidth: 2 } : (props) => <ScoreDot {...props} dataKey="composite" />}
             opacity={isOverlay ? 0.4 : 1}
             isAnimationActive={false}
           />
@@ -1618,7 +1651,7 @@ function TrendChart({ entries, filterChannel }) {
               dataKey="channel"
               stroke={chColor}
               strokeWidth={2.5}
-              dot={{ r: 4, fill: COLORS.bg, stroke: chColor, strokeWidth: 2.5 }}
+              dot={(props) => <ScoreDot {...props} dataKey="channel" color={chColor} />}
               connectNulls
               isAnimationActive={false}
             />
