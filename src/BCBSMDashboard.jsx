@@ -1248,7 +1248,7 @@ function computeTrend(entries) {
 }
 
 const MONITOR_START = "2026-01-01";
-const DISPUTE_PUBLIC_DATE = "2026-02-20";
+const DISPUTE_PUBLIC_DATE = "2026-03-03";
 
 function TrendChart({ entries, filterChannel }) {
   const allTrend = useMemo(() => computeTrend(entries), [entries]);
