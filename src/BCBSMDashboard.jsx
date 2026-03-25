@@ -1461,6 +1461,187 @@ function TrendChart({ entries, filterChannel }) {
   );
 }
 
+function ExecutiveSummary({ entries, filterChannel, scores }) {
+  const channelScores = useMemo(() => {
+    const ch = {};
+    ["media", "social", "stakeholder"].forEach((c) => {
+      const ce = entries.filter((e) => e.channel === c);
+      ch[c] = ce.length >= 2 ? computeScores(ce) : null;
+    });
+    return ch;
+  }, [entries]);
+
+  const momentum = useMemo(() => {
+    const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+    const mid = Math.floor(sorted.length / 2);
+    if (mid < 3) return null;
+    const early = computeScores(sorted.slice(0, mid));
+    const late = computeScores(sorted.slice(mid));
+    return { early: early.composite, late: late.composite, shift: late.composite - early.composite };
+  }, [entries]);
+
+  const topPatientStories = useMemo(() => {
+    return entries
+      .filter((e) => e.patientStory && getWeight(e) >= 1.0)
+      .sort((a, b) => getWeight(b) - getWeight(a))
+      .slice(0, 3);
+  }, [entries]);
+
+  const divergences = useMemo(() => {
+    const results = [];
+    ["media", "social", "stakeholder"].forEach((c) => {
+      const cs = channelScores[c];
+      if (!cs) return;
+      const diff = cs.composite - scores.composite;
+      if (Math.abs(diff) > 8) {
+        const label = c.charAt(0).toUpperCase() + c.slice(1);
+        const dir = diff > 0 ? "more favorable to Michigan Medicine" : "more favorable to BCBSM";
+        results.push({ channel: label, diff, dir, score: cs.composite });
+      }
+    });
+    return results;
+  }, [channelScores, scores]);
+
+  const keyMessages = useMemo(() => {
+    const msgs = [];
+    const mmFrame = entries.filter((e) => e.frameAdoption === "mm");
+    const bcbsFrame = entries.filter((e) => e.frameAdoption === "bcbs");
+    const mmW = mmFrame.reduce((s, e) => s + getWeight(e), 0);
+    const bcbsW = bcbsFrame.reduce((s, e) => s + getWeight(e), 0);
+    if (mmW > bcbsW * 1.3) msgs.push("Michigan Medicine's narrative frame leads across credible sources, but the gap is narrower than in NYC");
+    const patientEntries = entries.filter((e) => e.patientStory);
+    const patientMM = patientEntries.filter((e) => e.blameDirection === "bcbs").length;
+    const patientBCBS = patientEntries.filter((e) => e.blameDirection === "mm").length;
+    if (patientMM > patientBCBS) msgs.push(`Patient stories skew pro-MM (${patientMM} blame BCBS vs ${patientBCBS} blame MM) — children's hospital cases are most impactful`);
+    const stakeholder = entries.filter((e) => e.channel === "stakeholder");
+    const proBCBS = stakeholder.filter((e) => e.frameAdoption === "bcbs" || e.blameDirection === "mm").length;
+    if (proBCBS >= 3) msgs.push("BCBS has meaningful stakeholder support — HFH and Corewell deals create 2-vs-1 pressure on MM");
+    return msgs;
+  }, [entries]);
+
+  const fmtScore = (v) => `${v > 0 ? "+" : ""}${v.toFixed(0)}`;
+  const S = { section: { marginBottom: 12 }, label: { fontSize: 9, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6, fontWeight: 700 }, body: { fontSize: 13, color: COLORS.text, lineHeight: 1.7 }, bullet: { fontSize: 12, color: COLORS.text, lineHeight: 1.8, margin: 0, paddingLeft: 16 }, accent: { color: COLORS.amber, fontWeight: 600 }, warn: { color: "#2F65A7", fontWeight: 600 }, muted: { color: COLORS.textMuted, fontSize: 11 } };
+
+  if (filterChannel !== "all") {
+    const cs = channelScores[filterChannel];
+    if (!cs) return null;
+    const label = filterChannel.charAt(0).toUpperCase() + filterChannel.slice(1);
+    const allScores = computeScores(entries);
+    const diff = cs.composite - allScores.composite;
+    const diffDir = diff > 5 ? "stronger for Michigan Medicine" : diff < -5 ? "stronger for BCBSM" : "roughly aligned with";
+
+    const channelEntries = entries.filter((e) => e.channel === filterChannel);
+    const topSources = {};
+    channelEntries.forEach((e) => { topSources[e.source] = (topSources[e.source] || 0) + getWeight(e); });
+    const sortedSources = Object.entries(topSources).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    const takeaways = [];
+    if (filterChannel === "media") {
+      const tier1_2 = channelEntries.filter((e) => getWeight(e) >= 1.2);
+      const tier1_2MM = tier1_2.filter((e) => e.frameAdoption === "mm").length;
+      const tier1_2BCBS = tier1_2.filter((e) => e.frameAdoption === "bcbs").length;
+      const tier1_2Bal = tier1_2.filter((e) => e.frameAdoption === "balanced").length;
+      takeaways.push(`Of ${tier1_2.length} high-credibility media entries (Tier 1–2), ${tier1_2MM} adopt MM's frame, ${tier1_2BCBS} adopt BCBS's frame, and ${tier1_2Bal} are balanced.`);
+      takeaways.push("Crain's Detroit is the most influential single outlet — business audience shapes employer perception of both parties.");
+      takeaways.push("Grasso's Regents speech (Detroit News) escalated the rhetoric to institutional level — university president publicly accused BCBS of lying.");
+      const patientMedia = channelEntries.filter((e) => e.patientStory);
+      if (patientMedia.length > 0) takeaways.push(`${patientMedia.length} media entries feature patient stories — Mott Children's Hospital cases are most emotionally resonant.`);
+    } else if (filterChannel === "social") {
+      const organic = channelEntries.filter((e) => getWeight(e) >= 0.7 && getWeight(e) < 1.0);
+      const comments = channelEntries.filter((e) => getWeight(e) < 0.5);
+      takeaways.push(`${organic.length} organic social posts (0.7x weight), ${comments.length} comment section entries (0.4x weight).`);
+      takeaways.push("Threads is the dominant social platform for this dispute — @michellewhisks viral post (75+ likes, 60+ replies) set the tone.");
+      takeaways.push("CEO compensation ($6.9M) and nonprofit status criticism are the most viral social angles — emotional, shareable, hard for BCBS to rebut.");
+      if (cs.blameScore > 20) takeaways.push("Social blame direction is strongly anti-BCBS, but single-payer advocacy threads dilute the pro-MM signal.");
+    } else if (filterChannel === "stakeholder") {
+      const actions = channelEntries.filter((e) => getWeight(e) >= 1.3);
+      takeaways.push(`${actions.length} stakeholder entries at 1.3x weight — this is where BCBS has its strongest counter-narrative.`);
+      const proBCBS = channelEntries.filter((e) => e.blameDirection === "mm" || e.frameAdoption === "bcbs");
+      const proMM = channelEntries.filter((e) => e.blameDirection === "bcbs" || e.frameAdoption === "mm");
+      takeaways.push(`Henry Ford + Corewell value-based deals create "2-vs-1" pressure — MM is the holdout among the Big 3.`);
+      takeaways.push("DIFS (state insurance regulator) has declined to intervene — no regulatory pressure on either side. Governor Whitmer is silent.");
+      takeaways.push("Unlike the NYC dispute, no stakeholder has bypassed BCBS to validate MM's pricing directly (no 32BJ equivalent).");
+    }
+
+    return (
+      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
+        <div style={S.label}>EXECUTIVE BRIEF — {label.toUpperCase()} CHANNEL</div>
+        <div style={S.body}>
+          <span style={S.accent}>{label} composite: {fmtScore(cs.composite)}</span> — {diffDir} the overall score ({fmtScore(allScores.composite)}).
+          {channelEntries.length} entries tracked in this channel.
+        </div>
+        <div style={{ ...S.label, marginTop: 14 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
+        </ul>
+        <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
+        </ul>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
+      <div style={S.label}>EXECUTIVE SUMMARY</div>
+      <div style={{ ...S.body, marginBottom: 14 }}>
+        <span style={S.accent}>Michigan Medicine holds a narrative advantage</span> with a credibility-weighted composite of <strong>{fmtScore(scores.composite)}</strong>, though the margin is tighter than in comparable disputes.
+        {momentum && momentum.shift > 5 && <> Momentum is <span style={S.accent}>building for MM</span> — recent coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in earlier coverage.</>}
+        {momentum && momentum.shift < -5 && <> Momentum is <span style={S.warn}>shifting toward BCBS</span> — recent coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} earlier.</>}
+        {momentum && Math.abs(momentum.shift) <= 5 && <> Momentum is <strong>holding steady</strong> — no significant shift between early and recent coverage.</>}
+        {" "}The June 30 deadline is 97 days away — expect coverage intensity to accelerate sharply in May.
+      </div>
+
+      {divergences.length > 0 && (
+        <div style={S.section}>
+          <div style={S.label}>CHANNEL DIVERGENCES</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            {divergences.map((d) => (
+              <li key={d.channel} style={{ marginBottom: 2 }}>
+                ▸ <strong>{d.channel}</strong> ({fmtScore(d.score)}) is {d.dir} than the overall composite — {
+                  d.diff > 0 ? "amplifying MM's advantage" : "partially offsetting it"
+                }.
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div style={S.section}>
+        <div style={S.label}>KEY MESSAGES RESONATING</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+          <li style={{ marginBottom: 2 }}>▸ "Only academic medical center in Michigan" is the stickiest message — creates urgency around specialized care that can't be found elsewhere.</li>
+          <li style={{ marginBottom: 2 }}>▸ BCBS CEO compensation ($6.9M) paired with $246M loss is the most viral counter-frame — undercuts BCBS's affordability argument.</li>
+          <li style={{ marginBottom: 2 }}>▸ "44% increase" has traction with employers even though MM disputes it — BCBS is winning the employer audience more than the patient audience.</li>
+          {topPatientStories.length > 0 && (
+            <li style={{ marginBottom: 2 }}>▸ Top patient stories: {topPatientStories.map((e) => e.headline.split("—")[0].trim()).join("; ")}.</li>
+          )}
+        </ul>
+      </div>
+
+      <div style={S.section}>
+        <div style={S.label}>MARCOMM CONSIDERATIONS</div>
+        <ul style={{ ...S.bullet, listStyle: "none" }}>
+          <li style={{ marginBottom: 2 }}>▸ <strong>The "Big 3" dynamic is the core challenge.</strong> Henry Ford and Corewell signed value-based deals — MM is the holdout. BCBS can credibly say "two out of three agreed." MM needs to differentiate why academic medicine requires different terms.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>Children's hospital stories are the most powerful weapon.</strong> Mott Children's Hospital cases (Crohn's, cerebral palsy, developmental disability) generate intense sympathy. Prioritize these in earned media.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>Employer audience is the swing constituency.</strong> 60% of BCBS members are self-insured employer plans. BCBS's "lock out" framing to employers is creating counter-pressure. MM needs employer allies.</li>
+          <li style={{ marginBottom: 2 }}>▸ <strong>BCBS financial losses are genuine.</strong> $1.03B (2024) + $246M (2025) + $1.1B GLP-1 costs. This is not a fabricated hardship narrative — but CEO compensation undercuts the sympathy.</li>
+          {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
+            <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
+              channelScores.social.composite > channelScores.media.composite
+                ? "grassroots anger is running hotter than press coverage reflects. Organic sentiment may be outpacing the earned media narrative."
+                : "media coverage is more favorable than organic conversation. Earned media wins may not be translating to public perception."
+            }</li>
+          )}
+          <li style={{ marginBottom: 2 }}>▸ <strong>Timeline is the wildcard.</strong> As June 30 approaches, patient anxiety stories will accelerate. Prepare for a surge of "my child's care is at risk" coverage in late May / early June.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function ScoreGauge({ value, label, subtext }) {
   const clamped = Math.max(-100, Math.min(100, value));
   const pct = ((clamped + 100) / 200) * 100;
@@ -1856,6 +2037,8 @@ export default function PRWarRoom() {
           </button>
         ))}
       </div>
+
+      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} />
 
       {/* Gauges + Distributions */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
