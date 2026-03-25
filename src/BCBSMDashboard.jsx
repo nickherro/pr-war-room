@@ -1192,7 +1192,6 @@ const SOURCE_WEIGHTS = {
   "BCBS Financial Results (via Crain's Detroit / Detroit News)": 0.3,
   "BCBS corporate comms (employer outreach)": 0.3, "BCBS CEO Tricia Keith (via Crain's interview)": 0.3,
   "MM CEO David Miller (via Crain's interview)": 0.3, "UM HR Department": 0.3,
-  "Mount Sinai newsroom": 0.3,
   // Tier 7 — Stakeholder actions (1.3)
   "UM Board of Regents / Interim President Grasso": 1.3,
   "MSMS (MI State Medical Society)": 1.3, "MSMS (Michigan State Medical Society)": 1.3,
@@ -1508,7 +1507,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
     const bcbsFrame = entries.filter((e) => e.frameAdoption === "bcbs");
     const mmW = mmFrame.reduce((s, e) => s + getWeight(e), 0);
     const bcbsW = bcbsFrame.reduce((s, e) => s + getWeight(e), 0);
-    if (mmW > bcbsW * 1.3) msgs.push("Michigan Medicine's narrative frame leads across credible sources, but the gap is narrower than in NYC");
+    if (mmW > bcbsW * 1.3) msgs.push("Michigan Medicine's narrative frame leads across credible sources");
     const patientEntries = entries.filter((e) => e.patientStory);
     const patientMM = patientEntries.filter((e) => e.blameDirection === "bcbs").length;
     const patientBCBS = patientEntries.filter((e) => e.blameDirection === "mm").length;
@@ -1560,7 +1559,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
       const proMM = channelEntries.filter((e) => e.blameDirection === "bcbs" || e.frameAdoption === "mm");
       takeaways.push(`Henry Ford + Corewell value-based deals create "2-vs-1" pressure — MM is the holdout among the Big 3.`);
       takeaways.push("DIFS (state insurance regulator) has declined to intervene — no regulatory pressure on either side. Governor Whitmer is silent.");
-      takeaways.push("Unlike the NYC dispute, no stakeholder has bypassed BCBS to validate MM's pricing directly (no 32BJ equivalent).");
+      takeaways.push("No stakeholder has bypassed BCBS to validate MM's pricing directly — no external party has independently confirmed MM's cost claims.");
     }
 
     return (
