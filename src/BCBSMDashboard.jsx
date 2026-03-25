@@ -1387,11 +1387,12 @@ function TrendChart({ entries, filterChannel }) {
           />
           <YAxis
             domain={[-maxAbs, maxAbs]}
-            tick={{ fill: COLORS.textMuted, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}
+            ticks={[maxAbs, 0, -maxAbs]}
+            tick={{ fill: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}`}
-            width={36}
+            tickFormatter={(v) => v > 0 ? "MM FAV" : v < 0 ? "BCBSM FAV" : "NEUTRAL"}
+            width={78}
           />
           <YAxis yAxisId="vol" hide domain={[0, "auto"]} orientation="right" />
           <Tooltip content={<CustomTooltip />} />

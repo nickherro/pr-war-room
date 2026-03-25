@@ -1489,7 +1489,7 @@ function TrendChart({ entries, filterChannel }) {
     source.forEach((e) => { volMap[e.date] = (volMap[e.date] || 0) + 1; });
     const chMap = {};
     if (channelTrend) channelTrend.forEach((ct) => { chMap[ct.date] = ct.composite; });
-    return allTrend.map((t) => {
+    const data = allTrend.map((t) => {
       const parts = t.date.split("-");
       const label = `${parseInt(parts[1])}/${parseInt(parts[2])}`;
       const phase = t.date < DISPUTE_PUBLIC_DATE ? "pre" : "post";
@@ -1503,6 +1503,20 @@ function TrendChart({ entries, filterChannel }) {
         channel: chMap[t.date] ?? null,
       };
     });
+    // Insert synthetic point at dispute date so ReferenceLine can render on chart
+    if (data.length > 0 && DISPUTE_PUBLIC_DATE < data[0].date) {
+      const parts = DISPUTE_PUBLIC_DATE.split("-");
+      data.unshift({
+        date: DISPUTE_PUBLIC_DATE,
+        label: `${parseInt(parts[1])}/${parseInt(parts[2])}`,
+        phase: "pre",
+        composite: null,
+        count: 0,
+        volume: 0,
+        channel: null,
+      });
+    }
+    return data;
   }, [allTrend, channelTrend, entries, filterChannel]);
 
   if (chartData.length < 2) return null;
@@ -1522,8 +1536,7 @@ function TrendChart({ entries, filterChannel }) {
   const firstPostDate = chartData.find((d) => d.phase === "post")?.date;
   const preCount = chartData.filter((d) => d.phase === "pre").length;
   const postCount = chartData.filter((d) => d.phase === "post").length;
-  // If dispute date is before all data, we can't place a ReferenceLine — show as annotation instead
-  const disputeBeforeData = DISPUTE_PUBLIC_DATE < chartData[0].date;
+  const hasDisputePoint = chartData.some((d) => d.date === DISPUTE_PUBLIC_DATE);
 
   // Custom dot with score label
   const ScoreDot = ({ cx, cy, payload, dataKey, color }) => {
@@ -1597,17 +1610,6 @@ function TrendChart({ entries, filterChannel }) {
           )}
         </div>
       </div>
-      {disputeBeforeData && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>
-          <div style={{ width: 24, height: 0, borderTop: "2px dashed #DC298D", opacity: 0.8 }} />
-          <span style={{ fontSize: 11, color: "#DC298D", fontWeight: 700 }}>
-            DISPUTE PUBLIC — ~{(() => { const p = DISPUTE_PUBLIC_DATE.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}/${p[0].slice(2)}`; })()}
-          </span>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
-            (data coverage begins {(() => { const p = chartData[0].date.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}/${p[0].slice(2)}`; })()})
-          </span>
-        </div>
-      )}
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={chartData} margin={{ top: 20, right: 12, bottom: 4, left: 4 }}>
           <defs>
@@ -1626,17 +1628,18 @@ function TrendChart({ entries, filterChannel }) {
           />
           <YAxis
             domain={[-maxAbs, maxAbs]}
-            tick={{ fill: COLORS.textMuted, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}
+            ticks={[maxAbs, 0, -maxAbs]}
+            tick={{ fill: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}`}
-            width={36}
+            tickFormatter={(v) => v > 0 ? "MT SINAI FAV" : v < 0 ? "ANTHEM FAV" : "NEUTRAL"}
+            width={88}
           />
           <YAxis yAxisId="vol" hide domain={[0, "auto"]} orientation="right" />
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine y={0} stroke={COLORS.textMuted} strokeWidth={1} opacity={0.5} />
-          {firstPostDate && lastPreDate && !disputeBeforeData && (
-            <ReferenceLine x={firstPostDate} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
+          {hasDisputePoint && (
+            <ReferenceLine x={DISPUTE_PUBLIC_DATE} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
               <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#DC298D" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
