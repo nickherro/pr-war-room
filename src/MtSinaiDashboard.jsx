@@ -1472,7 +1472,7 @@ function computeTrend(entries) {
 }
 
 const MONITOR_START = "2025-09-01";
-const DISPUTE_PUBLIC_DATE = "2025-10-01";
+const DISPUTE_PUBLIC_DATE = "2025-10-15";
 
 function TrendChart({ entries, filterChannel }) {
   const allTrend = useMemo(() => computeTrend(entries), [entries]);
@@ -1522,6 +1522,8 @@ function TrendChart({ entries, filterChannel }) {
   const firstPostDate = chartData.find((d) => d.phase === "post")?.date;
   const preCount = chartData.filter((d) => d.phase === "pre").length;
   const postCount = chartData.filter((d) => d.phase === "post").length;
+  // If dispute date is before all data, we can't place a ReferenceLine — show as annotation instead
+  const disputeBeforeData = DISPUTE_PUBLIC_DATE < chartData[0].date;
 
   // Custom dot with score label
   const ScoreDot = ({ cx, cy, payload, dataKey, color }) => {
@@ -1595,6 +1597,17 @@ function TrendChart({ entries, filterChannel }) {
           )}
         </div>
       </div>
+      {disputeBeforeData && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>
+          <div style={{ width: 24, height: 0, borderTop: "2px dashed #DC298D", opacity: 0.8 }} />
+          <span style={{ fontSize: 11, color: "#DC298D", fontWeight: 700 }}>
+            DISPUTE PUBLIC — ~{(() => { const p = DISPUTE_PUBLIC_DATE.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}/${p[0].slice(2)}`; })()}
+          </span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+            (data coverage begins {(() => { const p = chartData[0].date.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}/${p[0].slice(2)}`; })()})
+          </span>
+        </div>
+      )}
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={chartData} margin={{ top: 20, right: 12, bottom: 4, left: 4 }}>
           <defs>
@@ -1622,9 +1635,9 @@ function TrendChart({ entries, filterChannel }) {
           <YAxis yAxisId="vol" hide domain={[0, "auto"]} orientation="right" />
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine y={0} stroke={COLORS.textMuted} strokeWidth={1} opacity={0.5} />
-          {firstPostDate && (
-            <ReferenceLine x={lastPreDate ? firstPostDate : chartData[0].date} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
-              <Label value={`DISPUTE PUBLIC ${lastPreDate ? "" : "(pre-data)"}`} position="insideTopRight" fill="#DC298D" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
+          {firstPostDate && lastPreDate && !disputeBeforeData && (
+            <ReferenceLine x={firstPostDate} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
+              <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#DC298D" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
           <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
