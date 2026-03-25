@@ -1470,6 +1470,9 @@ function computeTrend(entries) {
   return points;
 }
 
+const MONITOR_START = "2025-09-01";
+const DISPUTE_PUBLIC_DATE = "2025-11-25";
+
 function TrendChart({ entries, filterChannel }) {
   const allTrend = useMemo(() => computeTrend(entries), [entries]);
   const channelTrend = useMemo(() => {
@@ -1490,8 +1493,18 @@ function TrendChart({ entries, filterChannel }) {
   const maxAbs = Math.max(Math.abs(Math.min(...combined)), Math.abs(Math.max(...combined)), 30);
   const yMin = -maxAbs, yMax = maxAbs;
 
+  // Extend x-axis to start at monitoring period
+  const dataMinDate = allTrend[0].date;
+  const dataMaxDate = allTrend[allTrend.length - 1].date;
+  const xMinDate = MONITOR_START < dataMinDate ? MONITOR_START : dataMinDate;
+  const xMaxDate = dataMaxDate;
+  const xMinMs = new Date(xMinDate).getTime();
+  const xMaxMs = new Date(xMaxDate).getTime();
+  const xRange = xMaxMs - xMinMs || 1;
+
   const allDates = allTrend.map((t) => t.date);
-  const x = (i) => PX + (i / (allDates.length - 1)) * plotW;
+  const xByDate = (dateStr) => PX + ((new Date(dateStr).getTime() - xMinMs) / xRange) * plotW;
+  const x = (i) => xByDate(allDates[i]);
   const y = (v) => PY + ((yMax - v) / (yMax - yMin)) * plotH;
   const zeroY = y(0);
 
@@ -1519,24 +1532,18 @@ function TrendChart({ entries, filterChannel }) {
   const chLabelMap = { media: "MEDIA", social: "SOCIAL", stakeholder: "STAKEHOLDER" };
 
   if (channelTrend) {
-    const chDateIndex = {};
-    allDates.forEach((d, i) => { chDateIndex[d] = i; });
     const mappedPoints = channelTrend.map((ct) => {
-      let idx = chDateIndex[ct.date];
-      if (idx === undefined) {
-        let best = 0, bestDiff = Infinity;
-        allDates.forEach((d, i) => { const diff = Math.abs(new Date(d) - new Date(ct.date)); if (diff < bestDiff) { bestDiff = diff; best = i; } });
-        idx = best;
-      }
-      return { x: x(idx), y: y(ct.composite), composite: ct.composite, count: ct.count, date: ct.date };
+      return { x: xByDate(ct.date), y: y(ct.composite), composite: ct.composite, count: ct.count, date: ct.date };
     });
     chLinePoints = mappedPoints.map((p) => `${p.x},${p.y}`).join(" ");
     chDots = mappedPoints;
   }
 
   const gridLines = [-20, 0, 20];
-  const fmtDate = (d) => { const parts = d.split("-"); return `${parts[1]}/${parts[2]}`; };
+  const fmtDate = (d) => { const parts = d.split("-"); return `${parseInt(parts[1])}/${parseInt(parts[2])}`; };
   const isOverlay = filterChannel !== "all" && channelTrend;
+  const disputeX = xByDate(DISPUTE_PUBLIC_DATE);
+  const monitorStartX = xByDate(MONITOR_START);
 
   // Volume bars: when filtered, show only that channel's per-date volume; otherwise show all
   const volumeData = useMemo(() => {
@@ -1591,6 +1598,10 @@ function TrendChart({ entries, filterChannel }) {
         ))}
         <text x={PX - 6} y={PY - 8} textAnchor="end" fill={COLORS.mtsinai} fontSize="8" fontFamily="'JetBrains Mono', monospace">SINAI</text>
         <text x={PX - 6} y={H - PY + 14} textAnchor="end" fill={COLORS.anthem} fontSize="8" fontFamily="'JetBrains Mono', monospace">ANTHEM</text>
+        {/* X-axis labels: monitoring start, first data, middle, last */}
+        <text x={monitorStartX} y={H - 2} textAnchor="middle" fill={COLORS.textMuted} fontSize="8" fontFamily="'JetBrains Mono', monospace">
+          {fmtDate(MONITOR_START)}
+        </text>
         {allTrend.map((t, i) => (
           (i === 0 || i === allTrend.length - 1 || (allTrend.length > 5 && i === Math.floor(allTrend.length / 2))) ? (
             <text key={i} x={x(i)} y={H - 2} textAnchor="middle" fill={COLORS.textMuted} fontSize="8" fontFamily="'JetBrains Mono', monospace">
@@ -1598,6 +1609,14 @@ function TrendChart({ entries, filterChannel }) {
             </text>
           ) : null
         ))}
+        {/* Dispute goes public marker */}
+        <line x1={disputeX} y1={PY} x2={disputeX} y2={H - PY} stroke="#DC298D" strokeWidth={1.5} strokeDasharray="4,3" opacity={0.7} />
+        <text x={disputeX + 4} y={PY + 4} fill="#DC298D" fontSize="7" fontFamily="'JetBrains Mono', monospace" fontWeight="700" opacity={0.8}>
+          DISPUTE PUBLIC
+        </text>
+        <text x={disputeX + 4} y={PY + 12} fill="#DC298D" fontSize="7" fontFamily="'JetBrains Mono', monospace" opacity={0.6}>
+          {fmtDate(DISPUTE_PUBLIC_DATE)}
+        </text>
         <path d={areaAbovePath} fill={COLORS.mtsinai} opacity={isOverlay ? 0.06 : 0.12} />
         <path d={areaBelowPath} fill={COLORS.anthem} opacity={isOverlay ? 0.06 : 0.12} />
         <polyline points={aggLinePoints} fill="none" stroke={COLORS.accent} strokeWidth={isOverlay ? 1.5 : 2.5} strokeLinejoin="round" strokeLinecap="round" opacity={isOverlay ? 0.4 : 1} />
@@ -1665,6 +1684,67 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
       .filter((e) => e.patientStory && getWeight(e) >= 1.0)
       .sort((a, b) => getWeight(b) - getWeight(a))
       .slice(0, 3);
+  }, [entries]);
+
+  // Trend drivers — what is causing momentum shifts and why
+  const trendDrivers = useMemo(() => {
+    const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+    const mid = Math.floor(sorted.length / 2);
+    if (mid < 3) return null;
+    const early = sorted.slice(0, mid);
+    const late = sorted.slice(mid);
+    const earlyScores = computeScores(early);
+    const lateScores = computeScores(late);
+
+    // Dimension-level shifts
+    const dims = [
+      { name: "Frame Adoption", key: "frameScore", weight: "30%", early: earlyScores.frameScore, late: lateScores.frameScore },
+      { name: "Sentiment", key: "sentScore", weight: "30%", early: earlyScores.sentScore, late: lateScores.sentScore },
+      { name: "Blame Direction", key: "blameScore", weight: "25%", early: earlyScores.blameScore, late: lateScores.blameScore },
+      { name: "Patient Stories", key: "patientScore", weight: "15%", early: earlyScores.patientScore, late: lateScores.patientScore },
+    ];
+    const dimShifts = dims
+      .map((d) => ({ ...d, shift: d.late - d.early }))
+      .filter((d) => Math.abs(d.shift) > 3)
+      .sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift));
+
+    // Per-channel momentum
+    const channelMomentum = [];
+    ["media", "social", "stakeholder"].forEach((ch) => {
+      const chEarly = early.filter((e) => e.channel === ch);
+      const chLate = late.filter((e) => e.channel === ch);
+      if (chEarly.length < 2 || chLate.length < 2) return;
+      const eScores = computeScores(chEarly);
+      const lScores = computeScores(chLate);
+      const shift = lScores.composite - eScores.composite;
+      if (Math.abs(shift) > 5) {
+        const label = ch.charAt(0).toUpperCase() + ch.slice(1);
+        // Identify what's driving this channel's shift
+        const drivers = [];
+        const frameDiff = lScores.frameScore - eScores.frameScore;
+        const sentDiff = lScores.sentScore - eScores.sentScore;
+        const blameDiff = lScores.blameScore - eScores.blameScore;
+        const patDiff = lScores.patientScore - eScores.patientScore;
+        if (Math.abs(frameDiff) > 5) drivers.push(`frame adoption ${frameDiff > 0 ? "shifting toward Mt Sinai" : "shifting toward Anthem"} (${frameDiff > 0 ? "+" : ""}${frameDiff.toFixed(0)})`);
+        if (Math.abs(sentDiff) > 5) drivers.push(`sentiment ${sentDiff > 0 ? "turning more anti-Anthem" : "turning more anti-Mt Sinai"} (${sentDiff > 0 ? "+" : ""}${sentDiff.toFixed(0)})`);
+        if (Math.abs(blameDiff) > 5) drivers.push(`blame direction ${blameDiff > 0 ? "increasingly on Anthem" : "increasingly on Mt Sinai"} (${blameDiff > 0 ? "+" : ""}${blameDiff.toFixed(0)})`);
+        if (Math.abs(patDiff) > 5) drivers.push(`patient story saturation ${patDiff > 0 ? "increasing" : "decreasing"} (${patDiff > 0 ? "+" : ""}${patDiff.toFixed(0)})`);
+
+        // Notable new sources in the late period
+        const earlySourceSet = new Set(chEarly.map((e) => e.source));
+        const newSources = [...new Set(chLate.filter((e) => !earlySourceSet.has(e.source) && getWeight(e) >= 1.0).map((e) => e.source))];
+
+        channelMomentum.push({ channel: label, shift, early: eScores.composite, late: lScores.composite, drivers, newSources, earlyCount: chEarly.length, lateCount: chLate.length });
+      }
+    });
+
+    // Identify highest-weight late entries driving the narrative
+    const topLateEntries = late
+      .sort((a, b) => getWeight(b) - getWeight(a))
+      .slice(0, 5)
+      .map((e) => ({ source: e.source, headline: e.headline, weight: getWeight(e), frame: e.frameAdoption, blame: e.blameDirection }));
+
+    return { dimShifts, channelMomentum, topLateEntries, earlyRange: `${early[0].date} – ${early[early.length - 1].date}`, lateRange: `${late[0].date} – ${late[late.length - 1].date}` };
   }, [entries]);
 
   // Channel divergences
@@ -1758,6 +1838,28 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         <ul style={{ ...S.bullet, listStyle: "none" }}>
           {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
         </ul>
+        {trendDrivers && trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).length > 0 && (
+          <>
+            <div style={{ ...S.label, marginTop: 14 }}>TREND DRIVERS</div>
+            {trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).map((cm) => (
+              <div key={cm.channel}>
+                <div style={{ ...S.body, marginBottom: 6 }}>
+                  This channel moved <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> from early ({fmtScore(cm.early)}) to recent ({fmtScore(cm.late)}) coverage.
+                </div>
+                {cm.drivers.length > 0 && (
+                  <ul style={{ ...S.bullet, listStyle: "none" }}>
+                    {cm.drivers.map((d, i) => <li key={i} style={{ marginBottom: 3 }}>▸ {d}</li>)}
+                  </ul>
+                )}
+                {cm.newSources.length > 0 && (
+                  <div style={{ ...S.body, marginTop: 4 }}>
+                    New high-credibility sources: <span style={S.muted}>{cm.newSources.join(", ")}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </>
+        )}
       </div>
     );
   }
@@ -1772,6 +1874,61 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         {momentum && momentum.shift < -5 && <> Momentum is <span style={S.warn}>softening</span> — the second half of coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in the first half.</>}
         {momentum && Math.abs(momentum.shift) <= 5 && <> Momentum is <strong>steady</strong> — no significant shift between early and recent coverage.</>}
       </div>
+
+      {trendDrivers && (trendDrivers.dimShifts.length > 0 || trendDrivers.channelMomentum.length > 0) && (
+        <div style={S.section}>
+          <div style={S.label}>TREND DRIVERS — WHAT'S CAUSING THE SHIFT</div>
+          <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 8 }}>
+            Comparing early period ({trendDrivers.earlyRange}) vs recent period ({trendDrivers.lateRange})
+          </div>
+          {trendDrivers.dimShifts.length > 0 && (
+            <>
+              <div style={{ fontSize: 10, letterSpacing: 1, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, marginTop: 8 }}>DIMENSION SHIFTS</div>
+              <ul style={{ ...S.bullet, listStyle: "none" }}>
+                {trendDrivers.dimShifts.map((d) => (
+                  <li key={d.name} style={{ marginBottom: 4 }}>
+                    ▸ <strong>{d.name}</strong> ({d.weight}): moved <span style={d.shift > 0 ? S.accent : S.warn}>{d.shift > 0 ? "+" : ""}{d.shift.toFixed(0)} pts</span> — from {fmtScore(d.early)} to {fmtScore(d.late)}.
+                    {d.key === "frameScore" && d.shift > 0 && " More recent coverage is adopting Mt Sinai's framing of the dispute."}
+                    {d.key === "frameScore" && d.shift < 0 && " Anthem's framing is gaining traction in recent coverage."}
+                    {d.key === "sentScore" && d.shift > 0 && " Recent tone has turned more critical of Anthem."}
+                    {d.key === "sentScore" && d.shift < 0 && " Recent tone has softened toward Anthem or hardened toward Mt Sinai."}
+                    {d.key === "blameScore" && d.shift > 0 && " Sources are increasingly holding Anthem responsible."}
+                    {d.key === "blameScore" && d.shift < 0 && " Blame is shifting toward Mt Sinai in recent coverage."}
+                    {d.key === "patientScore" && d.shift > 0 && " Patient stories are appearing more frequently, reinforcing the human cost narrative."}
+                    {d.key === "patientScore" && d.shift < 0 && " Fewer patient stories in recent coverage — the human angle is fading."}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {trendDrivers.channelMomentum.length > 0 && (
+            <>
+              <div style={{ fontSize: 10, letterSpacing: 1, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, marginTop: 12 }}>CHANNEL MOMENTUM</div>
+              <ul style={{ ...S.bullet, listStyle: "none" }}>
+                {trendDrivers.channelMomentum.map((cm) => (
+                  <li key={cm.channel} style={{ marginBottom: 6 }}>
+                    ▸ <strong>{cm.channel}</strong>: <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> ({fmtScore(cm.early)} → {fmtScore(cm.late)}, {cm.earlyCount} → {cm.lateCount} entries).
+                    {cm.drivers.length > 0 && <> Driven by: {cm.drivers.join("; ")}.</>}
+                    {cm.newSources.length > 0 && <> New high-credibility sources entering: <span style={S.muted}>{cm.newSources.join(", ")}</span>.</>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {trendDrivers.topLateEntries.length > 0 && (
+            <>
+              <div style={{ fontSize: 10, letterSpacing: 1, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 4, marginTop: 12 }}>HIGHEST-IMPACT RECENT ENTRIES</div>
+              <ul style={{ ...S.bullet, listStyle: "none" }}>
+                {trendDrivers.topLateEntries.map((e, i) => (
+                  <li key={i} style={{ marginBottom: 3 }}>
+                    ▸ <span style={S.muted}>{e.weight.toFixed(1)}x</span> {e.source} — <em>{e.headline.length > 80 ? e.headline.slice(0, 80) + "…" : e.headline}</em>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
 
       {divergences.length > 0 && (
         <div style={S.section}>
