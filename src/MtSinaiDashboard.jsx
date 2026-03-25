@@ -1493,18 +1493,17 @@ function TrendChart({ entries, filterChannel }) {
   const maxAbs = Math.max(Math.abs(Math.min(...combined)), Math.abs(Math.max(...combined)), 30);
   const yMin = -maxAbs, yMax = maxAbs;
 
-  // Extend x-axis to start at monitoring period
-  const dataMinDate = allTrend[0].date;
-  const dataMaxDate = allTrend[allTrend.length - 1].date;
-  const xMinDate = MONITOR_START < dataMinDate ? MONITOR_START : dataMinDate;
-  const xMaxDate = dataMaxDate;
-  const xMinMs = new Date(xMinDate).getTime();
-  const xMaxMs = new Date(xMaxDate).getTime();
-  const xRange = xMaxMs - xMinMs || 1;
-
   const allDates = allTrend.map((t) => t.date);
-  const xByDate = (dateStr) => PX + ((new Date(dateStr).getTime() - xMinMs) / xRange) * plotW;
-  const x = (i) => xByDate(allDates[i]);
+  const x = (i) => PX + (i / (allDates.length - 1)) * plotW;
+  // For placing the dispute marker proportionally within the data range
+  const dataMinMs = new Date(allDates[0]).getTime();
+  const dataMaxMs = new Date(allDates[allDates.length - 1]).getTime();
+  const dataRange = dataMaxMs - dataMinMs || 1;
+  const xByDate = (dateStr) => {
+    const ms = new Date(dateStr).getTime();
+    const ratio = (ms - dataMinMs) / dataRange;
+    return PX + ratio * plotW;
+  };
   const y = (v) => PY + ((yMax - v) / (yMax - yMin)) * plotH;
   const zeroY = y(0);
 
@@ -1543,7 +1542,6 @@ function TrendChart({ entries, filterChannel }) {
   const fmtDate = (d) => { const parts = d.split("-"); return `${parseInt(parts[1])}/${parseInt(parts[2])}`; };
   const isOverlay = filterChannel !== "all" && channelTrend;
   const disputeX = xByDate(DISPUTE_PUBLIC_DATE);
-  const monitorStartX = xByDate(MONITOR_START);
 
   // Volume bars: when filtered, show only that channel's per-date volume; otherwise show all
   const volumeData = useMemo(() => {
@@ -1598,10 +1596,6 @@ function TrendChart({ entries, filterChannel }) {
         ))}
         <text x={PX - 6} y={PY - 8} textAnchor="end" fill={COLORS.mtsinai} fontSize="8" fontFamily="'JetBrains Mono', monospace">SINAI</text>
         <text x={PX - 6} y={H - PY + 14} textAnchor="end" fill={COLORS.anthem} fontSize="8" fontFamily="'JetBrains Mono', monospace">ANTHEM</text>
-        {/* X-axis labels: monitoring start, first data, middle, last */}
-        <text x={monitorStartX} y={H - 2} textAnchor="middle" fill={COLORS.textMuted} fontSize="8" fontFamily="'JetBrains Mono', monospace">
-          {fmtDate(MONITOR_START)}
-        </text>
         {allTrend.map((t, i) => (
           (i === 0 || i === allTrend.length - 1 || (allTrend.length > 5 && i === Math.floor(allTrend.length / 2))) ? (
             <text key={i} x={x(i)} y={H - 2} textAnchor="middle" fill={COLORS.textMuted} fontSize="8" fontFamily="'JetBrains Mono', monospace">
