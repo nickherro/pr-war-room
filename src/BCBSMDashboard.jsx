@@ -1438,6 +1438,7 @@ function TrendChart({ entries, filterChannel }) {
 }
 
 function ExecutiveSummary({ entries, filterChannel, scores }) {
+  const [expanded, setExpanded] = useState(false);
   const channelScores = useMemo(() => {
     const ch = {};
     ["media", "social", "stakeholder"].forEach((c) => {
@@ -1602,34 +1603,49 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
           <span style={S.accent}>{label} composite: {fmtScore(cs.composite)}</span> — {diffDir} the overall score ({fmtScore(allScores.composite)}).
           {channelEntries.length} entries tracked in this channel.
         </div>
-        <div style={{ ...S.label, marginTop: 14 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
-        </ul>
-        <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
-        </ul>
-        {trendDrivers && trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).length > 0 && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer",
+            color: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+            padding: "8px 0 4px", letterSpacing: 1,
+          }}
+        >
+          <span style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", display: "inline-block" }}>▶</span>
+          {expanded ? "COLLAPSE" : "EXPAND DETAILS"}
+        </button>
+        {expanded && (
           <>
-            <div style={{ ...S.label, marginTop: 14 }}>TREND DRIVERS</div>
-            {trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).map((cm) => (
-              <div key={cm.channel}>
-                <div style={{ ...S.body, marginBottom: 6 }}>
-                  This channel moved <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> from early ({fmtScore(cm.early)}) to recent ({fmtScore(cm.late)}) coverage.
-                </div>
-                {cm.drivers.length > 0 && (
-                  <ul style={{ ...S.bullet, listStyle: "none" }}>
-                    {cm.drivers.map((d, i) => <li key={i} style={{ marginBottom: 3 }}>▸ {d}</li>)}
-                  </ul>
-                )}
-                {cm.newSources.length > 0 && (
-                  <div style={{ ...S.body, marginTop: 4 }}>
-                    New high-credibility sources: <span style={S.muted}>{cm.newSources.join(", ")}</span>
+            <div style={{ ...S.label, marginTop: 10 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
+            <ul style={{ ...S.bullet, listStyle: "none" }}>
+              {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
+            </ul>
+            <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
+            <ul style={{ ...S.bullet, listStyle: "none" }}>
+              {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
+            </ul>
+            {trendDrivers && trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).length > 0 && (
+              <>
+                <div style={{ ...S.label, marginTop: 14 }}>TREND DRIVERS</div>
+                {trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).map((cm) => (
+                  <div key={cm.channel}>
+                    <div style={{ ...S.body, marginBottom: 6 }}>
+                      This channel moved <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> from early ({fmtScore(cm.early)}) to recent ({fmtScore(cm.late)}) coverage.
+                    </div>
+                    {cm.drivers.length > 0 && (
+                      <ul style={{ ...S.bullet, listStyle: "none" }}>
+                        {cm.drivers.map((d, i) => <li key={i} style={{ marginBottom: 3 }}>▸ {d}</li>)}
+                      </ul>
+                    )}
+                    {cm.newSources.length > 0 && (
+                      <div style={{ ...S.body, marginTop: 4 }}>
+                        New high-credibility sources: <span style={S.muted}>{cm.newSources.join(", ")}</span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                ))}
+              </>
+            )}
           </>
         )}
       </div>
@@ -1639,15 +1655,26 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
   return (
     <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
       <div style={S.label}>EXECUTIVE SUMMARY</div>
-      <div style={{ ...S.body, marginBottom: 14 }}>
+      <div style={{ ...S.body, marginBottom: 0 }}>
         <span style={S.accent}>Michigan Medicine holds a narrative advantage</span> with a credibility-weighted composite of <strong>{fmtScore(scores.composite)}</strong>, though the margin is tighter than in comparable disputes.
         {momentum && momentum.shift > 5 && <> Momentum is <span style={S.accent}>building for MM</span> — recent coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in earlier coverage.</>}
         {momentum && momentum.shift < -5 && <> Momentum is <span style={S.warn}>shifting toward BCBS</span> — recent coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} earlier.</>}
         {momentum && Math.abs(momentum.shift) <= 5 && <> Momentum is <strong>holding steady</strong> — no significant shift between early and recent coverage.</>}
         {" "}The June 30 deadline is 97 days away — expect coverage intensity to accelerate sharply in May.
       </div>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer",
+          color: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          padding: "8px 0 4px", letterSpacing: 1,
+        }}
+      >
+        <span style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", display: "inline-block" }}>▶</span>
+        {expanded ? "COLLAPSE" : "EXPAND DETAILS"}
+      </button>
 
-      {trendDrivers && (trendDrivers.dimShifts.length > 0 || trendDrivers.channelMomentum.length > 0) && (
+      {expanded && trendDrivers && (trendDrivers.dimShifts.length > 0 || trendDrivers.channelMomentum.length > 0) && (
         <div style={S.section}>
           <div style={S.label}>TREND DRIVERS — WHAT'S CAUSING THE SHIFT</div>
           <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 8 }}>
@@ -1702,7 +1729,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         </div>
       )}
 
-      {divergences.length > 0 && (
+      {expanded && divergences.length > 0 && (
         <div style={S.section}>
           <div style={S.label}>CHANNEL DIVERGENCES</div>
           <ul style={{ ...S.bullet, listStyle: "none" }}>
@@ -1717,36 +1744,40 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         </div>
       )}
 
-      <div style={S.section}>
-        <div style={S.label}>KEY MESSAGES RESONATING</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
-          <li style={{ marginBottom: 2 }}>▸ "Only academic medical center in Michigan" is the stickiest message — creates urgency around specialized care that can't be found elsewhere.</li>
-          <li style={{ marginBottom: 2 }}>▸ BCBS CEO compensation ($6.9M) paired with $246M loss is the most viral counter-frame — undercuts BCBS's affordability argument.</li>
-          <li style={{ marginBottom: 2 }}>▸ "44% increase" has traction with employers even though MM disputes it — BCBS is winning the employer audience more than the patient audience.</li>
-          {topPatientStories.length > 0 && (
-            <li style={{ marginBottom: 2 }}>▸ Top patient stories: {topPatientStories.map((e) => e.headline.split("—")[0].trim()).join("; ")}.</li>
-          )}
-        </ul>
-      </div>
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>KEY MESSAGES RESONATING</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+            <li style={{ marginBottom: 2 }}>▸ "Only academic medical center in Michigan" is the stickiest message — creates urgency around specialized care that can't be found elsewhere.</li>
+            <li style={{ marginBottom: 2 }}>▸ BCBS CEO compensation ($6.9M) paired with $246M loss is the most viral counter-frame — undercuts BCBS's affordability argument.</li>
+            <li style={{ marginBottom: 2 }}>▸ "44% increase" has traction with employers even though MM disputes it — BCBS is winning the employer audience more than the patient audience.</li>
+            {topPatientStories.length > 0 && (
+              <li style={{ marginBottom: 2 }}>▸ Top patient stories: {topPatientStories.map((e) => e.headline.split("—")[0].trim()).join("; ")}.</li>
+            )}
+          </ul>
+        </div>
+      )}
 
-      <div style={S.section}>
-        <div style={S.label}>MARCOMM CONSIDERATIONS</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          <li style={{ marginBottom: 2 }}>▸ <strong>The "Big 3" dynamic is the core challenge.</strong> Henry Ford and Corewell signed value-based deals — MM is the holdout. BCBS can credibly say "two out of three agreed." MM needs to differentiate why academic medicine requires different terms.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>Children's hospital stories are the most powerful weapon.</strong> Mott Children's Hospital cases (Crohn's, cerebral palsy, developmental disability) generate intense sympathy. Prioritize these in earned media.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>Employer audience is the swing constituency.</strong> 60% of BCBS members are self-insured employer plans. BCBS's "lock out" framing to employers is creating counter-pressure. MM needs employer allies.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>BCBS financial losses are genuine.</strong> $1.03B (2024) + $246M (2025) + $1.1B GLP-1 costs. This is not a fabricated hardship narrative — but CEO compensation undercuts the sympathy.</li>
-          {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
-            <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
-              channelScores.social.composite > channelScores.media.composite
-                ? "grassroots anger is running hotter than press coverage reflects. Organic sentiment may be outpacing the earned media narrative."
-                : "media coverage is more favorable than organic conversation. Earned media wins may not be translating to public perception."
-            }</li>
-          )}
-          <li style={{ marginBottom: 2 }}>▸ <strong>Timeline is the wildcard.</strong> As June 30 approaches, patient anxiety stories will accelerate. Prepare for a surge of "my child's care is at risk" coverage in late May / early June.</li>
-        </ul>
-      </div>
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>MARCOMM CONSIDERATIONS</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            <li style={{ marginBottom: 2 }}>▸ <strong>The "Big 3" dynamic is the core challenge.</strong> Henry Ford and Corewell signed value-based deals — MM is the holdout. BCBS can credibly say "two out of three agreed." MM needs to differentiate why academic medicine requires different terms.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>Children's hospital stories are the most powerful weapon.</strong> Mott Children's Hospital cases (Crohn's, cerebral palsy, developmental disability) generate intense sympathy. Prioritize these in earned media.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>Employer audience is the swing constituency.</strong> 60% of BCBS members are self-insured employer plans. BCBS's "lock out" framing to employers is creating counter-pressure. MM needs employer allies.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>BCBS financial losses are genuine.</strong> $1.03B (2024) + $246M (2025) + $1.1B GLP-1 costs. This is not a fabricated hardship narrative — but CEO compensation undercuts the sympathy.</li>
+            {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
+              <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
+                channelScores.social.composite > channelScores.media.composite
+                  ? "grassroots anger is running hotter than press coverage reflects. Organic sentiment may be outpacing the earned media narrative."
+                  : "media coverage is more favorable than organic conversation. Earned media wins may not be translating to public perception."
+              }</li>
+            )}
+            <li style={{ marginBottom: 2 }}>▸ <strong>Timeline is the wildcard.</strong> As June 30 approaches, patient anxiety stories will accelerate. Prepare for a surge of "my child's care is at risk" coverage in late May / early June.</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -1679,6 +1679,7 @@ function TrendChart({ entries, filterChannel }) {
 }
 
 function ExecutiveSummary({ entries, filterChannel, scores }) {
+  const [expanded, setExpanded] = useState(false);
   // Per-channel scores
   const channelScores = useMemo(() => {
     const ch = {};
@@ -1846,39 +1847,56 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
 
     return (
       <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
-        <div style={S.label}>EXECUTIVE BRIEF — {label.toUpperCase()} CHANNEL</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={S.label}>EXECUTIVE BRIEF — {label.toUpperCase()} CHANNEL</div>
+        </div>
         <div style={S.body}>
           <span style={S.accent}>{label} composite: {fmtScore(cs.composite)}</span> — {diffDir} the overall score ({fmtScore(computeScores(entries).composite)}).
           {channelEntries.length} entries tracked in this channel.
         </div>
-        <div style={{ ...S.label, marginTop: 14 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
-        </ul>
-        <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
-        </ul>
-        {trendDrivers && trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).length > 0 && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer",
+            color: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+            padding: "8px 0 4px", letterSpacing: 1,
+          }}
+        >
+          <span style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", display: "inline-block" }}>▶</span>
+          {expanded ? "COLLAPSE" : "EXPAND DETAILS"}
+        </button>
+        {expanded && (
           <>
-            <div style={{ ...S.label, marginTop: 14 }}>TREND DRIVERS</div>
-            {trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).map((cm) => (
-              <div key={cm.channel}>
-                <div style={{ ...S.body, marginBottom: 6 }}>
-                  This channel moved <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> from early ({fmtScore(cm.early)}) to recent ({fmtScore(cm.late)}) coverage.
-                </div>
-                {cm.drivers.length > 0 && (
-                  <ul style={{ ...S.bullet, listStyle: "none" }}>
-                    {cm.drivers.map((d, i) => <li key={i} style={{ marginBottom: 3 }}>▸ {d}</li>)}
-                  </ul>
-                )}
-                {cm.newSources.length > 0 && (
-                  <div style={{ ...S.body, marginTop: 4 }}>
-                    New high-credibility sources: <span style={S.muted}>{cm.newSources.join(", ")}</span>
+            <div style={{ ...S.label, marginTop: 10 }}>TOP SOURCES BY WEIGHTED INFLUENCE</div>
+            <ul style={{ ...S.bullet, listStyle: "none" }}>
+              {sortedSources.map(([src, w]) => <li key={src}>▸ {src} <span style={S.muted}>(cumulative weight: {w.toFixed(1)})</span></li>)}
+            </ul>
+            <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
+            <ul style={{ ...S.bullet, listStyle: "none" }}>
+              {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
+            </ul>
+            {trendDrivers && trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).length > 0 && (
+              <>
+                <div style={{ ...S.label, marginTop: 14 }}>TREND DRIVERS</div>
+                {trendDrivers.channelMomentum.filter((cm) => cm.channel.toLowerCase() === filterChannel).map((cm) => (
+                  <div key={cm.channel}>
+                    <div style={{ ...S.body, marginBottom: 6 }}>
+                      This channel moved <span style={cm.shift > 0 ? S.accent : S.warn}>{cm.shift > 0 ? "+" : ""}{cm.shift.toFixed(0)} pts</span> from early ({fmtScore(cm.early)}) to recent ({fmtScore(cm.late)}) coverage.
+                    </div>
+                    {cm.drivers.length > 0 && (
+                      <ul style={{ ...S.bullet, listStyle: "none" }}>
+                        {cm.drivers.map((d, i) => <li key={i} style={{ marginBottom: 3 }}>▸ {d}</li>)}
+                      </ul>
+                    )}
+                    {cm.newSources.length > 0 && (
+                      <div style={{ ...S.body, marginTop: 4 }}>
+                        New high-credibility sources: <span style={S.muted}>{cm.newSources.join(", ")}</span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                ))}
+              </>
+            )}
           </>
         )}
       </div>
@@ -1889,14 +1907,25 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
   return (
     <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "20px 24px", marginBottom: 20 }}>
       <div style={S.label}>EXECUTIVE SUMMARY</div>
-      <div style={{ ...S.body, marginBottom: 14 }}>
+      <div style={{ ...S.body, marginBottom: 0 }}>
         <span style={S.accent}>Mt Sinai holds a clear narrative advantage</span> with a credibility-weighted composite of <strong>{fmtScore(scores.composite)}</strong>.
         {momentum && momentum.shift > 5 && <> Momentum is <span style={S.accent}>strengthening</span> — the second half of coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in the first half.</>}
         {momentum && momentum.shift < -5 && <> Momentum is <span style={S.warn}>softening</span> — the second half of coverage scores {fmtScore(momentum.late)} vs {fmtScore(momentum.early)} in the first half.</>}
         {momentum && Math.abs(momentum.shift) <= 5 && <> Momentum is <strong>steady</strong> — no significant shift between early and recent coverage.</>}
       </div>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer",
+          color: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+          padding: "8px 0 4px", letterSpacing: 1,
+        }}
+      >
+        <span style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s ease", display: "inline-block" }}>▶</span>
+        {expanded ? "COLLAPSE" : "EXPAND DETAILS"}
+      </button>
 
-      {trendDrivers && (trendDrivers.dimShifts.length > 0 || trendDrivers.channelMomentum.length > 0) && (
+      {expanded && trendDrivers && (trendDrivers.dimShifts.length > 0 || trendDrivers.channelMomentum.length > 0) && (
         <div style={S.section}>
           <div style={S.label}>TREND DRIVERS — WHAT'S CAUSING THE SHIFT</div>
           <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 8 }}>
@@ -1951,7 +1980,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         </div>
       )}
 
-      {divergences.length > 0 && (
+      {expanded && divergences.length > 0 && (
         <div style={S.section}>
           <div style={S.label}>CHANNEL DIVERGENCES</div>
           <ul style={{ ...S.bullet, listStyle: "none" }}>
@@ -1966,35 +1995,39 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
         </div>
       )}
 
-      <div style={S.section}>
-        <div style={S.label}>KEY MESSAGES RESONATING</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
-          <li style={{ marginBottom: 2 }}>▸ "$450M in unpaid claims" is the stickiest message — concrete dollar amount beats Anthem's abstract "consumer protections" frame.</li>
-          <li style={{ marginBottom: 2 }}>▸ Non-profit vs. for-profit framing resonates strongly in post-UHC CEO shooting environment.</li>
-          {topPatientStories.length > 0 && (
-            <li style={{ marginBottom: 2 }}>▸ Top patient stories driving coverage: {topPatientStories.map((e) => e.source).join(", ")}.</li>
-          )}
-        </ul>
-      </div>
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>KEY MESSAGES RESONATING</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+            <li style={{ marginBottom: 2 }}>▸ "$450M in unpaid claims" is the stickiest message — concrete dollar amount beats Anthem's abstract "consumer protections" frame.</li>
+            <li style={{ marginBottom: 2 }}>▸ Non-profit vs. for-profit framing resonates strongly in post-UHC CEO shooting environment.</li>
+            {topPatientStories.length > 0 && (
+              <li style={{ marginBottom: 2 }}>▸ Top patient stories driving coverage: {topPatientStories.map((e) => e.source).join(", ")}.</li>
+            )}
+          </ul>
+        </div>
+      )}
 
-      <div style={S.section}>
-        <div style={S.label}>MARCOMM CONSIDERATIONS</div>
-        <ul style={{ ...S.bullet, listStyle: "none" }}>
-          <li style={{ marginBottom: 2 }}>▸ <strong>Patient story pipeline is critical.</strong> Every named patient has favored Mt Sinai. Anthem needs patient advocates or this dimension stays one-sided.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>32BJ model is the proof point.</strong> If other unions or large employers pursue direct contracts, Anthem's position as middleman erodes further. Track and amplify.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>Molina Medicaid is the vulnerability.</strong> Mt Sinai also dropped low-income plans — this undermines the "patient champion" narrative. Opponents will surface it.</li>
-          <li style={{ marginBottom: 2 }}>▸ <strong>NYP/UHC April 1 deadline</strong> is a narrative inflection point. If that dispute also breaks down, it validates Mt Sinai's framing as systemic. If it resolves, Anthem can say "others find a way."</li>
-          {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
-            <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
-              channelScores.social.composite > channelScores.media.composite
-                ? "grassroots sentiment is running ahead of press coverage. Owned media may be amplifying beyond what independent outlets reflect."
-                : "media coverage is more favorable than organic social conversation. Consider whether earned media gains are translating to public sentiment."
-            }</li>
-          )}
-          <li style={{ marginBottom: 2 }}>▸ <strong>Spanish-language outreach matters.</strong> El Diario coverage reaches an underserved segment of affected patients that English media misses entirely.</li>
-        </ul>
-      </div>
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>MARCOMM CONSIDERATIONS</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            <li style={{ marginBottom: 2 }}>▸ <strong>Patient story pipeline is critical.</strong> Every named patient has favored Mt Sinai. Anthem needs patient advocates or this dimension stays one-sided.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>32BJ model is the proof point.</strong> If other unions or large employers pursue direct contracts, Anthem's position as middleman erodes further. Track and amplify.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>Molina Medicaid is the vulnerability.</strong> Mt Sinai also dropped low-income plans — this undermines the "patient champion" narrative. Opponents will surface it.</li>
+            <li style={{ marginBottom: 2 }}>▸ <strong>NYP/UHC April 1 deadline</strong> is a narrative inflection point. If that dispute also breaks down, it validates Mt Sinai's framing as systemic. If it resolves, Anthem can say "others find a way."</li>
+            {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
+              <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
+                channelScores.social.composite > channelScores.media.composite
+                  ? "grassroots sentiment is running ahead of press coverage. Owned media may be amplifying beyond what independent outlets reflect."
+                  : "media coverage is more favorable than organic social conversation. Consider whether earned media gains are translating to public sentiment."
+              }</li>
+            )}
+            <li style={{ marginBottom: 2 }}>▸ <strong>Spanish-language outreach matters.</strong> El Diario coverage reaches an underserved segment of affected patients that English media misses entirely.</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
