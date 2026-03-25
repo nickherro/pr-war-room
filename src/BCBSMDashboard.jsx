@@ -1307,7 +1307,7 @@ function TrendChart({ entries, filterChannel }) {
     return (
       <g>
         <circle cx={cx} cy={cy} r={4} fill={COLORS.bg} stroke={dotColor} strokeWidth={2} />
-        <text x={cx} y={cy - 10} textAnchor="middle" fill={dotColor} fontSize="8" fontWeight="700" fontFamily="'JetBrains Mono', monospace">
+        <text x={cx} y={cy - 10} textAnchor="middle" fill={dotColor} fontSize="11" fontWeight="700" fontFamily="'JetBrains Mono', monospace">
           {val > 0 ? "+" : ""}{val.toFixed(0)}
         </text>
       </g>
@@ -1318,7 +1318,7 @@ function TrendChart({ entries, filterChannel }) {
     if (!active || !payload || !payload.length) return null;
     const d = payload[0].payload;
     return (
-      <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>
+      <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
         <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count} {d.phase === "pre" ? "· PRE-PUBLIC" : ""}</div>
         <div style={{ color: d.composite > 10 ? COLORS.red : d.composite < -10 ? "#2F65A7" : COLORS.amber, fontWeight: 700 }}>
           Composite: {d.composite > 0 ? "+" : ""}{d.composite.toFixed(1)}
@@ -1337,7 +1337,7 @@ function TrendChart({ entries, filterChannel }) {
     const d = chartData.find((p) => p.date === payload.value);
     const isPre = d && d.phase === "pre";
     return (
-      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(255,255,255,0.2)" : COLORS.textMuted} fontSize={9} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
+      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(255,255,255,0.2)" : COLORS.textMuted} fontSize={11} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
         {d ? d.label : ""}
       </text>
     );
@@ -1346,10 +1346,10 @@ function TrendChart({ entries, filterChannel }) {
   return (
     <div style={{ marginTop: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <div style={{ fontSize: 10, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+        <div style={{ fontSize: 11, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
           NARRATIVE MOMENTUM — CUMULATIVE COMPOSITE OVER TIME
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
           {preCount > 0 && (
             <span style={{ color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>
               {preCount} pre-public
@@ -1387,7 +1387,7 @@ function TrendChart({ entries, filterChannel }) {
           />
           <YAxis
             domain={[-maxAbs, maxAbs]}
-            tick={{ fill: COLORS.textMuted, fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+            tick={{ fill: COLORS.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}`}
@@ -1398,7 +1398,7 @@ function TrendChart({ entries, filterChannel }) {
           <ReferenceLine y={0} stroke={COLORS.textMuted} strokeWidth={1} opacity={0.5} />
           {lastPreDate && firstPostDate && (
             <ReferenceLine x={firstPostDate} stroke="#D86018" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
-              <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#D86018" fontSize={8} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
+              <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#D86018" fontSize={10} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
           <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
