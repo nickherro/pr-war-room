@@ -23,16 +23,17 @@ export default function App({ onLogout }) {
           justifyContent: "center",
           gap: 4,
           padding: "8px 16px",
-          background: "rgba(0, 0, 0, 0.85)",
+          background: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          borderBottom: "1px solid #D8DDE6",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
         }}
       >
         <span
           style={{
             fontSize: 10,
             letterSpacing: 2,
-            color: "rgba(255,255,255,0.35)",
+            color: "rgba(0,0,0,0.35)",
             fontFamily: "'JetBrains Mono', monospace",
             fontWeight: 600,
             marginRight: 12,
@@ -51,10 +52,10 @@ export default function App({ onLogout }) {
               fontFamily: "'JetBrains Mono', monospace",
               fontWeight: 700,
               borderRadius: 4,
-              border: active === d.id ? "1px solid rgba(255,255,255,0.2)" : "1px solid transparent",
+              border: active === d.id ? "1px solid rgba(0,0,0,0.15)" : "1px solid transparent",
               cursor: "pointer",
-              background: active === d.id ? "rgba(255,255,255,0.12)" : "transparent",
-              color: active === d.id ? "#fff" : "rgba(255,255,255,0.4)",
+              background: active === d.id ? "rgba(0,0,0,0.07)" : "transparent",
+              color: active === d.id ? "#1A1A2E" : "rgba(0,0,0,0.4)",
               transition: "all 0.15s ease",
             }}
           >
@@ -70,10 +71,10 @@ export default function App({ onLogout }) {
             fontFamily: "'JetBrains Mono', monospace",
             fontWeight: 600,
             borderRadius: 4,
-            border: "1px solid rgba(255,255,255,0.15)",
+            border: "1px solid rgba(0,0,0,0.15)",
             cursor: "pointer",
             background: "transparent",
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(0,0,0,0.4)",
             letterSpacing: 1,
             transition: "all 0.15s ease",
           }}

@@ -45,20 +45,21 @@ function AuthGate() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#00274C',
+      background: '#F8F9FB',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     }}>
       <form onSubmit={handleSubmit} style={{
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: '#FFFFFF',
+        border: '1px solid #D8DDE6',
         borderRadius: 12,
         padding: '48px 40px',
         width: 360,
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
       }}>
-        <div style={{ color: '#fff', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', textAlign: 'center', marginBottom: 8, opacity: 0.6 }}>
+        <div style={{ color: '#1A1A2E', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', textAlign: 'center', marginBottom: 8, opacity: 0.5 }}>
           Authorized Access Only
         </div>
         <input
@@ -71,9 +72,9 @@ function AuthGate() {
           style={{
             padding: '12px 16px',
             borderRadius: 6,
-            border: error ? '1px solid #e74c3c' : '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(255,255,255,0.08)',
-            color: '#fff',
+            border: error ? '1px solid #e74c3c' : '1px solid #D8DDE6',
+            background: '#F5F7FA',
+            color: '#1A1A2E',
             fontSize: 15,
             outline: 'none',
           }}
@@ -87,9 +88,9 @@ function AuthGate() {
           style={{
             padding: '12px 16px',
             borderRadius: 6,
-            border: error ? '1px solid #e74c3c' : '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(255,255,255,0.08)',
-            color: '#fff',
+            border: error ? '1px solid #e74c3c' : '1px solid #D8DDE6',
+            background: '#F5F7FA',
+            color: '#1A1A2E',
             fontSize: 15,
             outline: 'none',
           }}

@@ -1104,21 +1104,21 @@ const LABELS = {
 const COLORS = {
   mm: "#00274C",
   bcbs: "#2F65A7",
-  neutral: "#465E85",
+  neutral: "#64748B",
   negative_bcbs: "#9A3324",
   negative_mm: "#2F65A7",
   positive_bcbs: "#2F65A7",
   positive_mm: "#9A3324",
-  accent: "#FFCB05",
-  bg: "#00274C",
-  surface: "#002D5A",
-  surfaceHover: "#003A72",
-  border: "#1A4A7A",
-  text: "#F2E6C9",
-  textMuted: "#8FAAC4",
+  accent: "#B8860B",
+  bg: "#FFFFFF",
+  surface: "#F5F7FA",
+  surfaceHover: "#EDF0F5",
+  border: "#D8DDE6",
+  text: "#1A1A2E",
+  textMuted: "#64748B",
   red: "#9A3324",
-  green: "#00B2A9",
-  amber: "#FFCB05",
+  green: "#059669",
+  amber: "#B8860B",
 };
 
 // Source credibility weights — credibility-adjusted influence on composite score
@@ -1318,7 +1318,7 @@ function TrendChart({ entries, filterChannel }) {
     if (!active || !payload || !payload.length) return null;
     const d = payload[0].payload;
     return (
-      <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13 }}>
+      <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
         <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count} {d.phase === "pre" ? "· PRE-PUBLIC" : ""}</div>
         <div style={{ color: d.composite > 10 ? COLORS.red : d.composite < -10 ? "#2F65A7" : COLORS.amber, fontWeight: 700 }}>
           Composite: {d.composite > 0 ? "+" : ""}{d.composite.toFixed(1)}
@@ -1337,7 +1337,7 @@ function TrendChart({ entries, filterChannel }) {
     const d = chartData.find((p) => p.date === payload.value);
     const isPre = d && d.phase === "pre";
     return (
-      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(255,255,255,0.2)" : COLORS.textMuted} fontSize={13} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
+      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(0,0,0,0.2)" : COLORS.textMuted} fontSize={13} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
         {d ? d.label : ""}
       </text>
     );
@@ -1351,7 +1351,7 @@ function TrendChart({ entries, filterChannel }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>
           {preCount > 0 && (
-            <span style={{ color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>
+            <span style={{ color: "rgba(0,0,0,0.3)", fontStyle: "italic" }}>
               {preCount} pre-public
             </span>
           )}
@@ -1402,7 +1402,7 @@ function TrendChart({ entries, filterChannel }) {
               <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#D86018" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
-          <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
+          <Bar dataKey="volume" fill="rgba(0,0,0,0.06)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
           <Area
             type="monotone"
             dataKey="composite"
@@ -1890,7 +1890,7 @@ function EntryRow({ entry, onDelete }) {
           fontWeight: 700,
           fontFamily: "'JetBrains Mono', monospace",
           background: entry.frameAdoption === "mm" ? "#5C1F14" : entry.frameAdoption === "bcbs" ? "#003A72" : "#1A4A7A",
-          color: entry.frameAdoption === "mm" ? "#FFCB05" : entry.frameAdoption === "bcbs" ? "#8FAAC4" : "#8FAAC4",
+          color: entry.frameAdoption === "mm" ? COLORS.amber : entry.frameAdoption === "bcbs" ? COLORS.bcbs : COLORS.textMuted,
           textAlign: "center",
         }}
       >
@@ -1972,7 +1972,7 @@ export default function PRWarRoom() {
             <div style={{ fontSize: 10, letterSpacing: 2, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6 }}>
               COMPOSITE NARRATIVE ADVANTAGE
             </div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
+            <div style={{ fontSize: 9, color: "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
               Monitoring period: Jan 1, 2026 — Present
             </div>
             <div style={{ fontSize: 40, fontWeight: 700, color: compositeColor, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>

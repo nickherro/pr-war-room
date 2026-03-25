@@ -1326,23 +1326,23 @@ const LABELS = {
 };
 
 const COLORS = {
-  mtsinai: "#06ABEB",
-  anthem: "#DC298D",
-  neutral: "#465E85",
-  negative_anthem: "#06ABEB",
-  negative_mtsinai: "#DC298D",
-  positive_anthem: "#DC298D",
-  positive_mtsinai: "#06ABEB",
-  accent: "#06ABEB",
-  bg: "#00002D",
-  surface: "#0A0A3D",
-  surfaceHover: "#12124A",
-  border: "#1A1A5A",
-  text: "#E8EAF6",
-  textMuted: "#8A8DB8",
-  red: "#06ABEB",
-  green: "#00B2A9",
-  amber: "#06ABEB",
+  mtsinai: "#0284C7",
+  anthem: "#BE185D",
+  neutral: "#64748B",
+  negative_anthem: "#0284C7",
+  negative_mtsinai: "#BE185D",
+  positive_anthem: "#BE185D",
+  positive_mtsinai: "#0284C7",
+  accent: "#0284C7",
+  bg: "#FFFFFF",
+  surface: "#F5F7FA",
+  surfaceHover: "#EDF0F5",
+  border: "#D8DDE6",
+  text: "#1A1A2E",
+  textMuted: "#64748B",
+  red: "#0284C7",
+  green: "#059669",
+  amber: "#0284C7",
 };
 
 // Source credibility weights — credibility-adjusted influence on composite score
@@ -1558,7 +1558,7 @@ function TrendChart({ entries, filterChannel }) {
     if (!active || !payload || !payload.length) return null;
     const d = payload[0].payload;
     return (
-      <div style={{ background: "rgba(0,0,0,0.9)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13 }}>
+      <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
         <div style={{ color: COLORS.textMuted, marginBottom: 4 }}>{d.date} · n={d.count} {d.phase === "pre" ? "· PRE-PUBLIC" : ""}</div>
         <div style={{ color: d.composite > 10 ? COLORS.mtsinai : d.composite < -10 ? COLORS.anthem : COLORS.accent, fontWeight: 700 }}>
           Composite: {d.composite > 0 ? "+" : ""}{d.composite.toFixed(1)}
@@ -1578,7 +1578,7 @@ function TrendChart({ entries, filterChannel }) {
     const d = chartData.find((p) => p.date === payload.value);
     const isPre = d && d.phase === "pre";
     return (
-      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(255,255,255,0.2)" : COLORS.textMuted} fontSize={13} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
+      <text x={x} y={y + 12} textAnchor="middle" fill={isPre ? "rgba(0,0,0,0.2)" : COLORS.textMuted} fontSize={13} fontFamily="'JetBrains Mono', monospace" fontStyle={isPre ? "italic" : "normal"}>
         {d ? d.label : ""}
       </text>
     );
@@ -1592,7 +1592,7 @@ function TrendChart({ entries, filterChannel }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>
           {preCount > 0 && (
-            <span style={{ color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>
+            <span style={{ color: "rgba(0,0,0,0.3)", fontStyle: "italic" }}>
               {preCount} pre-public
             </span>
           )}
@@ -1643,7 +1643,7 @@ function TrendChart({ entries, filterChannel }) {
               <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#DC298D" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
-          <Bar dataKey="volume" fill="rgba(255,255,255,0.08)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
+          <Bar dataKey="volume" fill="rgba(0,0,0,0.06)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
           <Area
             type="monotone"
             dataKey="composite"
@@ -2035,7 +2035,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
 function ScoreGauge({ value, label, subtext }) {
   const clamped = Math.max(-100, Math.min(100, value));
   const pct = ((clamped + 100) / 200) * 100;
-  const color = clamped > 15 ? COLORS.mtsinai : clamped < -15 ? COLORS.anthem : "#8A8DB8";
+  const color = clamped > 15 ? COLORS.mtsinai : clamped < -15 ? COLORS.anthem : "#64748B";
   const winner = clamped > 10 ? "→ Mt Sinai Advantage" : clamped < -10 ? "→ Anthem Advantage" : "→ Contested";
 
   return (
@@ -2140,7 +2140,7 @@ function EntryRow({ entry, onDelete }) {
           fontWeight: 700,
           fontFamily: "'JetBrains Mono', monospace",
           background: entry.frameAdoption === "mtsinai" ? "#0A3A5C" : entry.frameAdoption === "anthem" ? "#3D0A2A" : "#1A1A5A",
-          color: entry.frameAdoption === "mtsinai" ? "#06ABEB" : entry.frameAdoption === "anthem" ? "#DC298D" : "#8A8DB8",
+          color: entry.frameAdoption === "mtsinai" ? COLORS.mtsinai : entry.frameAdoption === "anthem" ? COLORS.anthem : "#64748B",
           textAlign: "center",
         }}
       >
@@ -2173,7 +2173,7 @@ export default function MtSinaiDashboard() {
 
   const deleteEntry = useCallback((id) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
 
-  const compositeColor = scores.composite > 15 ? COLORS.mtsinai : scores.composite < -15 ? COLORS.anthem : "#8A8DB8";
+  const compositeColor = scores.composite > 15 ? COLORS.mtsinai : scores.composite < -15 ? COLORS.anthem : "#64748B";
   const compositeLabel = scores.composite > 15 ? "MT SINAI LEADING" : scores.composite < -15 ? "ANTHEM LEADING" : "CONTESTED";
 
   return (
@@ -2222,7 +2222,7 @@ export default function MtSinaiDashboard() {
             <div style={{ fontSize: 10, letterSpacing: 2, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6 }}>
               COMPOSITE NARRATIVE ADVANTAGE
             </div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
+            <div style={{ fontSize: 9, color: "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
               Monitoring period: Sep 1, 2025 — Present
             </div>
             <div style={{ fontSize: 40, fontWeight: 700, color: compositeColor, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>
