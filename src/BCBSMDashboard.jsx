@@ -1208,7 +1208,7 @@ function computeTrend(entries) {
   dates.forEach((d) => {
     cumulative.push(...dateMap[d]);
     const s = computeScores(cumulative);
-    points.push({ date: d, composite: s.composite, count: cumulative.length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+    points.push({ date: d, composite: s.composite, count: cumulative.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
   });
   return points;
 }
@@ -1288,6 +1288,18 @@ function TrendChart({ entries, filterChannel }) {
   const fmtDate = (d) => { const parts = d.split("-"); return `${parts[1]}/${parts[2]}`; };
   const isOverlay = filterChannel !== "all" && channelTrend;
 
+  // Volume bars: when filtered, show only that channel's per-date volume; otherwise show all
+  const volumeData = useMemo(() => {
+    const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
+    const sorted = [...source].sort((a, b) => a.date.localeCompare(b.date));
+    const dMap = {};
+    sorted.forEach((e) => { dMap[e.date] = (dMap[e.date] || 0) + 1; });
+    return allTrend.map((t) => ({ date: t.date, vol: dMap[t.date] || 0 }));
+  }, [entries, filterChannel, allTrend]);
+  const maxVol = Math.max(...volumeData.map((v) => v.vol), 1);
+  const barMaxH = plotH * 0.55;
+  const barW = Math.max(4, Math.min(18, plotW / allTrend.length * 0.6));
+
   return (
     <div style={{ marginTop: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -1308,6 +1320,16 @@ function TrendChart({ entries, filterChannel }) {
         )}
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto" }}>
+        {/* Volume bars — behind everything */}
+        {volumeData.map((v, i) => {
+          if (v.vol === 0) return null;
+          const barH = (v.vol / maxVol) * barMaxH;
+          const bx = x(i) - barW / 2;
+          const by = H - PY - barH;
+          return (
+            <rect key={`vol${i}`} x={bx} y={by} width={barW} height={barH} rx={2} fill="rgba(255,255,255,0.06)" />
+          );
+        })}
         {/* Grid */}
         {gridLines.map((v) => (
           <g key={v}>
