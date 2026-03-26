@@ -72,29 +72,30 @@ export default function App({ onLogout }) {
         >
           WAR ROOM
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 2, flex: 1, flexWrap: "wrap" }}>
-        {DASHBOARDS.map((d) => (
-          <button
-            key={d.id}
-            onClick={() => setActive(d.id)}
-            style={{
-              padding: "4px 10px",
-              fontSize: 10,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontWeight: 700,
-              borderRadius: 4,
-              border: active === d.id ? "1px solid rgba(0,0,0,0.15)" : "1px solid transparent",
-              cursor: "pointer",
-              background: active === d.id ? "rgba(0,0,0,0.07)" : "transparent",
-              color: active === d.id ? "#1A1A2E" : "rgba(0,0,0,0.4)",
-              transition: "all 0.15s ease",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {d.short}
-          </button>
-        ))}
-        </div>
+        <select
+          value={active}
+          onChange={(e) => setActive(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "5px 8px",
+            fontSize: 10,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontWeight: 700,
+            borderRadius: 4,
+            border: "1px solid rgba(0,0,0,0.15)",
+            background: "rgba(0,0,0,0.03)",
+            color: "#1A1A2E",
+            cursor: "pointer",
+            appearance: "auto",
+            maxWidth: 320,
+          }}
+        >
+          {DASHBOARDS.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.label}
+            </option>
+          ))}
+        </select>
         <button
           onClick={onLogout}
           style={{
