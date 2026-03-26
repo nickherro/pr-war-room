@@ -946,7 +946,11 @@ function EntryRow({ entry, onDelete, config }) {
       <div>
         <div style={{ fontWeight: 600, fontSize: 12, lineHeight: 1.3 }}>{entry.headline || entry.source}</div>
         <div style={{ color: colors.textMuted, fontSize: 11, marginTop: 2 }}>
-          {entry.source} · {labels.sourceType[entry.sourceType]} {entry.patientStory ? " · 👤 Patient story" : ""}
+          {entry.url ? (
+            <a href={entry.url} target="_blank" rel="noopener noreferrer" style={{ color: colors.accent, textDecoration: "none", borderBottom: `1px solid ${colors.accent}40` }}>
+              {entry.source}
+            </a>
+          ) : entry.source} · {labels.sourceType[entry.sourceType]} {entry.patientStory ? " · 👤 Patient story" : ""}
         </div>
         {entry.notes && <div style={{ color: colors.textMuted, fontSize: 10, marginTop: 3, fontStyle: "italic", lineHeight: 1.4 }}>{entry.notes}</div>}
       </div>
