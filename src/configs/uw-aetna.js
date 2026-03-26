@@ -948,6 +948,18 @@ export default {
       "Aetna's 'lowest rates of any commercial payor' positioning may save money short-term but costs employer trust when networks fail — and WA employers now have two data points (Providence + UW Medicine).",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Pre-Deadline (May 2025)", points: ["Claimed UW Medicine was demanding <strong>unreasonable rates</strong> that would increase costs for members", "Positioned Aetna as protecting patients from inflated hospital pricing"] },
+      { phase: "During Gap (Jun 2025)", points: ["Maintained that Aetna was negotiating in good faith while UW Medicine refused to agree to fair terms", "Noted Boeing retirees on PPO ESA Medicare Advantage were exempt — signaling Aetna's willingness to protect some populations"] },
+      { phase: "Resolution (Jul 2025)", points: ["Agreed to retroactive contract covering the 33-day gap, effective through January 1, 2027", "Did not disclose rate terms — resolution framing was neutral"] },
+    ],
+    provider: [
+      { phase: "Pre-Deadline (May 2025)", points: ["CEO Tim Dellit framed the dispute as seeking rates that are <strong>'fair, sustainable and in the best interests of our patients'</strong>", "Established that Aetna's reimbursement rates were the <strong>lowest of any commercial payor</strong> in the market — stickiest argument of the dispute"] },
+      { phase: "During Gap (Jun 2025)", points: ["Emphasized that despite 'best efforts,' UW Medicine could not reach a <strong>financially feasible</strong> agreement with Aetna", "Leveraged patient stories — Sharon Zimmerman (rare cancer, Fred Hutch) became the defining human face of the dispute", "Cited Providence-Aetna WA precedent to establish a <strong>pattern of Aetna underpaying PNW providers</strong>"] },
+      { phase: "Resolution (Jul 2025)", points: ["Secured a retroactive agreement papering over the 33-day gap — patients treated during the gap covered at in-network rates", "Contract through Jan 2027 signals meaningful rate improvement achieved"] },
+    ],
+  },
   timeline: [
     { date: "2025-05-29", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-06-01", type: "termination", label: "Contract terminates" },

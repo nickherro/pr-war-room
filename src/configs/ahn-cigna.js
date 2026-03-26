@@ -1064,6 +1064,18 @@ export default {
       "Pittsburgh benefits brokers were key intermediaries — their contingency planning visibility signaled dispute severity to the employer community.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "2023 Round (May–Jun 2023)", points: ["Cigna mailed patient warning letters framing AHN as the party <strong>'dropping' Cigna</strong> — preemptive blame-shifting", "Told patients <strong>'You'll likely pay more'</strong> if AHN drops Cigna, centering cost to members", "VP Mike Ungvary at resolution: 'The collaboration we have with Allegheny Health Network puts quality, affordable care in reach for people'"] },
+      { phase: "2025 Round — Early (Jun 2025)", points: ["Claimed AHN was demanding <strong>'unreasonably high rates that would significantly increase costs'</strong>", "Argued that most Cigna clients are <strong>employers who pay for health benefits</strong> — rate increases 'directly impact local companies, their employees and families'"] },
+      { phase: "2025 Round — Resolution (Jun 2025)", points: ["Agreed to a <strong>3-year deal</strong> through June 30, 2028 — significant improvement over 2023's 1-year stopgap", "Framed resolution as ensuring 'affordable, quality care' for Pittsburgh-area patients"] },
+    ],
+    provider: [
+      { phase: "2023 Round (May–Jun 2023)", points: ["VP Dan Laurent established core talking point: seeking <strong>'fair and equitable reimbursement rates'</strong>", "Directed patients to pressure Cigna — call-to-action framing positioned AHN as patient advocate", "Secured 1-year deal; AHN President James Benedict: <strong>'great news for the more than twenty thousand people'</strong>"] },
+      { phase: "2025 Round — Early (Jun 2025)", points: ["Cited Highmark Health's <strong>$147M loss at AHN in 2024</strong> and $1.3B+ invested since 2018 as evidence rates are unsustainable", "Leveraged Becker's systemic data: <strong>Cigna disputes rose 160% in two years</strong> (51 in 2022 to 133 in 2024) — AHN is not uniquely unreasonable", "'Second time in two years' framing established Cigna as a <strong>pattern offender</strong> in Pittsburgh"] },
+      { phase: "2025 Round — Resolution (Jun 2025)", points: ["Secured a 3-year agreement — long-term stability vs 2023's stopgap 1-year deal signals meaningful rate improvement", "Neither side disclosed rate specifics, but deal length suggests AHN achieved closer to fair market terms"] },
+    ],
+  },
   timeline: [
     { date: "2023-05-24", type: "newsBreak", label: "Round 1 news breaks publicly" },
     { date: "2023-06-30", type: "termination", label: "Round 1 contract deadline" },

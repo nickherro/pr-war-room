@@ -1298,6 +1298,18 @@ export default {
       "Benefits consultants advising mid-renewal employers questioned BCBSAZ network stability — but Dignity's simultaneous Aetna dispute made switching insurers futile.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Feb 2024)", points: ["BCBSAZ revealed it had already offered a <strong>$49M rate increase</strong> — Dignity demanded 37% more on top of that", "Positioned as Arizona's largest health insurer protecting members from excessive hospital pricing", "Leaked Dignity's <strong>$153M in profits</strong> (AZ DHS data) to undermine the provider's claims of financial need"] },
+      { phase: "Mid-Dispute (Feb–Mar 2024)", points: ["Won support from <strong>AZ state lawmakers</strong> who leaned pro-BCBSAZ — political environment unfavorable to Dignity", "YRMC data point: rates allegedly <strong>twice the average Phoenix hospital and three times Tucson average</strong> — '4th highest-cost hospital in state'", "Held firm on final offer as Dignity fought on two fronts simultaneously (BCBSAZ and Aetna)"] },
+      { phase: "Resolution (Mar 2024)", points: ["Resolution framed as Dignity <strong>'accepting AZ Blue's final offer'</strong> — media positioned BCBSAZ as the party that won", "12 News: 'Dignity Health accepts AZ Blue offer' — 'accepts' language positioned Dignity as capitulating after 6 weeks"] },
+    ],
+    provider: [
+      { phase: "Early (Feb 2024)", points: ["Argued rates needed to <strong>keep pace with rising costs</strong> of care delivery in Arizona", "Emphasized affected facilities included <strong>Barrow Neurological Institute</strong> (nationally ranked) and 8 hospitals serving tens of thousands"] },
+      { phase: "Mid-Dispute (Feb–Mar 2024)", points: ["Fighting on two fronts — BCBSAZ <strong>and</strong> Aetna simultaneously — undermined the 'BCBSAZ is unreasonable' narrative", "Media began framing Dignity as the <strong>common denominator</strong> across multiple payor disputes", "Congressional intervention (Kelly, Sinema, Crane) created bipartisan pressure to resolve"] },
+      { phase: "Resolution (Mar 2024)", points: ["Accepted BCBSAZ's final offer after 6 weeks out-of-network — widely perceived as Dignity <strong>blinking first</strong>", "In-network effective March 15; community patience had worn thin and political pressure was mounting"] },
+    ],
+  },
   timeline: [
     { date: "2024-02-01", type: "termination", label: "Contract terminates" },
     { date: "2024-02-03", type: "newsBreak", label: "News breaks publicly" },

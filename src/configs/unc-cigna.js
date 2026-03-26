@@ -1137,6 +1137,40 @@ export default {
       "Resolution on Dec 12 (3 days before Cigna open enrollment close) likely prevented worst-case employer defection, but damage to Cigna's 2026 enrollment pipeline was already substantial.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Jul 2025)", points: [
+        "Cigna countered that UNC Health demands were '<strong>well above market levels</strong>'",
+        "Positioned dispute as a rate issue — UNC was asking for too much money",
+        "Corporate statements framed Cigna as protecting affordability for employers and families",
+      ] },
+      { phase: "Mid-Dispute (Oct–Nov 2025)", points: [
+        "Maintained 'above market' framing as UNC Health publicized operational grievances about Cigna practices",
+        "Could not effectively counter UNC's <strong>30% denial rate</strong> and downcoded claims data",
+        "Cigna's pattern of national disputes (Hartford, Hackensack Meridian, Tenet, Baptist, Bon Secours, Piedmont) undermined 'UNC is uniquely unreasonable' framing",
+      ] },
+      { phase: "Resolution (Dec 2025)", points: [
+        "Agreement reached December 12 after a <strong>12-day actual out-of-network gap</strong> (Dec 1–12)",
+        "Resolution came just 3 days before Cigna open enrollment close — preventing worst-case employer defections",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Jul 2025)", points: [
+        "UNC Health spokesperson: system 'not satisfied with Cigna's reimbursement rates, its <strong>use of prior authorization and how often the insurer is denying coverage</strong>'",
+        "Framed dispute around three grievances: inadequate rates, excessive prior authorization, and <strong>30% denial rate with downcoded claims</strong>",
+        "65,000 affected members figure became the standard across all coverage",
+      ] },
+      { phase: "Mid-Dispute (Sep–Nov 2025)", points: [
+        "Patient stories built sustained pressure: Patric Pederson's 11-month-old son Stanley (meningitis, RSV, strokes) — '<strong>incredible stress</strong>'; Becky Pezzoni (cancer survivor): '<strong>the patient got lost in all of this</strong>'; Jon Markle (~80, diabetic): 'I am on a very fixed income'",
+        "Published devastating cost data: OT copay <strong>$25 to $468</strong> (19x), doctor visit <strong>$30 to $165</strong> (5.5x) if contract expired",
+        "Encouraged employers to consider alternative plans during open enrollment — <strong>aggressive market pressure tactic</strong>; Town of Apex (850 employees) publicly pressured Cigna",
+      ] },
+      { phase: "Resolution (Dec 2025)", points: [
+        "Agreement reached Dec 12 after 12-day gap with real patient disruption — unlike most disputes that resolve pre-deadline",
+        "NCHA President Steve Lawler gave UNC institutional backing from the state hospital association",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2025-07-02", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-11-30", type: "termination", label: "Contract terminates" },

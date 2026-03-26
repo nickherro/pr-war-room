@@ -1154,6 +1154,40 @@ export default {
       notes: "Resolution notification to employer clients. Retroactive to April 1 — no member cost exposure for the gap period. Key relief for HR/benefits teams.",
     },
   ],
+  arguments: {
+    payor: [
+      { phase: "Early (Feb–Mar 2024)", points: [
+        "Aetna spokesperson Alex Kepnes: 'focused on avoiding <strong>unsupportable increases in reimbursement rates</strong>'",
+        "Framed Dignity as demanding excessive rate hikes that would raise costs for employers and families",
+        "Positioned dispute as Dignity choosing to leave the network, not Aetna refusing to pay",
+      ] },
+      { phase: "Mid-Dispute (Apr 2024)", points: [
+        "Brief, corporate-tone public statements with <strong>no patient voices or community advocates</strong>",
+        "Relied on employer notifications framing Dignity as the party disrupting care",
+        "Could not match Dignity's local media saturation in rural AZ, CA, and NV markets",
+      ] },
+      { phase: "Resolution (Apr 2024)", points: [
+        "Agreed to <strong>retroactive multi-year contract</strong> effective back to April 1 — no member cost exposure for the gap period",
+        "Notified plan sponsors of restoration — resolution suggests Aetna conceded on key rate terms",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Feb–Mar 2024)", points: [
+        "Dignity framed BCBS-AZ as refusing to pay <strong>millions in outstanding claims</strong> — set the PR template later used against Aetna",
+        "Highlighted 'unprecedented financial challenges' as justification for rate increases",
+        "Patient letters warned of April 1 network exit — created patient anxiety that drove local media coverage",
+      ] },
+      { phase: "Mid-Dispute (Apr 2024)", points: [
+        "Aetna 'unwilling to agree to <strong>responsible terms</strong> that help address the unprecedented financial challenges experienced by Dignity Health'",
+        "Deployed vulnerable patient stories: Sue Kumar (single mother, rheumatoid arthritis, 10-year-old at risk of losing pediatrician); Nicole Allison (chronic conditions, 3-week notice to find new doctors)",
+        "Leveraged simultaneous disputes with BCBS-AZ and Partnership HealthPlan to frame <strong>insurers — not Dignity — as responsible</strong> for disruptions",
+      ] },
+      { phase: "Resolution (Apr 2024)", points: [
+        "Controlled the PR cadence throughout — issuing <strong>press releases at every stage</strong> while Aetna relied on brief statements",
+        "Retroactive contract restoration framed as Dignity's successful fight for fair reimbursement",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2024-02-01", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-04-01", type: "termination", label: "Aetna contract terminates" },

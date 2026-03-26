@@ -857,6 +857,40 @@ export default {
       "UHC's $469M cost framing is their strongest employer argument, but cancer treatment disruption for employees creates counter-pressure that employers can't ignore.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Jun 2025)", points: [
+        "Claimed MSK was demanding a <strong>30% average price hike</strong> (36% for the cancer center specifically)",
+        "Framed the rate increase as costing <strong>$469 million</strong>, directly impacting self-insured employers and families",
+        "Stated UHC 'already reimburses MSK at levels significantly higher than other NCI-designated health systems'",
+      ] },
+      { phase: "Mid-Dispute (Jun 2025)", points: [
+        "Sent employer/broker notifications framing MSK as choosing to leave the network",
+        "Warned ASO/self-funded employer plans would lose access immediately with <strong>no cooling-off protection</strong>",
+        "Emphasized $469M cost figure to position MSK's demands as a threat to employer bottom lines",
+      ] },
+      { phase: "Resolution (Jul 2025)", points: [
+        "UHC NY CEO Junior Harewood: 'We understand how <strong>deeply personal</strong> this negotiation has been' — unusually conciliatory tone suggesting PR pressure was felt",
+        "Framed resolution as UHC's choice: 'pleased to renew our relationship'",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Jun 2025)", points: [
+        "CMO Dr. Cardinale Smith: UHC kept rates at just <strong>1.6% annual increases</strong> over 5 years — less than one-third of actual cost increases",
+        "Published 'UHC Claims vs. Facts' rebuttal PDF with detailed data countering UHC's '30% hike' narrative",
+        "Argued MSK's <strong>total cost per cancer episode is 4–16% lower</strong> than other NCI-designated centers, with 25% fewer inpatient days and 76% fewer outpatient encounters",
+      ] },
+      { phase: "Mid-Dispute (Jun 2025)", points: [
+        "Created dedicated insurance negotiation page for patients, directing them to resources",
+        "Social media messaging framed UHC as 'unreasonable': 'doing everything we can to come to a <strong>reasonable agreement</strong> with UHC'",
+        "Leveraged structural advantage: every named patient story involved <strong>active cancer treatment</strong> — maximally sympathetic framing impossible for UHC to counter",
+      ] },
+      { phase: "Resolution (Jul 2025)", points: [
+        "CEO Selwyn Vickers: agreement 'protects access to MSK for thousands of patients' — victory framing implying <strong>UHC was threatening access</strong>",
+        "'Uninterrupted in-network access' messaging claimed credit for preventing disruption",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2025-06-19", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-06-30", type: "termination", label: "Contract terminates" },

@@ -724,6 +724,17 @@ export default {
       "UNITE HERE union engagement added labor voice to the predominantly corporate negotiation.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Jul 2024)", points: ["Cigna Newsroom referenced prior Oregon resolution (2023) as evidence of <strong>willingness to negotiate</strong>", "Maintained corporate commitment to 'affordable, quality care' — standard insurer affordability framing"] },
+      { phase: "Resolution (Aug 2024)", points: ["Agreed to renewed contracts across all WA entities — Providence, Swedish, Kadlec, PacMed, Health Connect Partners, INHS, St. Luke's Rehab", "Cigna resolved before Aetna, avoiding the <strong>'sole holdout'</strong> narrative that later damaged Aetna"] },
+    ],
+    provider: [
+      { phase: "Early (Jul 2024)", points: ["Cited <strong>$1.2B operating loss (2023)</strong> and costs up 26% since 2019 as core financial justification", "Contrasted Providence's losses against Cigna's <strong>$6.7B operating earnings and $9B in dividends/buybacks</strong> — devastating financial comparison", "FTI Consulting data provided third-party validation that hospital costs outpaced commercial reimbursement"] },
+      { phase: "Mid-Dispute (Jul–Aug 2024)", points: ["Swedish-branded patient communications and <strong>MyChart messaging</strong> controlled the narrative at point of care", "Directed patients to contact Cigna with questions — subtly shifted the burden to the insurer", "WA regulatory environment ($157.8M AG enforcement) created mutual pressure for quick resolution"] },
+      { phase: "Resolution (Aug 2024)", points: ["Resolved Cigna in under four weeks of public tension — <strong>speed prevented emotional escalation</strong>", "Strategically resolved Cigna first, then used it as precedent to isolate Aetna as the <strong>sole holdout with 35,000 patients at risk</strong>", "Sequential resolution was described as 'masterful' divide-and-conquer negotiation"] },
+    ],
+  },
   timeline: [
     { date: "2024-07-16", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-08-08", type: "agreement", label: "Agreement reached" },

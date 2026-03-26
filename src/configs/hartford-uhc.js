@@ -829,6 +829,40 @@ export default {
       "Self-insured employers faced dual pressure: UHC cost warnings vs. employee access to CT's 2nd-largest system. Neither side could fully capture employer sympathy.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Mar 2025)", points: [
+        "Created dedicated dispute page claiming HHC was seeking a <strong>~20% rate hike over 3 years</strong>, costing $185–200 million",
+        "Argued HHC physicians are <strong>already ~20% above the UHC Connecticut average</strong>",
+        "Offered <strong>1.8% annual increases</strong> — positioned as a 'fair and competitive' rate",
+      ] },
+      { phase: "Mid-Dispute (Mar 2025)", points: [
+        "Warned employers that <strong>65%+ of HHC rate hike costs</strong> would fall on self-insured employers",
+        "Cited specific employer impact data: 9 businesses facing $500K+, worst cases <strong>$1.3–6.3 million annually</strong>",
+        "Published rate comparison data showing HHC already above CT market rates",
+      ] },
+      { phase: "Resolution (Apr 2025)", points: [
+        "Conciliatory resolution framing — deal reached just after midnight April 1",
+        "No public counter-narrative to HHC's victory messaging",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Feb 2025)", points: [
+        "Launched dedicated dispute page: 'Your care is our priority' — implying UHC's priority was cost-cutting",
+        "CEO Jeffrey Flaks: 'We will not accept an agreement that undermines our ability to <strong>care for Connecticut</strong>'",
+        "Framed UHC's 1.8%/yr offer as <strong>below the CT benchmark of 2.9%/yr</strong> — below inflation and below state standard",
+      ] },
+      { phase: "Mid-Dispute (Mar 2025)", points: [
+        "Leveraged CT congressional delegation letter (Larson, Blumenthal, Courtney) demanding UHC protect <strong>Medicare Advantage enrollees</strong>",
+        "Patient stories drove coverage: Kristen Whitney Daniels (34, post-concussion) facing <strong>$10,000 out-of-pocket</strong>; colorectal cancer patient: 'under threat of having my cancer treatments taken away'",
+        "CT Hospital Association publicly backed HHC, framing dispute as <strong>insurer vs. entire provider community</strong>",
+      ] },
+      { phase: "Resolution (Apr 2025)", points: [
+        "CEO Flaks: agreement '<strong>protects access</strong> for Connecticut patients' — implying UHC was threatening it",
+        "Positioned HHC as having fought for patients against insurer cost-cutting",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2025-02-20", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-03-31", type: "termination", label: "Contract terminates" },

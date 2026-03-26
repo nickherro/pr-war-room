@@ -957,6 +957,18 @@ export default {
       "Second disruption in four years damages Cigna's network reliability reputation with Upstate SC employers and brokers.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Nov 2024)", points: ["Claimed Spartanburg Regional demanded a <strong>23% rate increase</strong> and was 'already the most expensive provider in the area'", "Framed resolution as providing 'access to quality, affordable care' — standard insurer affordability messaging"] },
+      { phase: "Out-of-Network (Jan 2025)", points: ["Noted Cigna Medicare contracts remained in-network — limiting the disruption to commercial plans only", "Counter-narrative: SRHS also had prior Aetna disputes, suggesting SRHS is a serial disputant, not just Cigna"] },
+      { phase: "Resolution (Feb 2025)", points: ["Agreed to multi-year deal covering six hospital campuses and 700+ physicians", "Cigna Newsroom claimed credit for 'protecting affordability while restoring access'"] },
+    ],
+    provider: [
+      { phase: "Early (Nov 2024)", points: ["Spartanburg Regional stated <strong>'Cigna is not recognizing rising labor and supply costs'</strong>", "Cited Cigna's position as being in <strong>'stark contrast to other major national insurers'</strong> — isolating Cigna as the outlier", "Simultaneous announcement with Bon Secours St. Francis amplified the story — two health systems exiting Cigna in the same market"] },
+      { phase: "Out-of-Network (Jan 2025)", points: ["This was the <strong>second Cigna network disruption since 2020</strong> (prior 18-month gap from June 2020 to January 2022) — pattern framing undermined Cigna's 'unreasonable demands' narrative", "Emphasized SRHS operates the region's <strong>only Level I Trauma Center</strong> and serves Cherokee, Union, and Spartanburg counties with few alternatives", "Directed patients to file continuity of care requests with Cigna; SC law provides 90-day continuation for serious medical conditions"] },
+      { phase: "Resolution (Feb 2025)", points: ["Secured multi-year agreement — mirrors 2022 resolution pattern but with longer-term stability", "6 hospital campuses, facilities, and 700+ physician network restored to in-network status"] },
+    ],
+  },
   timeline: [
     { date: "2024-11-20", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-12-31", type: "termination", label: "Contract terminates" },

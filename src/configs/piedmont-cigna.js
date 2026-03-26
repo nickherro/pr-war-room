@@ -871,6 +871,18 @@ export default {
       "Open enrollment had already closed for many employers when the December deadline approached — employers and employees felt trapped with no ability to switch plans.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Oct–Nov 2025)", points: ["Positioned Tenet as seeking rates <strong>'far beyond what is reasonable'</strong> for a for-profit hospital chain", "Accused Tenet/Piedmont of <strong>'stoking fear among patients as a negotiating tactic'</strong>", "Insisted on state-based contracts vs Tenet's preferred national deal — complicating local resolution"] },
+      { phase: "Deadline Pressure (Dec 2025)", points: ["Launched 'Save Our Healthcare' counter-messaging — but Cigna's corporate tone was less effective than Tenet's patient-access framing", "Cigna shares already under pressure from pharmacy-benefit margin warnings (stock fell 17% in Oct) — financial headwinds limited Cigna's leverage"] },
+      { phase: "Resolution (Dec 2025)", points: ["National Tenet/Cigna agreement on December 31 included Piedmont Medical Center — no interruption in coverage", "Multi-year deal with terms not disclosed; negotiations centered on prior authorization and fair emergency reimbursement"] },
+    ],
+    provider: [
+      { phase: "Early (Oct–Nov 2025)", points: ["Piedmont framed Cigna as <strong>'refusing to negotiate in good faith'</strong> on rate increases for its 282-bed Level III trauma hospital", "Tenet's national 'unsure-ance' campaign applied locally: <strong>'If you have Cigna, you have health unsureance'</strong>", "FTI data showed Cigna among <strong>most active insurers in disputes</strong> nationally — 51 (2022) to 133 (2024) — normalizing Piedmont's position"] },
+      { phase: "Escalation (Dec 2025)", points: ["WRHI (Rock Hill hometown radio) coverage that local businesses <strong>chose Cigna specifically because Piedmont was in-network</strong> — broken promise framing", "Cited Cigna's <strong>rate offers 'well below inflation'</strong> and proposed <strong>cuts to physician and ASC reimbursement</strong>", "Wendell Potter (former Cigna executive turned whistleblower) lent powerful insider credibility to Piedmont's position", "Directed patients to KeepYourHealthcareAccess.com — coordinated with national Tenet campaign"] },
+      { phase: "Resolution (Dec 2025)", points: ["Included in national Tenet/Cigna resolution December 31 — multi-year deal preserved in-network access", "York County employers and patients avoided disruption as market-by-market deals (Palm Beach, San Antonio) built momentum toward deadline"] },
+    ],
+  },
   timeline: [
     { date: "2025-10-15", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-12-31", type: "termination", label: "Contract set to terminate" },

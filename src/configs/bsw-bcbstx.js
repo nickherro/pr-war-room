@@ -1260,6 +1260,40 @@ export default {
       "BSW's counter-notifications to patients created a dueling-communication dynamic that confused employer plan participants.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (May–Jun 2024)", points: [
+        "BCBSTX framed BSW as the party threatening to terminate unless BCBS would '<strong>significantly increase what we pay them</strong>'",
+        "Positioned BCBSTX as the one being left — preferred framing was 'BSW could terminate' rather than 'BCBS refusing to pay'",
+        "Emphasized BCBSTX's <strong>~25% market share and ~8 million members</strong> to signal leverage",
+      ] },
+      { phase: "Mid-Dispute (Jun–Sep 2024)", points: [
+        "Sent member notification letters reaching HR departments across Texas — the <strong>employer channel was BCBSTX's most effective pressure tool</strong>",
+        "Axios Dallas adopted BCBSTX framing: 'BCBS could drop BSW' — positioning BSW as the party being removed",
+        "Leveraged HealthSelect coverage for <strong>500,000+ state employees and retirees</strong> to create implicit political pressure",
+      ] },
+      { phase: "Resolution (Sep 2024)", points: [
+        "Agreed to three-month extension (June 27) then long-term agreement (September 27)",
+        "Resolution avoided triggering <strong>TDI network adequacy rules (HB 3359)</strong> which would have created formal compliance issues for BCBSTX",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (May 2024)", points: [
+        "Notified BCBSTX it would terminate unless agreements were modified — framed BCBSTX as <strong>underpaying</strong>",
+        "Cited financial pressure: BSW revenue <strong>$1.2 billion in 2023 exceeded by $1.41 billion in expenses</strong>",
+        "Positioned as Texas's <strong>largest nonprofit system</strong> (51 hospitals, 800+ care sites, 7,300 physicians) fighting for sustainable reimbursement",
+      ] },
+      { phase: "Mid-Dispute (Jun–Sep 2024)", points: [
+        "Patient advocate Belynda Montgomery: 'months of backlog and misinformation' — <strong>patient harm narrative inherently blamed the payor</strong>",
+        "Leveraged rural Texas presence where BSW is often the only major system — network exit would create <strong>healthcare deserts</strong>",
+        "Counter-notifications to patients created dueling communication dynamic; KCEN VERIFY segments confirmed high public confusion",
+      ] },
+      { phase: "Resolution (Sep 2024)", points: [
+        "Secured three-month extension (June 27) buying time for substantive negotiations",
+        "Long-term agreement reached September 27 — dispute lasted nearly 5 months but <strong>no actual network disruption occurred</strong>",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2024-05-07", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-07-01", type: "termination", label: "Contract set to terminate" },

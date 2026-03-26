@@ -1018,6 +1018,18 @@ export default {
       "Jefferson Health-Cigna failure to resolve (March 15) retroactively validated every employer concern raised during the MLH dispute — Cigna's Philadelphia reputation was severely damaged.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Nov–Dec 2024)", points: ["Claimed to be working <strong>'in good faith'</strong> with Main Line Health — implying MLH was not", "Emphasized Cigna has a <strong>'robust system of providers in the area'</strong> if MLH exits — signaling willingness to let MLH walk"] },
+      { phase: "Mid-Dispute (Jan–Feb 2025)", points: ["Framed to employers that rate increases would be 'detrimental to customers and their families'", "Cigna's $247.1B revenue (up 27%) and $7.7B adjusted income reported January 30 — <strong>devastating timing</strong> one day after Healthcare Dive article on the dispute"] },
+      { phase: "Resolution (Feb 2025)", points: ["Commercial contract resolved around February 15, 2025 — terms not disclosed", "Medicare Advantage termination (Jan 1) was <strong>not resolved</strong> — MLH remained out-of-network for Cigna MA patients"] },
+    ],
+    provider: [
+      { phase: "Early (Nov–Dec 2024)", points: ["Notified Cigna MA patients that coverage ends January 1, 2025 — provided 90-day continuity of care window", "Published dedicated patient-facing Cigna insurance update pages on mainlinehealth.org"] },
+      { phase: "Mid-Dispute (Jan–Feb 2025)", points: ["Told patients Cigna <strong>'reimburses the health system at lower rates than nearby health systems and uses rates set in 2016'</strong> — eight years without a rate increase", "CEO Jack Lynch cited <strong>three consecutive years of operating losses</strong> ($125M in FY2023, $61M in FY2024) and 200 nonclinical layoffs to demonstrate financial hardship", "Noted <strong>65% of patients are on Medicare/Medicaid</strong> at below-cost rates — MLH depends on commercial insurers paying fairly", "Philadelphia Inquirer's 'rates haven't been updated since 2016' framing was the most damaging single data point for Cigna"] },
+      { phase: "Resolution (Feb 2025)", points: ["Commercial contract resolved around February 15 — likely secured meaningful rate improvement given the leverage of 2016 rate exposure", "MA termination remained unresolved, setting precedent for broader Cigna MA network erosion in Philadelphia region"] },
+    ],
+  },
   timeline: [
     { date: "2024-11-15", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-01-01", type: "termination", label: "MA contract terminates" },

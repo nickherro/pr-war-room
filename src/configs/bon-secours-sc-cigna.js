@@ -1042,6 +1042,18 @@ export default {
       "InsuranceNewsNet coverage of the resolution reaches the broker/agent channel directly — the dispute will factor into employer renewal decisions and RFP evaluations for Cigna.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Nov 2024)", points: ["Cigna framed Bon Secours as <strong>'choosing to leave our network unless we agree to significant rate increases'</strong>", "Positioned rate increases as inflationary to patients — classic payer playbook making the provider look greedy", "Advised affected patients to 'call the number on your card' for alternative in-network providers — reactive, generic messaging"] },
+      { phase: "MA Termination (Jan 2025)", points: ["Did not address the <strong>HCSC sale context</strong> — Cigna had sold its Medicare Advantage business to HCSC for $3.7B, complicating the 'Bon Secours is leaving' narrative", "Cigna's corporate decision to exit Medicare created the disruption, but Cigna's messaging omitted this"] },
+      { phase: "Resolution (Apr 2025)", points: ["Commercial contract resolved April 1, 2025 as part of broader Bon Secours Mercy Health multi-state deal", "Cigna claimed credit for 'protecting affordability' while restoring access across VA, OH, and SC markets"] },
+    ],
+    provider: [
+      { phase: "Early (Jun–Nov 2024)", points: ["Informed Cigna of MA exit decision in June 2024 — <strong>six months' notice</strong> aligned with standard contract provisions", "Cited Cigna's failure to provide a <strong>rate increase in over six years</strong> as core justification", "Countered Cigna's 'choosing to leave' narrative by noting Cigna's MA plan was <strong>sold to HCSC, an entity Bon Secours doesn't partner with</strong>"] },
+      { phase: "Mid-Dispute (Dec 2024–Mar 2025)", points: ["Sent proactive letters to ~500 affected MA patients with enough time before the Dec 7 Medicare open enrollment deadline", "Created dedicated bonsecours.com insurance updates page — professional communication strategy", "Ohio sister system (Mercy Health) amplified the narrative: <strong>'high rate of claim denials led to significant delays in life-sustaining care'</strong>"] },
+      { phase: "Resolution (Apr 2025)", points: ["Commercial contract resolved April 1, 2025 as part of multi-state BSMH deal covering VA, OH, and SC", "Multi-state coordination strengthened Bon Secours' negotiating leverage — system-wide approach to Cigna underpayment"] },
+    ],
+  },
   timeline: [
     { date: "2024-11-20", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-01-01", type: "termination", label: "MA contract terminates" },

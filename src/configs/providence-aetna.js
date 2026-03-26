@@ -1196,6 +1196,40 @@ export default {
       "Resolution arriving Dec 1, 2025 was just in time for 2026 open enrollment decisions — employers could maintain Aetna without the Providence gap.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Aug 2024)", points: [
+        "Aetna: Providence demanding '<strong>unreasonable rate increases</strong> that would raise costs for employers'",
+        "Employer cost framing targeted self-funded plan sponsors who bear direct cost impact",
+        "Corporate tone with no patient voices — relied on affordability messaging",
+      ] },
+      { phase: "Mid-Dispute (Jan–Nov 2025, Oregon)", points: [
+        "Maintained 'unreasonable rate increases' framing as Oregon dispute extended for nearly a full year",
+        "Could not effectively counter Providence's <strong>for-profit vs. nonprofit contrast</strong> (CVS/Aetna $3.7B operating income vs Providence $1.2B operating loss)",
+        "In Oregon, 85%+ of Aetna members are in self-funded employer plans — employer pressure mounted as open enrollment approached",
+      ] },
+      { phase: "Resolution (Sep 2024 WA / Dec 2025 OR)", points: [
+        "WA resolved quickly (5 days from public disclosure to deal) after WA OIC issued briefing memo",
+        "Oregon took <strong>nearly 12 months</strong> to resolve — December 4, 2025 agreement effective December 1",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Aug 2024)", points: [
+        "CFO Greg Hoffman: '<strong>For-profit insurers like Aetna continue to reap benefits of multi-year contracts</strong> while costs skyrocket'",
+        "Cited <strong>$1.2 billion operating loss</strong> and costs up 26% since 2019 as evidence rates must increase",
+        "Strategically resolved Cigna deal first — <strong>isolated Aetna as the holdout insurer</strong> ('we can make deals with reasonable insurers')",
+      ] },
+      { phase: "Mid-Dispute (Jan–Nov 2025, Oregon)", points: [
+        "Oregon patient stories defined the dispute: Bob Dragoon's daughter (34, mother of two, stomach cancer) — 'appointments, medications, and treatment plans have been <strong>halted</strong>'",
+        "Providence: 'Other insurers agreed to step up and share in increasing costs; <strong>Aetna has not</strong>'",
+        "~9,000 Oregon Aetna patients affected; independent clinics (Women's Healthcare Associates, Oregon Clinic) forced to publish clarifications — <strong>confusion radius extended beyond Providence-owned facilities</strong>",
+      ] },
+      { phase: "Resolution (Sep 2024 WA / Dec 2025 OR)", points: [
+        "WA: 'patients will continue to have access' — victory framing implying Providence secured the deal that protects patients",
+        "Oregon: resolution arrived just in time for <strong>2026 open enrollment decisions</strong> — employers could maintain Aetna without the Providence gap",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2024-08-28", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-09-01", type: "termination", label: "WA contract terminates" },

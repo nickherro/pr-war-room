@@ -1000,6 +1000,40 @@ export default {
       "~10,000 UFCW Local 135 workers created direct employer pressure — union benefits are a negotiated contract item, not just an insurance product.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Oct–Dec 2024)", points: [
+        "Anthem framed Scripps as demanding excessive rate increases that would drive up costs for employers and families",
+        "Positioned the dispute as a Scripps decision to leave the network",
+        "Cited Anthem/Elevance's <strong>$108.92 billion total assets</strong> was avoided — relied on affordability framing instead",
+      ] },
+      { phase: "Mid-Dispute (Jan–Apr 2025)", points: [
+        "Anthem <strong>denied 2,300 claims totaling $34 million</strong>; appeals recovered only $6.5 million — Scripps publicized this data devastatingly",
+        "800+ instances of Anthem <strong>reversing prior authorization after billing</strong> became the dispute's defining data point",
+        "Corporate statements could not compete with Scripps CEO's 'delay, deny, don't pay' soundbite",
+      ] },
+      { phase: "Resolution (May 2025)", points: [
+        "Agreed to extension agreement (not a new contract) <strong>retroactive to January 1</strong>",
+        "Extension through September 2026 — dispute paused but not fully resolved",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Oct–Dec 2024)", points: [
+        "Sent letters to <strong>125,000+ Anthem policyholders</strong> warning of potential network exit — fired first public salvo",
+        "CEO Chris Van Gorder: hospitals face '<strong>hospital deserts</strong>' as insurers underpay — systemic framing",
+        "Cited compensation costs up >8%/yr, pharma >14%/yr as justification for rate increases",
+      ] },
+      { phase: "Mid-Dispute (Jan–Apr 2025)", points: [
+        "Published devastating data: Anthem denied 2,300 claims ($34M), reversed 800+ prior authorizations after billing — '<strong>delay, deny or don't pay</strong>'",
+        "Patient stories sustained pressure for months: Angel Coronel (brain rehab, $1,000+/day OON costs), Lisa Schmidt (rare disease, forced to travel to Cleveland for surgery), Kirsten Lozano (ulcerative colitis, authorizations repeatedly canceled)",
+        "State Sen. Blakespear sent formal letter to DMHC; <strong>Covered California opened 60-day special enrollment</strong> for 14,000 affected enrollees",
+      ] },
+      { phase: "Resolution (May 2025)", points: [
+        "Extension agreement retroactive to Jan 1 — claims during 4-month gap period to be reprocessed at in-network rates",
+        "Scripps spokesperson Richard Neale: 'This is an extension, <strong>it is not a new agreement</strong>' — dispute paused, not over",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2024-10-17", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-01-01", type: "termination", label: "Contract terminates" },

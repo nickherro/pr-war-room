@@ -826,6 +826,40 @@ export default {
       "Retroactive coverage resolution neutralized the employer impact — but the disruption created lasting questions about Cigna network stability in Philadelphia market.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Mar 2025)", points: [
+        "Claimed Jefferson was demanding an '<strong>unreasonable rate hike</strong> that would raise health costs for employers and families'",
+        "Stated Cigna offered 'fair and competitive' rates",
+        "Framed Jefferson as choosing to leave the network — employer notifications positioned Cigna as the victim",
+      ] },
+      { phase: "Mid-Dispute (Mar 2025)", points: [
+        "Notified Philadelphia-area employers that Jefferson was no longer in network, emphasizing 'alternative providers available'",
+        "Maintained corporate defensive tone throughout — <strong>no patient voices or physician advocates</strong> in any Cigna communications",
+        "Could point to LVHN (Jefferson-owned) maintaining separate Cigna contract as evidence of continued access",
+      ] },
+      { phase: "Resolution (Apr 2025)", points: [
+        "Agreed to retroactive coverage to March 15 — no patients ultimately billed at out-of-network rates",
+        "Multi-year agreement terms not disclosed publicly",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Mar 2025)", points: [
+        "Dr. Edmund Pribitkin (Chief Physician Executive): Cigna reimbursement increased <strong>only ~3% since 2020</strong> while Hospital Wage Index rose 20% and CPI-U rose 21%",
+        "Cited Jefferson's <strong>$196 million operating loss</strong> in FY2025 as evidence current Cigna rates are unsustainable",
+        "Published patient notice with Dr. Pribitkin <strong>TikTok video</strong> urging patients to contact Cigna directly",
+      ] },
+      { phase: "Mid-Dispute (Mar 2025)", points: [
+        "Dr. Pribitkin's TikTok video went viral — crossed from owned to social to earned media (<strong>picked up by 6ABC</strong>)",
+        "Saturated hyperlocal media: 12+ suburban outlets (Patch, Bucks County Herald, Glenside Local, MontCo Today) created drumbeat of patient anxiety coverage",
+        "Named patient David Rosenberg: wife's mammogram critical due to <strong>family breast cancer history</strong>, children's pediatrician also Jefferson — entire family healthcare ecosystem disrupted",
+      ] },
+      { phase: "Resolution (Apr 2025)", points: [
+        "Multi-year agreement <strong>retroactive to March 15</strong> — presented as Jefferson's victory in fighting for fair rates",
+        "HealthLeaders explicitly credited Jefferson's '<strong>public pressure campaign</strong>' as the decisive factor",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2025-03-12", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-03-15", type: "termination", label: "Contract terminates" },

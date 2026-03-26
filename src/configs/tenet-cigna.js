@@ -1085,6 +1085,18 @@ export default {
       "Open enrollment timing (Oct-Nov) meant some employers may have begun exploring alternatives to Cigna for 2026, creating commercial pressure beyond the immediate dispute.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Oct–Nov 2025)", points: ["Mailed notification letters to members across <strong>7 states</strong> warning of potential network disruption — creating direct patient and employer anxiety", "Framed Tenet as seeking rates <strong>'far beyond what is reasonable'</strong> and putting 'business ahead of people in the communities where they operate'", "Accused Tenet of <strong>'stoking fear among patients as a negotiating tactic'</strong> (Memphis market)"] },
+      { phase: "Counter-Campaign (Dec 2025)", points: ["Launched 'Save Our Healthcare' counter-site — framed Tenet as a for-profit chain prioritizing shareholders", "Insisted on <strong>state-based contracts</strong> vs Tenet's preferred national deal structure", "Corporate tone was less effective than Tenet's patient-access and 'unsure-ance' framing"] },
+      { phase: "Resolution (Dec 2025)", points: ["Agreed to multi-year deal on December 31 — all 64 hospitals, ~370 ASCs, and 2,000 providers remain in-network", "Negotiations centered on prior authorization safeguards, physician-led medical decisions, and fair emergency reimbursement"] },
+    ],
+    provider: [
+      { phase: "Early (Oct 2025)", points: ["Spokesperson Lesley Bogdanow introduced <strong>'unsure-ance'</strong> framing: 'If Tenet is forced out of network, consumers are paying premiums for a partial network with fewer providers'", "Accused Cigna of demanding <strong>'excessive, unreasonable rate cuts'</strong> after 11 months of failed negotiations", "Quantified massive scale: 64 hospitals, ~370 ASCs, 2,000 providers across AL, AZ, CA, FL, SC, TN, TX"] },
+      { phase: "Escalation (Nov–Dec 2025)", points: ["Launched <strong>KeepYourHealthcareAccess.com</strong> campaign site with patient petition and Cigna executive contact info", "Ran paid newspaper ads with 'unsure-ance' messaging — unusual for hospital systems to buy print ads attacking insurers", "Cited Cigna's <strong>10% premium revenue increase per member</strong> while refusing fair provider rates", "Arizona AG investigation into Cigna claim denials and Cigna's paused E&M downcoding policy (R49) created regulatory headwinds"] },
+      { phase: "Resolution (Dec 2025)", points: ["Multi-year national contract preserved on December 31 — no interruption in coverage", "Market-by-market announcements (Palm Beach, Texas Baptist, national) built momentum toward deadline-day resolution", "2022 lawsuit where 19 Tenet hospitals sued Cigna over emergency care reimbursement provided legal leverage backdrop"] },
+    ],
+  },
   timeline: [
     { date: "2025-10-02", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-12-31", type: "termination", label: "Contract set to terminate" },

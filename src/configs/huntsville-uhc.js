@@ -878,6 +878,40 @@ export default {
       "Self-insured employers face direct cost impact from rate changes — UHC's cost framing resonates here more than anywhere else.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Oct 2024)", points: [
+        "Created dedicated microsite (es.uhc.com/huntsville) claiming HHHS charges <strong>>20% higher than the Alabama state average</strong>",
+        "Alleged HHHS demanded a <strong>>25% rate increase in a single year</strong>",
+        "Positioned UHC as protecting 'affordable care for our members'",
+      ] },
+      { phase: "Mid-Dispute (Oct–Nov 2024)", points: [
+        "Employer-facing communications framed HHHS as demanding excessive rate increases that would hit self-insured employers directly",
+        "UHC's '>20% above Alabama average' became its core employer-channel argument",
+        "Corporate statements emphasized commitment to 'reaching an agreement that keeps care affordable'",
+      ] },
+      { phase: "Resolution (Nov 2024)", points: [
+        "No major public resolution statement — UHC maintained low profile in resolution coverage",
+        "Conceded to multi-year deal one day before termination deadline",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Oct 2024)", points: [
+        "CEO Jeff Samz: UHC's <strong>denial rate is 75% higher</strong> than comparable insurers",
+        "'We cannot continue to absorb these losses' — framed the dispute as financial survival for a public hospital system",
+        "Coordinated same-day announcement across all four Huntsville TV stations for <strong>full market saturation</strong>",
+      ] },
+      { phase: "Mid-Dispute (Oct–Nov 2024)", points: [
+        "Helen Keller Hospital exited UHC network Oct 15 and Highlands Medical Center Oct 31 — <strong>demonstrated willingness to follow through</strong> with concrete patient disruption",
+        "Patient stories drove coverage: Danielle DuPont (expecting mother): '<strong>I feel like I'm the one being punished</strong>'; Terri Krejci (lupus/RA/cancer survivor): 'scared and confused'",
+        "Cited UHC's <strong>$32.4 billion annual earnings</strong> to undercut affordability argument",
+      ] },
+      { phase: "Resolution (Nov 2024)", points: [
+        "CEO Samz: 'This outcome <strong>protects access to care</strong> for the communities we serve'",
+        "Multi-year agreement finalized Nov 20 — HHHS framed as having defended community access against out-of-state insurer",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2024-10-10", type: "newsBreak", label: "News breaks publicly" },
     { date: "2024-10-15", type: "termination", label: "Helen Keller Hospital exits network" },

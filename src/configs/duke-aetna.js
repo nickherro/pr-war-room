@@ -1240,6 +1240,40 @@ export default {
       "State agency HR bulletins across multiple departments created administrative burden that added political pressure for resolution.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Jul–Aug 2025)", points: [
+        "NC State Treasurer Briner called Duke's rate demand '<strong>incredibly tone deaf</strong>'",
+        "Board member Brian Miller MD revealed Duke's financials: <strong>$4.3 billion investments, $566 million operating cash flows, $202 million operating income</strong>",
+        "Briner: 'Duke is more than fine with our existing rates' — framed Duke as wealthy and not needing increases",
+      ] },
+      { phase: "Mid-Dispute (Sep 2025)", points: [
+        "Briner escalated rhetoric: '<strong>greedy</strong>' Duke is '<strong>putting profit before people</strong>'",
+        "Released detailed financial brief to media showing Duke's strong balance sheet vs SHP's <strong>$507 million inherited deficit</strong>",
+        "Taxpayer-protection framing resonated with conservative fiscal outlets (Carolina Journal, The Center Square)",
+      ] },
+      { phase: "Resolution (Oct 2025)", points: [
+        "Agreement reached October 3 — 17 days before the scheduled network exit",
+        "SHP received <strong>$150 million plus additional $100 million</strong> from NC General Assembly to shore up funding",
+      ] },
+    ],
+    provider: [
+      { phase: "Early (Jul–Aug 2025)", points: [
+        "Duke framed Aetna as refusing reasonable rate increases — <strong>no rate increase in 4 years</strong>",
+        "Argued Duke was asking for increases '<strong>below inflation</strong>' — the stickiest data point in the dispute",
+        "70,000 Triangle members at risk and 22,000 who list Duke as their PCP quantified the patient impact",
+      ] },
+      { phase: "Mid-Dispute (Aug–Sep 2025)", points: [
+        "Patient stories escalated: cancer patient '<strong>devastated</strong>' by potential loss of Duke access; OOP would double from <strong>$5,900 to $11,800</strong>",
+        "Stage 4 melanoma patient: irony of using Briner's own language — 'putting profit before people' — directed at the system forcing patients out of network",
+        "Open enrollment timing amplified employer anxiety — UNC system and Appalachian State HR issued employee advisories",
+      ] },
+      { phase: "Resolution (Oct 2025)", points: [
+        "Agreement reached well before the Oct 20 deadline — Duke's PR pressure and legislative funding created conditions for deal",
+        "CEO departure (Craig Albanese to Kaiser, Sep 9) did not derail negotiations — COO Thomas Owens completed the deal",
+      ] },
+    ],
+  },
   timeline: [
     { date: "2025-07-23", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-10-20", type: "termination", label: "Scheduled network exit" },

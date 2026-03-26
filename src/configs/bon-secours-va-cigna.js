@@ -1003,6 +1003,18 @@ export default {
       "Cigna's employer-facing framing ('rate increases detrimental to customers') was their strongest argument but was undercut by employee anxiety about losing access to their doctors.",
     ],
   },
+  arguments: {
+    payor: [
+      { phase: "Early (Feb–Mar 2025)", points: ["Claimed Bon Secours Mercy Health was demanding <strong>significant rate increases across multiple markets</strong> that would be 'detrimental to customers'", "Quantified demand as <strong>more than 27% over five years</strong> (30% per Becker's reporting)", "Positioned Cigna as patient advocate — rate increases would raise costs for 'local customers and their families'"] },
+      { phase: "Deadline Week (Mar 2025)", points: ["Launched 'Save Our Healthcare' counter-messaging — framed Tenet/BSMH as corporate chains prioritizing profit", "Defensive corporate tone was less effective than Bon Secours' patient-access framing"] },
+      { phase: "Resolution (Apr 2025)", points: ["Agreed to multi-year deal after 24-hour extension — spokespeople <strong>declined to answer questions</strong> about contract terms", "Neither side claimed victory publicly — neutral resolution framing"] },
+    ],
+    provider: [
+      { phase: "Early (Feb–Mar 2025)", points: ["Core claim: <strong>Cigna has not provided a rate increase in over six years</strong> — the stickiest factual argument of the dispute", "Bon Secours' FAQ stated: 'What Cigna pays our doctors, nurses and caregivers is <strong>not adequate to account for the cost of providing safe, quality care</strong>'", "30,000 Virginia patients at 8 hospitals quantified the impact — Richmond, Hampton Roads, and rural communities all affected"] },
+      { phase: "Mobilization (Mar 2025)", points: ["Launched patient advocacy campaign: <strong>'Call Cigna and tell them to keep Bon Secours in-network'</strong> with provided scripts", "Directed patients to contact employers, file complaints with Virginia Bureau of Insurance, and post on social media", "Created dedicated bonsecours.com Cigna updates page and 'How to Take Action' mobilization page"] },
+      { phase: "Resolution (Apr 2025)", points: ["Multi-year agreement reached April 1 after 24-hour extension past the March 31 deadline", "Virginia's 2024 continuity of care law (90 days minimum, 180 for life-threatening conditions) provided patient safety net during negotiations", "Resolved as part of broader BSMH system-wide deal covering VA, OH, and SC simultaneously"] },
+    ],
+  },
   timeline: [
     { date: "2025-02-13", type: "newsBreak", label: "News breaks publicly" },
     { date: "2025-03-31", type: "termination", label: "Contract set to terminate" },
