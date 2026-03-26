@@ -3,15 +3,19 @@ import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceL
 
 // === SHARED COMPUTATION LOGIC ===
 
-const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
+export const DEFAULT_SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
+export const DEFAULT_DIMENSION_WEIGHTS = { frame: 0.3, sentiment: 0.3, blame: 0.25, patientStory: 0.15 };
 
-function getWeight(entry, sourceWeights) {
-  return sourceWeights[entry.source] ?? SOURCE_TYPE_WEIGHTS[entry.sourceType] ?? 1.0;
+function getWeight(entry, sourceWeights, sourceTypeWeights) {
+  return sourceWeights[entry.source] ?? sourceTypeWeights[entry.sourceType] ?? 1.0;
 }
 
-function computeScores(entries, config) {
+function computeScores(entries, config, overrides) {
   const { providerKey, payorKey, sourceWeights } = config;
-  const gw = (e) => getWeight(e, sourceWeights);
+  const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
+  const dw = overrides?.dimensionWeights || DEFAULT_DIMENSION_WEIGHTS;
+  const mergedSourceWeights = overrides?.sourceWeights ? { ...sourceWeights, ...overrides.sourceWeights } : sourceWeights;
+  const gw = (e) => getWeight(e, mergedSourceWeights, stw);
   const totalW = entries.reduce((s, e) => s + gw(e), 0) || 1;
   const mediaEntries = entries.filter((e) => e.channel === "media");
   const socialEntries = entries.filter((e) => e.channel === "social");
@@ -33,7 +37,7 @@ function computeScores(entries, config) {
   const patientW = entries.filter((e) => e.patientStory).reduce((s, e) => s + gw(e), 0);
   const patientScore = (patientW / totalW) * 100;
 
-  const composite = frameScore * 0.3 + sentScore * 0.3 + blameScore * 0.25 + patientScore * 0.15;
+  const composite = frameScore * dw.frame + sentScore * dw.sentiment + blameScore * dw.blame + patientScore * dw.patientStory;
 
   return {
     total: entries.length,
@@ -56,7 +60,7 @@ function computeScores(entries, config) {
   };
 }
 
-function computeTrend(entries, config) {
+function computeTrend(entries, config, overrides) {
   if (entries.length === 0) return [];
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const dateMap = {};
@@ -69,7 +73,7 @@ function computeTrend(entries, config) {
   const cumulative = [];
   dates.forEach((d) => {
     cumulative.push(...dateMap[d]);
-    const s = computeScores(cumulative, config);
+    const s = computeScores(cumulative, config, overrides);
     points.push({ date: d, composite: s.composite, count: cumulative.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
   });
   return points;
@@ -77,11 +81,11 @@ function computeTrend(entries, config) {
 
 // === CHART COMPONENTS ===
 
-function SearchTrendsChart({ entries, config }) {
+function SearchTrendsChart({ entries, config, overrides }) {
   const { disputePublicDate, searchTrends, colors, searchLabel, gradientId } = config;
 
   const data = useMemo(() => {
-    const trend = computeTrend(entries, config);
+    const trend = computeTrend(entries, config, overrides);
     const dates = trend.map((t) => t.date);
     if (dates.length > 0 && disputePublicDate < dates[0]) {
       dates.unshift(disputePublicDate);
@@ -163,18 +167,18 @@ function SearchTrendsChart({ entries, config }) {
   );
 }
 
-function TrendChart({ entries, filterChannel, config }) {
+function TrendChart({ entries, filterChannel, config, overrides }) {
   const { disputePublicDate, colors, gradientId } = config;
   const providerFavLabel = config.providerShort + " FAV";
   const payorFavLabel = config.payorShort + " FAV";
 
-  const allTrend = useMemo(() => computeTrend(entries, config), [entries, config]);
+  const allTrend = useMemo(() => computeTrend(entries, config, overrides), [entries, config, overrides]);
   const channelTrend = useMemo(() => {
     if (filterChannel === "all") return null;
     const channelEntries = entries.filter((e) => e.channel === filterChannel);
     if (channelEntries.length < 2) return null;
-    return computeTrend(channelEntries, config);
-  }, [entries, filterChannel, config]);
+    return computeTrend(channelEntries, config, overrides);
+  }, [entries, filterChannel, config, overrides]);
 
   const chartData = useMemo(() => {
     const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
@@ -370,16 +374,18 @@ function TrendChart({ entries, filterChannel, config }) {
 
 // === EXECUTIVE SUMMARY ===
 
-function ExecutiveSummary({ entries, filterChannel, scores, config }) {
+function ExecutiveSummary({ entries, filterChannel, scores, config, overrides }) {
   const [expanded, setExpanded] = useState(false);
   const { providerKey, payorKey, providerName, payorName, providerShort, payorShort, colors, sourceWeights } = config;
-  const gw = (e) => getWeight(e, sourceWeights);
+  const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
+  const mergedSW = overrides?.sourceWeights ? { ...sourceWeights, ...overrides.sourceWeights } : sourceWeights;
+  const gw = (e) => getWeight(e, mergedSW, stw);
 
   const channelScores = useMemo(() => {
     const ch = {};
     ["media", "social", "stakeholder", "employer"].forEach((c) => {
       const ce = entries.filter((e) => e.channel === c);
-      ch[c] = ce.length >= 2 ? computeScores(ce, config) : null;
+      ch[c] = ce.length >= 2 ? computeScores(ce, config, overrides) : null;
     });
     return ch;
   }, [entries, config]);
@@ -388,8 +394,8 @@ function ExecutiveSummary({ entries, filterChannel, scores, config }) {
     const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
     const mid = Math.floor(sorted.length / 2);
     if (mid < 3) return null;
-    const early = computeScores(sorted.slice(0, mid), config);
-    const late = computeScores(sorted.slice(mid), config);
+    const early = computeScores(sorted.slice(0, mid), config, overrides);
+    const late = computeScores(sorted.slice(mid), config, overrides);
     return { early: early.composite, late: late.composite, shift: late.composite - early.composite };
   }, [entries, config]);
 
@@ -406,8 +412,8 @@ function ExecutiveSummary({ entries, filterChannel, scores, config }) {
     if (mid < 3) return null;
     const early = sorted.slice(0, mid);
     const late = sorted.slice(mid);
-    const earlyScores = computeScores(early, config);
-    const lateScores = computeScores(late, config);
+    const earlyScores = computeScores(early, config, overrides);
+    const lateScores = computeScores(late, config, overrides);
 
     const dims = [
       { name: "Frame Adoption", key: "frameScore", weight: "30%", early: earlyScores.frameScore, late: lateScores.frameScore },
@@ -425,8 +431,8 @@ function ExecutiveSummary({ entries, filterChannel, scores, config }) {
       const chEarly = early.filter((e) => e.channel === ch);
       const chLate = late.filter((e) => e.channel === ch);
       if (chEarly.length < 2 || chLate.length < 2) return;
-      const eScores = computeScores(chEarly, config);
-      const lScores = computeScores(chLate, config);
+      const eScores = computeScores(chEarly, config, overrides);
+      const lScores = computeScores(chLate, config, overrides);
       const shift = lScores.composite - eScores.composite;
       if (Math.abs(shift) > 5) {
         const label = ch.charAt(0).toUpperCase() + ch.slice(1);
@@ -492,7 +498,7 @@ function ExecutiveSummary({ entries, filterChannel, scores, config }) {
     const cs = channelScores[filterChannel];
     if (!cs) return null;
     const label = filterChannel.charAt(0).toUpperCase() + filterChannel.slice(1);
-    const allScores = computeScores(entries, config);
+    const allScores = computeScores(entries, config, overrides);
     const diff = cs.composite - allScores.composite;
     const diffDir = diff > 5 ? `stronger for ${providerName}` : diff < -5 ? `stronger for ${payorName}` : "roughly aligned with";
 
@@ -1056,7 +1062,7 @@ function EntryLogs({ entries, filterChannel, onDelete, config }) {
   });
 }
 
-export default function WarRoomDashboard({ config }) {
+export default function WarRoomDashboard({ config, weightOverrides }) {
   const { providerName, payorName, providerShort, payorShort, colors, labels, entries: initialEntries } = config;
   const [entries, setEntries] = useState(initialEntries);
   const [filterChannel, setFilterChannel] = useState("all");
@@ -1065,7 +1071,7 @@ export default function WarRoomDashboard({ config }) {
     () => (filterChannel === "all" ? entries : entries.filter((e) => e.channel === filterChannel)),
     [entries, filterChannel]
   );
-  const scores = useMemo(() => computeScores(filtered, config), [filtered, config]);
+  const scores = useMemo(() => computeScores(filtered, config, weightOverrides), [filtered, config, weightOverrides]);
 
   const deleteEntry = useCallback((id) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
 
@@ -1136,8 +1142,8 @@ export default function WarRoomDashboard({ config }) {
             <div>Patient Story Saturation (15%): <span style={{ color: colors.text }}>{scores.patientScore.toFixed(0)}%</span></div>
           </div>
         </div>
-        <TrendChart entries={entries} filterChannel={filterChannel} config={config} />
-        {config.searchTrends && config.searchTrends.length > 0 && <SearchTrendsChart entries={entries} config={config} />}
+        <TrendChart entries={entries} filterChannel={filterChannel} config={config} overrides={weightOverrides} />
+        {config.searchTrends && config.searchTrends.length > 0 && <SearchTrendsChart entries={entries} config={config} overrides={weightOverrides} />}
       </div>
 
       {/* Dispute Timeline */}
@@ -1175,7 +1181,7 @@ export default function WarRoomDashboard({ config }) {
         ))}
       </div>
 
-      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} />
+      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} overrides={weightOverrides} />
 
       {/* Gauges + Distributions */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
