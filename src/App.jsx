@@ -33,7 +33,7 @@ function DashboardRenderer({ id }) {
   if (id === "bcbsm") return <BCBSMDashboard />;
   if (id === "mtsinai") return <MtSinaiDashboard />;
   const dash = DASHBOARDS.find((d) => d.id === id);
-  if (dash?.config) return <WarRoomDashboard config={dash.config} />;
+  if (dash?.config) return <WarRoomDashboard key={id} config={dash.config} />;
   return <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Dashboard not found</div>;
 }
 
