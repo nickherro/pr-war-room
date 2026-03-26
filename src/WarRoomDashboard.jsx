@@ -1101,7 +1101,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
           <span style={{ height: 1, flex: 1, background: colors.border }} />
         </div>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.2 }}>
-          PR War Room <span style={{ color: colors.textMuted, fontWeight: 400 }}>— {config.title}</span>
+          Market Sentiment Tracker <span style={{ color: colors.textMuted, fontWeight: 400 }}>— {config.title}</span>
         </h1>
         <p style={{ margin: "6px 0 0", fontSize: 12, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
           {config.subtitle} · {filtered.length} entries tracked

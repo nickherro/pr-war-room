@@ -95,7 +95,7 @@ export default function App({ onLogout }) {
             flexShrink: 0,
           }}
         >
-          WAR ROOM
+          MST
         </span>
         <select
           value={active}
