@@ -807,6 +807,49 @@ function DisputeTimeline({ config }) {
   );
 }
 
+function ArgumentsSection({ config }) {
+  const { colors, providerShort, payorShort, arguments: args } = config;
+  if (!args) return null;
+
+  const renderPhases = (phases, accentColor) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {phases.map((phase, i) => (
+        <div key={i} style={{ position: "relative", paddingLeft: 16 }}>
+          <div style={{ position: "absolute", left: 0, top: 6, width: 6, height: 6, borderRadius: "50%", background: accentColor }} />
+          {phases.length > 1 && i < phases.length - 1 && (
+            <div style={{ position: "absolute", left: 2.5, top: 14, width: 1, bottom: -10, background: `${accentColor}30` }} />
+          )}
+          <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: accentColor, fontWeight: 700, marginBottom: 2 }}>
+            {phase.phase}
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 14, fontSize: 12, lineHeight: 1.6, color: colors.text }}>
+            {phase.points.map((pt, j) => (
+              <li key={j} style={{ marginBottom: 2 }} dangerouslySetInnerHTML={{ __html: pt }} />
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+      <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 10, padding: "16px 20px" }}>
+        <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12 }}>
+          {payorShort} ARGUMENTS
+        </div>
+        {renderPhases(args.payor, colors.payorColor)}
+      </div>
+      <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 10, padding: "16px 20px" }}>
+        <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12 }}>
+          {providerShort} ARGUMENTS
+        </div>
+        {renderPhases(args.provider, colors.providerColor)}
+      </div>
+    </div>
+  );
+}
+
 function DistBar({ label, values, barColors, labels: segLabels, config }) {
   const total = values.reduce((a, b) => a + b, 0) || 1;
   return (
@@ -901,6 +944,76 @@ function EntryRow({ entry, onDelete, config }) {
 
 // === MAIN DASHBOARD ===
 
+function EntryLogs({ entries, filterChannel, onDelete, config }) {
+  const { colors } = config;
+  const [expanded, setExpanded] = useState({});
+  const channels = filterChannel === "all" ? ["media", "social", "stakeholder", "employer"] : [filterChannel];
+  const isAll = filterChannel === "all";
+
+  return channels.map((ch) => {
+    const chEntries = entries.filter((e) => e.channel === ch).sort((a, b) => b.date.localeCompare(a.date));
+    if (chEntries.length === 0) return null;
+    const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : ch === "stakeholder" ? "STAKEHOLDER" : "EMPLOYER";
+    const chColor = ch === "media" ? (colors.payorColor || "#2F65A7") : ch === "social" ? "#059669" : ch === "stakeholder" ? "#D86018" : "#8B6914";
+    const isOpen = isAll ? !!expanded[ch] : true;
+
+    return (
+      <div key={ch} style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
+        <div
+          onClick={isAll ? () => setExpanded((prev) => ({ ...prev, [ch]: !prev[ch] })) : undefined}
+          style={{
+            padding: "12px 16px",
+            borderBottom: isOpen ? `1px solid ${colors.border}` : "none",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: isAll ? "pointer" : "default",
+            userSelect: "none",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {isAll && (
+              <span style={{ fontSize: 10, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", transition: "transform 0.15s", display: "inline-block", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}>
+                &#9654;
+              </span>
+            )}
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: chColor, display: "inline-block" }} />
+            <span style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{chLabel} LOG</span>
+          </div>
+          <span style={{ fontSize: 11, color: colors.textMuted }}>{chEntries.length} entries</span>
+        </div>
+        {isOpen && (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "90px 1fr 100px 90px 90px 36px",
+                gap: 8,
+                padding: "8px 12px",
+                borderBottom: `1px solid ${colors.border}`,
+                fontSize: 10,
+                color: colors.textMuted,
+                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: 0.5,
+              }}
+            >
+              <span>DATE</span>
+              <span>SOURCE / HEADLINE</span>
+              <span>FRAME</span>
+              <span>SENTIMENT</span>
+              <span>REACH</span>
+              <span></span>
+            </div>
+            {chEntries.map((entry) => (
+              <EntryRow key={entry.id} entry={entry} onDelete={onDelete} config={config} />
+            ))}
+          </>
+        )}
+      </div>
+    );
+  });
+}
+
 export default function WarRoomDashboard({ config }) {
   const { providerName, payorName, providerShort, payorShort, colors, labels, entries: initialEntries } = config;
   const [entries, setEntries] = useState(initialEntries);
@@ -988,6 +1101,9 @@ export default function WarRoomDashboard({ config }) {
       {/* Dispute Timeline */}
       <DisputeTimeline config={config} />
 
+      {/* Arguments */}
+      <ArgumentsSection config={config} />
+
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
         {[
@@ -1072,46 +1188,7 @@ export default function WarRoomDashboard({ config }) {
       </div>
 
       {/* Per-channel Entry Logs */}
-      {(filterChannel === "all" ? ["media", "social", "stakeholder", "employer"] : [filterChannel]).map((ch) => {
-        const chEntries = entries.filter((e) => e.channel === ch).sort((a, b) => b.date.localeCompare(a.date));
-        if (chEntries.length === 0) return null;
-        const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : ch === "stakeholder" ? "STAKEHOLDER" : "EMPLOYER";
-        const chColor = ch === "media" ? (colors.payorColor || "#2F65A7") : ch === "social" ? "#059669" : ch === "stakeholder" ? "#D86018" : "#8B6914";
-        return (
-          <div key={ch} style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
-            <div style={{ padding: "12px 16px", borderBottom: `1px solid ${colors.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: chColor, display: "inline-block" }} />
-                <span style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{chLabel} LOG</span>
-              </div>
-              <span style={{ fontSize: 11, color: colors.textMuted }}>{chEntries.length} entries</span>
-            </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "90px 1fr 100px 90px 90px 36px",
-                gap: 8,
-                padding: "8px 12px",
-                borderBottom: `1px solid ${colors.border}`,
-                fontSize: 10,
-                color: colors.textMuted,
-                fontFamily: "'JetBrains Mono', monospace",
-                letterSpacing: 0.5,
-              }}
-            >
-              <span>DATE</span>
-              <span>SOURCE / HEADLINE</span>
-              <span>FRAME</span>
-              <span>SENTIMENT</span>
-              <span>REACH</span>
-              <span></span>
-            </div>
-            {chEntries.map((entry) => (
-              <EntryRow key={entry.id} entry={entry} onDelete={deleteEntry} config={config} />
-            ))}
-          </div>
-        );
-      })}
+      <EntryLogs entries={entries} filterChannel={filterChannel} onDelete={deleteEntry} config={config} />
     </div>
   );
 }
