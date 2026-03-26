@@ -1364,11 +1364,27 @@ const SEARCH_TRENDS = [
   { week: "2026-03-09", interest: 100 }, { week: "2026-03-16", interest: 78 }, { week: "2026-03-23", interest: 55 },
 ];
 
-function SearchTrendsChart() {
-  const data = SEARCH_TRENDS.map((d) => {
-    const parts = d.week.split("-");
-    return { ...d, label: `${parseInt(parts[1])}/${parseInt(parts[2])}` };
-  });
+function SearchTrendsChart({ entries }) {
+  // Build the same date categories as TrendChart so x-axes align
+  const data = useMemo(() => {
+    const trend = computeTrend(entries);
+    const dates = trend.map((t) => t.date);
+    // For each chart date, find nearest search trends week and map interest
+    return dates.map((d) => {
+      const dTime = new Date(d).getTime();
+      let closest = SEARCH_TRENDS[0];
+      let minDiff = Infinity;
+      SEARCH_TRENDS.forEach((s) => {
+        const diff = Math.abs(new Date(s.week).getTime() - dTime);
+        if (diff < minDiff) { minDiff = diff; closest = s; }
+      });
+      const parts = d.split("-");
+      return { date: d, label: `${parseInt(parts[1])}/${parseInt(parts[2])}`, interest: closest.interest };
+    });
+  }, [entries]);
+
+  const firstPostDate = data.find((d) => d.date >= DISPUTE_PUBLIC_DATE)?.date;
+
   return (
     <div style={{ marginTop: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -1389,12 +1405,12 @@ function SearchTrendsChart() {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} opacity={0.4} vertical={false} />
           <XAxis
-            dataKey="week"
+            dataKey="date"
             tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
             axisLine={{ stroke: COLORS.border }}
             tickLine={false}
             tickFormatter={(v) => { const p = v.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}`; }}
-            interval={Math.floor(data.length / 6)}
+            interval={data.length > 15 ? Math.floor(data.length / 8) : 0}
           />
           <YAxis
             domain={[0, 100]}
@@ -1402,7 +1418,7 @@ function SearchTrendsChart() {
             tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
             axisLine={false}
             tickLine={false}
-            width={30}
+            width={78}
           />
           <Tooltip
             content={({ active, payload }) => {
@@ -1410,15 +1426,17 @@ function SearchTrendsChart() {
               const d = payload[0].payload;
               return (
                 <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "6px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
-                  <div style={{ color: COLORS.textMuted }}>{d.week}</div>
+                  <div style={{ color: COLORS.textMuted }}>{d.date}</div>
                   <div style={{ color: "#7C3AED", fontWeight: 700 }}>Interest: {d.interest}/100</div>
                 </div>
               );
             }}
           />
-          <ReferenceLine x="2026-03-02" stroke="#D86018" strokeWidth={1} strokeDasharray="4 3" opacity={0.6}>
-            <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#D86018" fontSize={9} fontFamily="'JetBrains Mono', monospace" fontWeight={600} />
-          </ReferenceLine>
+          {firstPostDate && (
+            <ReferenceLine x={firstPostDate} stroke="#D86018" strokeWidth={1} strokeDasharray="4 3" opacity={0.6}>
+              <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#D86018" fontSize={9} fontFamily="'JetBrains Mono', monospace" fontWeight={600} />
+            </ReferenceLine>
+          )}
           <Area type="monotone" dataKey="interest" stroke="none" fill="url(#searchGradBCBSM)" isAnimationActive={false} />
           <Line type="monotone" dataKey="interest" stroke="#7C3AED" strokeWidth={2} dot={false} isAnimationActive={false} />
         </ComposedChart>
@@ -2093,7 +2111,8 @@ function EntryRow({ entry, onDelete }) {
           borderRadius: 3,
           fontWeight: 700,
           fontFamily: "'JetBrains Mono', monospace",
-          background: entry.frameAdoption === "mm" ? "#5C1F14" : entry.frameAdoption === "bcbs" ? "#003A72" : "#1A4A7A",
+          background: "transparent",
+          border: `1px solid ${entry.frameAdoption === "mm" ? COLORS.amber : entry.frameAdoption === "bcbs" ? COLORS.bcbs : COLORS.border}`,
           color: entry.frameAdoption === "mm" ? COLORS.amber : entry.frameAdoption === "bcbs" ? COLORS.bcbs : COLORS.textMuted,
           textAlign: "center",
         }}
@@ -2193,7 +2212,7 @@ export default function PRWarRoom() {
           </div>
         </div>
         <TrendChart entries={entries} filterChannel={filterChannel} />
-        <SearchTrendsChart />
+        <SearchTrendsChart entries={entries} />
       </div>
 
       {/* Filter tabs */}
