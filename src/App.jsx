@@ -1,11 +1,41 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import BCBSMDashboard from "./BCBSMDashboard.jsx";
 import MtSinaiDashboard from "./MtSinaiDashboard.jsx";
+import WarRoomDashboard from "./WarRoomDashboard.jsx";
 
+// Import configs as they're created
+const configs = {};
+const configModules = import.meta.glob("./configs/*.js", { eager: true });
+Object.entries(configModules).forEach(([path, mod]) => {
+  const key = path.replace("./configs/", "").replace(".js", "");
+  configs[key] = mod.default;
+});
+
+// Build dashboard registry — legacy dashboards first, then config-based ones
 const DASHBOARDS = [
-  { id: "bcbsm", label: "BCBSM vs Michigan Medicine", short: "BCBSM v. MM" },
-  { id: "mtsinai", label: "Mt Sinai vs Anthem BCBS", short: "Mt Sinai v. Anthem" },
+  { id: "bcbsm", label: "BCBSM vs Michigan Medicine", short: "BCBSM v. MM", legacy: true },
+  { id: "mtsinai", label: "Mt Sinai vs Anthem BCBS", short: "Mt Sinai v. Anthem", legacy: true },
 ];
+
+// Add config-based dashboards
+Object.entries(configs).forEach(([key, config]) => {
+  // Skip if already in legacy list
+  if (DASHBOARDS.some((d) => d.id === key)) return;
+  DASHBOARDS.push({
+    id: key,
+    label: config.title,
+    short: config.navShort || config.title,
+    config,
+  });
+});
+
+function DashboardRenderer({ id }) {
+  if (id === "bcbsm") return <BCBSMDashboard />;
+  if (id === "mtsinai") return <MtSinaiDashboard />;
+  const dash = DASHBOARDS.find((d) => d.id === id);
+  if (dash?.config) return <WarRoomDashboard config={dash.config} />;
+  return <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Dashboard not found</div>;
+}
 
 export default function App({ onLogout }) {
   const [active, setActive] = useState("bcbsm");
@@ -37,18 +67,19 @@ export default function App({ onLogout }) {
             fontFamily: "'JetBrains Mono', monospace",
             fontWeight: 600,
             marginRight: 12,
+            flexShrink: 0,
           }}
         >
           WAR ROOM
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 2, flex: 1, flexWrap: "wrap" }}>
         {DASHBOARDS.map((d) => (
           <button
             key={d.id}
             onClick={() => setActive(d.id)}
             style={{
-              padding: "6px 16px",
-              fontSize: 11,
+              padding: "4px 10px",
+              fontSize: 10,
               fontFamily: "'JetBrains Mono', monospace",
               fontWeight: 700,
               borderRadius: 4,
@@ -57,6 +88,7 @@ export default function App({ onLogout }) {
               background: active === d.id ? "rgba(0,0,0,0.07)" : "transparent",
               color: active === d.id ? "#1A1A2E" : "rgba(0,0,0,0.4)",
               transition: "all 0.15s ease",
+              whiteSpace: "nowrap",
             }}
           >
             {d.short}
@@ -66,7 +98,7 @@ export default function App({ onLogout }) {
         <button
           onClick={onLogout}
           style={{
-            padding: "6px 14px",
+            padding: "4px 10px",
             fontSize: 10,
             fontFamily: "'JetBrains Mono', monospace",
             fontWeight: 600,
@@ -77,6 +109,7 @@ export default function App({ onLogout }) {
             color: "rgba(0,0,0,0.4)",
             letterSpacing: 1,
             transition: "all 0.15s ease",
+            flexShrink: 0,
           }}
         >
           LOGOUT
@@ -84,7 +117,7 @@ export default function App({ onLogout }) {
       </div>
 
       {/* Dashboard content */}
-      {active === "bcbsm" ? <BCBSMDashboard /> : <MtSinaiDashboard />}
+      <DashboardRenderer id={active} />
     </div>
   );
 }
