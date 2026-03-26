@@ -748,9 +748,6 @@ function DisputeTimeline({ config }) {
   if (!timeline || timeline.length === 0) return null;
 
   const sorted = [...timeline].sort((a, b) => new Date(a.date) - new Date(b.date));
-  const startMs = new Date(sorted[0].date).getTime();
-  const endMs = new Date(sorted[sorted.length - 1].date).getTime();
-  const rangeMs = endMs - startMs || 1;
 
   const typeStyles = {
     newsBreak: { color: "#E87722", label: "News Breaks" },
@@ -762,40 +759,81 @@ function DisputeTimeline({ config }) {
 
   const fmt = (d) => {
     const dt = new Date(d + "T12:00:00");
-    return dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
+
+  // Group events that share the same date
+  const groups = [];
+  sorted.forEach((evt) => {
+    const last = groups[groups.length - 1];
+    if (last && last[0].date === evt.date) {
+      last.push(evt);
+    } else {
+      groups.push([evt]);
+    }
+  });
+
+  const count = groups.length;
 
   return (
     <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 10, padding: "16px 24px", marginBottom: 20 }}>
-      <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 14 }}>
+      <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 16 }}>
         DISPUTE TIMELINE
       </div>
-      <div style={{ position: "relative", height: 60, marginBottom: 8 }}>
-        {/* Main line */}
-        <div style={{ position: "absolute", top: 20, left: 0, right: 0, height: 2, background: colors.border }} />
-        {/* Events */}
-        {sorted.map((evt, i) => {
-          const pct = ((new Date(evt.date).getTime() - startMs) / rangeMs) * 100;
-          const style = typeStyles[evt.type] || typeStyles.other;
+      <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+        {groups.map((group, gi) => {
+          const isMulti = group.length > 1;
           return (
-            <div key={i} style={{ position: "absolute", left: `${pct}%`, top: 0, transform: "translateX(-50%)", textAlign: "center", zIndex: 2 }}>
-              <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: colors.textMuted, whiteSpace: "nowrap", marginBottom: 2 }}>
-                {fmt(evt.date)}
+            <div key={gi} style={{ display: "flex", alignItems: "center", flex: gi < count - 1 ? 1 : "none" }}>
+              {/* Node */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 0, flexShrink: 0 }}>
+                <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: colors.textMuted, marginBottom: 4, whiteSpace: "nowrap" }}>
+                  {fmt(group[0].date)}
+                </div>
+                {isMulti ? (
+                  <div style={{ position: "relative", width: 18, height: 18 }}>
+                    {group.map((evt, ei) => {
+                      const s = typeStyles[evt.type] || typeStyles.other;
+                      return (
+                        <div key={ei} style={{
+                          position: "absolute",
+                          width: 14, height: 14, borderRadius: "50%", background: s.color,
+                          border: `2px solid ${colors.bg}`, boxShadow: `0 0 0 1px ${s.color}40`,
+                          top: 2, left: ei * 6,
+                          zIndex: group.length - ei,
+                        }} />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{
+                    width: 14, height: 14, borderRadius: "50%",
+                    background: (typeStyles[group[0].type] || typeStyles.other).color,
+                    border: `2px solid ${colors.bg}`,
+                    boxShadow: `0 0 0 1px ${(typeStyles[group[0].type] || typeStyles.other).color}40`,
+                  }} />
+                )}
+                <div style={{ marginTop: 4, textAlign: "center", maxWidth: 110 }}>
+                  {group.map((evt, ei) => {
+                    const s = typeStyles[evt.type] || typeStyles.other;
+                    return (
+                      <div key={ei} style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: s.color, fontWeight: 600, lineHeight: 1.3 }}>
+                        {evt.label}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div style={{
-                width: 12, height: 12, borderRadius: "50%", background: style.color,
-                border: `2px solid ${colors.bg}`, boxShadow: `0 0 0 1px ${style.color}40`,
-                margin: "0 auto",
-              }} />
-              <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: style.color, fontWeight: 600, whiteSpace: "nowrap", marginTop: 2, maxWidth: 120 }}>
-                {evt.label}
-              </div>
+              {/* Connector line */}
+              {gi < count - 1 && (
+                <div style={{ flex: 1, height: 2, background: colors.border, minWidth: 12, alignSelf: "center", marginTop: -14 }} />
+              )}
             </div>
           );
         })}
       </div>
       {/* Legend */}
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}>
         {Object.entries(typeStyles).filter(([k]) => sorted.some(e => e.type === k)).map(([k, v]) => (
           <div key={k} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: colors.textMuted }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: v.color }} />
