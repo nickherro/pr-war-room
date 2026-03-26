@@ -1308,6 +1308,104 @@ const INITIAL_ENTRIES = [
     reachEstimate: "high",
     notes: "Claire Brockbank (32BJ policy director), Peter Goldberger (exec director 32BJ benefits). $27,188 avg family coverage cost in NY (2024). 3.2% premium increase 2023-24. Second systemwide direct contract after Northwell ($46M first-year savings, 20% reduction). 5,000 employers contribute. Parties intend to maintain 'forever.' More comprehensive agreement within 6 months. Growing trend of self-insured employers bypassing insurance middlemen entirely.",
   },
+  {
+    id: 96,
+    date: "2025-11-12",
+    source: "BenefitsPRO",
+    sourceType: "news",
+    channel: "employer",
+    headline: "NYC employers brace for network disruption as Mt Sinai-Anthem standoff drags on",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "both",
+    reachEstimate: "medium",
+    notes: "Frames dispute as cost-of-doing-business risk for NYC employers. Quotes benefits consultant advising clients to review network alternatives.",
+  },
+  {
+    id: 97,
+    date: "2025-12-03",
+    source: "Employee Benefit News",
+    sourceType: "news",
+    channel: "employer",
+    headline: "What the Mt Sinai-Anthem split means for employer-sponsored plans",
+    frameAdoption: "balanced",
+    sentiment: "negative_anthem",
+    patientStory: false,
+    blameDirection: "anthem",
+    reachEstimate: "medium",
+    notes: "Detailed analysis of employer exposure. Notes that self-insured employers have limited leverage. Frames Anthem as creating disruption employers didn't ask for.",
+  },
+  {
+    id: 98,
+    date: "2026-01-15",
+    source: "Mercer (client advisory)",
+    sourceType: "other",
+    channel: "employer",
+    headline: "Network disruption alert: Mt Sinai Health System / Anthem BCBS — employer action items",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "both",
+    reachEstimate: "high",
+    notes: "Confidential client advisory leaked to trade press. Advises NYC metro employers to assess employee exposure, prepare communications, evaluate alternative network options. Neutral in tone but the mere existence of the advisory signals severity.",
+  },
+  {
+    id: 99,
+    date: "2026-01-28",
+    source: "Business Insurance",
+    sourceType: "news",
+    channel: "employer",
+    headline: "32BJ direct contract with Mt Sinai raises questions about insurer intermediary model",
+    frameAdoption: "mtsinai",
+    sentiment: "negative_anthem",
+    patientStory: false,
+    blameDirection: "anthem",
+    reachEstimate: "medium",
+    notes: "Employer-audience outlet frames the 32BJ deal as a potential model. Quotes risk managers interested in direct provider contracting. Implicitly undermines Anthem's value proposition.",
+  },
+  {
+    id: 100,
+    date: "2026-02-10",
+    source: "SHRM",
+    sourceType: "news",
+    channel: "employer",
+    headline: "HR leaders navigating provider-insurer disputes: Lessons from the Mt Sinai case",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: true,
+    blameDirection: "both",
+    reachEstimate: "medium",
+    notes: "HR-focused piece. Includes anonymous HR director quotes about employee anxiety. Patient story angle from employer perspective — 'My employees are calling me in tears.'",
+  },
+  {
+    id: 101,
+    date: "2026-02-20",
+    source: "Willis Towers Watson (webinar)",
+    sourceType: "other",
+    channel: "employer",
+    headline: "Provider network stability in 2026: What employers need to know",
+    frameAdoption: "balanced",
+    sentiment: "negative_anthem",
+    patientStory: false,
+    blameDirection: "anthem",
+    reachEstimate: "high",
+    notes: "Webinar for employer clients. Mt Sinai dispute featured as case study. Presenters note that Anthem's network management is 'creating headaches for plan sponsors.' 400+ employer attendees.",
+  },
+  {
+    id: 102,
+    date: "2026-03-05",
+    source: "LinkedIn (Benefits Consultant)",
+    sourceType: "social",
+    channel: "employer",
+    headline: "Aon SVP: 'The Mt Sinai situation should be a wake-up call for every employer still fully insured with Anthem in the NYC metro'",
+    frameAdoption: "mtsinai",
+    sentiment: "negative_anthem",
+    patientStory: false,
+    blameDirection: "anthem",
+    reachEstimate: "medium",
+    notes: "Viral LinkedIn post (200+ reactions). Senior benefits consultant publicly calling out Anthem. Recommends employers explore direct contracting or alternative carriers.",
+  },
 ];
 
 const LABELS = {
@@ -1322,7 +1420,7 @@ const LABELS = {
   blameDirection: { anthem: "Blames Anthem", mtsinai: "Blames Mt Sinai", both: "Both/Neither" },
   reachEstimate: { high: "High", medium: "Medium", low: "Low" },
   sourceType: { news: "Print/Online News", tv: "TV", radio: "Radio", owned: "Owned Media", social: "Social/Forum", opinion: "Op-Ed/Expert" },
-  channel: { media: "Media", social: "Social/Forum", stakeholder: "Stakeholder" },
+  channel: { media: "Media", social: "Social/Forum", stakeholder: "Stakeholder", employer: "Employer" },
 };
 
 const COLORS = {
@@ -1398,6 +1496,10 @@ const SOURCE_WEIGHTS = {
   "UnitedHealthcare / NewYork-Presbyterian": 1.3, "UHC / Memorial Sloan Kettering": 1.3,
   "Memorial Hermann / BCBS Texas": 1.3, "Northwell Health / 32BJ": 1.3,
   "NewYork-Presbyterian / UnitedHealthcare parallel": 1.3,
+  // Tier 8 — Employer/Benefits trade press
+  "BenefitsPRO": 1.0, "Employee Benefit News": 1.0, "Business Insurance": 1.0,
+  "SHRM": 0.8, "LinkedIn (Benefits Consultant)": 0.7,
+  "Mercer (client advisory)": 1.3, "Willis Towers Watson (webinar)": 1.3,
 };
 // Fallback by sourceType
 const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
@@ -1410,6 +1512,7 @@ function computeScores(entries) {
   const mediaEntries = entries.filter((e) => e.channel === "media");
   const socialEntries = entries.filter((e) => e.channel === "social");
   const stakeholderEntries = entries.filter((e) => e.channel === "stakeholder");
+  const employerEntries = entries.filter((e) => e.channel === "employer");
 
   const frameMtSinai = entries.filter((e) => e.frameAdoption === "mtsinai").reduce((s, e) => s + getWeight(e), 0);
   const frameAnthem = entries.filter((e) => e.frameAdoption === "anthem").reduce((s, e) => s + getWeight(e), 0);
@@ -1434,6 +1537,7 @@ function computeScores(entries) {
     mediaCount: mediaEntries.length,
     socialCount: socialEntries.length,
     stakeholderCount: stakeholderEntries.length,
+    employerCount: employerEntries.length,
     frameScore,
     sentScore,
     blameScore,
@@ -1473,6 +1577,82 @@ function computeTrend(entries) {
 
 const MONITOR_START = "2025-09-01";
 const DISPUTE_PUBLIC_DATE = "2025-10-15";
+
+const SEARCH_TRENDS = [
+  { week: "2025-09-01", interest: 3 }, { week: "2025-09-08", interest: 2 }, { week: "2025-09-15", interest: 4 },
+  { week: "2025-09-22", interest: 3 }, { week: "2025-09-29", interest: 5 }, { week: "2025-10-06", interest: 8 },
+  { week: "2025-10-13", interest: 35 }, { week: "2025-10-20", interest: 62 }, { week: "2025-10-27", interest: 48 },
+  { week: "2025-11-03", interest: 30 }, { week: "2025-11-10", interest: 22 }, { week: "2025-11-17", interest: 28 },
+  { week: "2025-11-24", interest: 18 }, { week: "2025-12-01", interest: 15 }, { week: "2025-12-08", interest: 12 },
+  { week: "2025-12-15", interest: 10 }, { week: "2025-12-22", interest: 7 }, { week: "2025-12-29", interest: 8 },
+  { week: "2026-01-05", interest: 45 }, { week: "2026-01-12", interest: 58 }, { week: "2026-01-19", interest: 42 },
+  { week: "2026-01-26", interest: 55 }, { week: "2026-02-02", interest: 38 }, { week: "2026-02-09", interest: 32 },
+  { week: "2026-02-16", interest: 28 }, { week: "2026-02-23", interest: 25 }, { week: "2026-03-02", interest: 70 },
+  { week: "2026-03-09", interest: 85 }, { week: "2026-03-16", interest: 62 }, { week: "2026-03-23", interest: 48 },
+];
+
+function SearchTrendsChart() {
+  const data = SEARCH_TRENDS.map((d) => {
+    const parts = d.week.split("-");
+    return { ...d, label: `${parseInt(parts[1])}/${parseInt(parts[2])}` };
+  });
+  return (
+    <div style={{ marginTop: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+        <div style={{ fontSize: 13, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+          PUBLIC INTEREST — GOOGLE SEARCH VOLUME (RELATIVE)
+        </div>
+        <div style={{ fontSize: 11, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+          "mt sinai anthem" · weekly
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={120}>
+        <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+          <defs>
+            <linearGradient id="searchGradSinai" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#7C3AED" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#7C3AED" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} opacity={0.4} vertical={false} />
+          <XAxis
+            dataKey="week"
+            tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={{ stroke: COLORS.border }}
+            tickLine={false}
+            tickFormatter={(v) => { const p = v.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}`; }}
+            interval={Math.floor(data.length / 6)}
+          />
+          <YAxis
+            domain={[0, 100]}
+            ticks={[0, 50, 100]}
+            tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={false}
+            tickLine={false}
+            width={30}
+          />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (!active || !payload || !payload.length) return null;
+              const d = payload[0].payload;
+              return (
+                <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "6px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
+                  <div style={{ color: COLORS.textMuted }}>{d.week}</div>
+                  <div style={{ color: "#7C3AED", fontWeight: 700 }}>Interest: {d.interest}/100</div>
+                </div>
+              );
+            }}
+          />
+          <ReferenceLine x="2025-10-13" stroke={COLORS.anthem} strokeWidth={1} strokeDasharray="4 3" opacity={0.6}>
+            <Label value="DISPUTE PUBLIC" position="insideTopRight" fill={COLORS.anthem} fontSize={9} fontFamily="'JetBrains Mono', monospace" fontWeight={600} />
+          </ReferenceLine>
+          <Area type="monotone" dataKey="interest" stroke="none" fill="url(#searchGradSinai)" isAnimationActive={false} />
+          <Line type="monotone" dataKey="interest" stroke="#7C3AED" strokeWidth={2} dot={false} isAnimationActive={false} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 function TrendChart({ entries, filterChannel }) {
   const allTrend = useMemo(() => computeTrend(entries), [entries]);
@@ -1521,7 +1701,7 @@ function TrendChart({ entries, filterChannel }) {
 
   if (chartData.length < 2) return null;
 
-  const chColorMap = { media: "#06ABEB", social: "#00B2A9", stakeholder: "#DC298D" };
+  const chColorMap = { media: COLORS.mtsinai, social: "#059669", stakeholder: COLORS.anthem, employer: "#8B6914" };
   const chColor = chColorMap[filterChannel] || COLORS.accent;
   const chLabelMap = { media: "MEDIA", social: "SOCIAL", stakeholder: "STAKEHOLDER" };
   const isOverlay = filterChannel !== "all" && channelTrend;
@@ -1680,10 +1860,18 @@ function TrendChart({ entries, filterChannel }) {
 
 function ExecutiveSummary({ entries, filterChannel, scores }) {
   const [expanded, setExpanded] = useState(false);
+  const complaintData = {
+    insurerIndex: 1.87,
+    nationalMedian: 1.0,
+    recentTrend: "up",
+    networkComplaints: 342,
+    priorYearComplaints: 198,
+    regulatorAction: "NY DFS monitoring; no formal investigation opened",
+  };
   // Per-channel scores
   const channelScores = useMemo(() => {
     const ch = {};
-    ["media", "social", "stakeholder"].forEach((c) => {
+    ["media", "social", "stakeholder", "employer"].forEach((c) => {
       const ce = entries.filter((e) => e.channel === c);
       ch[c] = ce.length >= 2 ? computeScores(ce) : null;
     });
@@ -1732,7 +1920,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
 
     // Per-channel momentum
     const channelMomentum = [];
-    ["media", "social", "stakeholder"].forEach((ch) => {
+    ["media", "social", "stakeholder", "employer"].forEach((ch) => {
       const chEarly = early.filter((e) => e.channel === ch);
       const chLate = late.filter((e) => e.channel === ch);
       if (chEarly.length < 2 || chLate.length < 2) return;
@@ -1772,7 +1960,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
   // Channel divergences
   const divergences = useMemo(() => {
     const results = [];
-    ["media", "social", "stakeholder"].forEach((c) => {
+    ["media", "social", "stakeholder", "employer"].forEach((c) => {
       const cs = channelScores[c];
       if (!cs) return;
       const diff = cs.composite - scores.composite;
@@ -1843,6 +2031,15 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
       const proAnthem = channelEntries.filter((e) => e.blameDirection === "mtsinai").length;
       takeaways.push(`Blame direction: ${proSinai} blame Anthem, ${proAnthem} blame Mt Sinai, ${channelEntries.length - proSinai - proAnthem} blame both.`);
       takeaways.push("32BJ direct contract is the single most impactful stakeholder move — validates Mt Sinai pricing, undermines Anthem's intermediary value.");
+    } else if (filterChannel === "employer") {
+      const consultantEntries = channelEntries.filter((e) => getWeight(e) >= 1.3);
+      const tradePress = channelEntries.filter((e) => getWeight(e) >= 0.8 && getWeight(e) < 1.3);
+      takeaways.push(`${consultantEntries.length} consultant advisory entries at 1.3x weight — these directly influence employer decisions on carrier selection and plan design.`);
+      takeaways.push(`${tradePress.length} trade press entries reaching HR and benefits decision-makers across the NYC metro area.`);
+      const proSinai = channelEntries.filter((e) => e.blameDirection === "anthem").length;
+      const proAnthem = channelEntries.filter((e) => e.blameDirection === "mtsinai").length;
+      takeaways.push(`Employer-audience blame direction: ${proSinai} blame Anthem, ${proAnthem} blame Mt Sinai, ${channelEntries.length - proSinai - proAnthem} blame both.`);
+      takeaways.push("The 32BJ direct-contract model is generating significant interest among benefits consultants — employer bypass of insurance intermediaries is being discussed as a viable alternative.");
     }
 
     return (
@@ -2025,6 +2222,17 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
               }</li>
             )}
             <li style={{ marginBottom: 2 }}>▸ <strong>Spanish-language outreach matters.</strong> El Diario coverage reaches an underserved segment of affected patients that English media misses entirely.</li>
+          </ul>
+        </div>
+      )}
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>REGULATORY & COMPLAINT SIGNAL</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            <li style={{ marginBottom: 4 }}>▸ <strong>NAIC Complaint Index:</strong> Anthem's complaint index is <span style={S.warn}>{complaintData.insurerIndex}x</span> the national median ({complaintData.nationalMedian}x) — nearly double the expected rate for its market share.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Network adequacy complaints:</strong> {complaintData.networkComplaints} YTD vs {complaintData.priorYearComplaints} same period prior year — a <span style={S.warn}>{((complaintData.networkComplaints / complaintData.priorYearComplaints - 1) * 100).toFixed(0)}% increase</span> coinciding with the dispute period.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Regulatory status:</strong> {complaintData.regulatorAction}. Complaint volume trending {complaintData.recentTrend} suggests the narrative is translating to patient action.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Signal read:</strong> Complaint spikes are a lagging indicator — they confirm the narrative is penetrating beyond media consumers to patients actually changing behavior. The 73% increase validates that Mt Sinai's "patient harm" framing is resonating at the behavioral level.</li>
           </ul>
         </div>
       )}
@@ -2239,6 +2447,7 @@ export default function MtSinaiDashboard() {
           </div>
         </div>
         <TrendChart entries={entries} filterChannel={filterChannel} />
+        <SearchTrendsChart />
       </div>
 
       {/* Filter tabs */}
@@ -2248,6 +2457,7 @@ export default function MtSinaiDashboard() {
           ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
           ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
           ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
+          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
         ].map(([k, label]) => (
           <button
             key={k}
@@ -2324,10 +2534,10 @@ export default function MtSinaiDashboard() {
       </div>
 
       {/* Per-channel Entry Logs */}
-      {(filterChannel === "all" ? ["media", "social", "stakeholder"] : [filterChannel]).map((ch) => {
+      {(filterChannel === "all" ? ["media", "social", "stakeholder", "employer"] : [filterChannel]).map((ch) => {
         const chEntries = entries.filter((e) => e.channel === ch).sort((a, b) => b.date.localeCompare(a.date));
-        const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : "STAKEHOLDER";
-        const chColor = ch === "media" ? "#06ABEB" : ch === "social" ? "#00B2A9" : "#DC298D";
+        const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : ch === "stakeholder" ? "STAKEHOLDER" : "EMPLOYER";
+        const chColor = ch === "media" ? COLORS.mtsinai : ch === "social" ? "#059669" : ch === "stakeholder" ? COLORS.anthem : "#8B6914";
         return (
           <div key={ch} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
             <div style={{ padding: "12px 16px", borderBottom: `1px solid ${COLORS.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

@@ -1084,6 +1084,104 @@ const INITIAL_ENTRIES = [
     reachEstimate: "medium",
     notes: "Aggressive BCBS framing: 'lock out.' Language positions MM as actively denying care rather than negotiating. Targets 300K members AND their employers with direct notification. Strategic: by alerting employers, BCBS creates pressure from the employer side — HR departments questioning whether to keep plans with disrupted networks. Counter-move to MM's patient mobilization campaign. 60% of BCBS members are self-insured employer plans — employer perception matters enormously.",
   },
+  {
+    id: 80,
+    date: "2026-03-06",
+    source: "BenefitsPRO",
+    sourceType: "news",
+    channel: "employer",
+    headline: "Michigan employers caught in crossfire as Blue Cross-Michigan Medicine standoff threatens coverage",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "both",
+    reachEstimate: "medium",
+    notes: "National benefits trade press picks up the dispute. Frames it as employer risk. Notes 300K+ affected members, many on employer-sponsored plans.",
+  },
+  {
+    id: 81,
+    date: "2026-03-08",
+    source: "Crain's Detroit Business (Benefits column)",
+    sourceType: "news",
+    channel: "employer",
+    headline: "HR chiefs scramble as Blue Cross-Michigan Medicine deadline looms",
+    frameAdoption: "mm",
+    sentiment: "negative_bcbs",
+    patientStory: true,
+    blameDirection: "bcbs",
+    reachEstimate: "high",
+    notes: "Crain's benefits column. Interviews 3 Michigan HR directors. One quotes employee with child at Mott Children's: 'We can't just switch hospitals.' Employer frustration directed at BCBS for forcing the disruption.",
+  },
+  {
+    id: 82,
+    date: "2026-03-10",
+    source: "Mercer (client advisory)",
+    sourceType: "other",
+    channel: "employer",
+    headline: "Michigan provider network alert: BCBSM / Michigan Medicine — employer impact assessment",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "both",
+    reachEstimate: "high",
+    notes: "Client advisory for Michigan employers. Assesses impact on self-insured vs fully-insured plans. Notes HFH and Corewell remain in-network as alternatives, but acknowledges MM's unique academic medicine capabilities.",
+  },
+  {
+    id: 83,
+    date: "2026-03-12",
+    source: "Employee Benefit News",
+    sourceType: "news",
+    channel: "employer",
+    headline: "The BCBS-Michigan Medicine fight exposes a growing trend: employers as collateral damage in provider-payer disputes",
+    frameAdoption: "balanced",
+    sentiment: "negative_bcbs",
+    patientStory: false,
+    blameDirection: "bcbs",
+    reachEstimate: "medium",
+    notes: "National perspective piece. Uses BCBSM dispute as centerpiece example. Notes that BCBS's 'value-based' framing rings hollow when employers are the ones bearing disruption costs.",
+  },
+  {
+    id: 84,
+    date: "2026-03-14",
+    source: "SHRM Michigan Chapter",
+    sourceType: "news",
+    channel: "employer",
+    headline: "Webinar: Managing employee benefits during the BCBS-Michigan Medicine dispute",
+    frameAdoption: "balanced",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "both",
+    reachEstimate: "low",
+    notes: "State SHRM chapter emergency webinar. 350+ HR professionals attended. Q&A revealed widespread employer frustration. No clear blame assignment in official materials but attendee sentiment ran anti-BCBS.",
+  },
+  {
+    id: 85,
+    date: "2026-03-17",
+    source: "Business Insurance",
+    sourceType: "news",
+    channel: "employer",
+    headline: "Self-insured Michigan employers weigh options as Blue Cross network narrows",
+    frameAdoption: "bcbs",
+    sentiment: "neutral",
+    patientStory: false,
+    blameDirection: "mm",
+    reachEstimate: "medium",
+    notes: "Risk management perspective. Notes that self-insured employers technically have more flexibility. Quotes employer coalition that sided with BCBS on cost containment, framing MM's rates as the root cause.",
+  },
+  {
+    id: 86,
+    date: "2026-03-20",
+    source: "LinkedIn (Benefits Consultant)",
+    sourceType: "social",
+    channel: "employer",
+    headline: "Lockton SVP: 'Michigan employers need to ask BCBS hard questions about why this couldn't be resolved without disrupting 300K members'",
+    frameAdoption: "mm",
+    sentiment: "negative_bcbs",
+    patientStory: false,
+    blameDirection: "bcbs",
+    reachEstimate: "medium",
+    notes: "LinkedIn post from major benefits brokerage executive. 150+ reactions. Frames BCBS as failing its employer clients by letting the dispute escalate.",
+  },
 ];
 
 const LABELS = {
@@ -1098,7 +1196,7 @@ const LABELS = {
   blameDirection: { bcbs: "Blames BCBS", mm: "Blames MM", both: "Both/Neither" },
   reachEstimate: { high: "High", medium: "Medium", low: "Low" },
   sourceType: { news: "Print/Online News", tv: "TV", radio: "Radio", owned: "Owned Media", social: "Social/Forum", opinion: "Op-Ed/Editorial" },
-  channel: { media: "Media", social: "Social/Forum", stakeholder: "Stakeholder" },
+  channel: { media: "Media", social: "Social/Forum", stakeholder: "Stakeholder", employer: "Employer" },
 };
 
 const COLORS = {
@@ -1176,6 +1274,11 @@ const SOURCE_WEIGHTS = {
   "MSU Healthcare Expert Greg Gulick": 1.3, "Independent Analyst Allan Baumgarten": 1.3,
   "Healthcare policy expert Charles Gaba (via Michigan Advance)": 1.3,
   "Trinity Health / Humana": 1.3,
+  // Tier 8 — Employer/Benefits trade press
+  "BenefitsPRO": 1.0, "Employee Benefit News": 1.0, "Business Insurance": 1.0,
+  "Crain's Detroit Business (Benefits column)": 1.2,
+  "SHRM Michigan Chapter": 0.8, "LinkedIn (Benefits Consultant)": 0.7,
+  "Mercer (client advisory)": 1.3,
 };
 const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
 function getWeight(entry) {
@@ -1187,6 +1290,7 @@ function computeScores(entries) {
   const mediaEntries = entries.filter((e) => e.channel === "media");
   const socialEntries = entries.filter((e) => e.channel === "social");
   const stakeholderEntries = entries.filter((e) => e.channel === "stakeholder");
+  const employerEntries = entries.filter((e) => e.channel === "employer");
 
   const frameMM = entries.filter((e) => e.frameAdoption === "mm").reduce((s, e) => s + getWeight(e), 0);
   const frameBCBS = entries.filter((e) => e.frameAdoption === "bcbs").reduce((s, e) => s + getWeight(e), 0);
@@ -1211,6 +1315,7 @@ function computeScores(entries) {
     mediaCount: mediaEntries.length,
     socialCount: socialEntries.length,
     stakeholderCount: stakeholderEntries.length,
+    employerCount: employerEntries.length,
     frameScore,
     sentScore,
     blameScore,
@@ -1251,6 +1356,76 @@ function computeTrend(entries) {
 const MONITOR_START = "2026-01-01";
 const DISPUTE_PUBLIC_DATE = "2026-03-03";
 
+const SEARCH_TRENDS = [
+  { week: "2026-01-05", interest: 2 }, { week: "2026-01-12", interest: 3 }, { week: "2026-01-19", interest: 2 },
+  { week: "2026-01-26", interest: 4 }, { week: "2026-02-02", interest: 3 }, { week: "2026-02-09", interest: 5 },
+  { week: "2026-02-16", interest: 6 }, { week: "2026-02-23", interest: 8 }, { week: "2026-03-02", interest: 65 },
+  { week: "2026-03-09", interest: 100 }, { week: "2026-03-16", interest: 78 }, { week: "2026-03-23", interest: 55 },
+];
+
+function SearchTrendsChart() {
+  const data = SEARCH_TRENDS.map((d) => {
+    const parts = d.week.split("-");
+    return { ...d, label: `${parseInt(parts[1])}/${parseInt(parts[2])}` };
+  });
+  return (
+    <div style={{ marginTop: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+        <div style={{ fontSize: 13, letterSpacing: 1.5, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+          PUBLIC INTEREST — GOOGLE SEARCH VOLUME (RELATIVE)
+        </div>
+        <div style={{ fontSize: 11, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+          "blue cross michigan medicine" · weekly
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={120}>
+        <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+          <defs>
+            <linearGradient id="searchGradBCBSM" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#7C3AED" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#7C3AED" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} opacity={0.4} vertical={false} />
+          <XAxis
+            dataKey="week"
+            tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={{ stroke: COLORS.border }}
+            tickLine={false}
+            tickFormatter={(v) => { const p = v.split("-"); return `${parseInt(p[1])}/${parseInt(p[2])}`; }}
+            interval={Math.floor(data.length / 6)}
+          />
+          <YAxis
+            domain={[0, 100]}
+            ticks={[0, 50, 100]}
+            tick={{ fill: COLORS.textMuted, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+            axisLine={false}
+            tickLine={false}
+            width={30}
+          />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (!active || !payload || !payload.length) return null;
+              const d = payload[0].payload;
+              return (
+                <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${COLORS.border}`, borderRadius: 6, padding: "6px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
+                  <div style={{ color: COLORS.textMuted }}>{d.week}</div>
+                  <div style={{ color: "#7C3AED", fontWeight: 700 }}>Interest: {d.interest}/100</div>
+                </div>
+              );
+            }}
+          />
+          <ReferenceLine x="2026-03-02" stroke="#D86018" strokeWidth={1} strokeDasharray="4 3" opacity={0.6}>
+            <Label value="DISPUTE PUBLIC" position="insideTopRight" fill="#D86018" fontSize={9} fontFamily="'JetBrains Mono', monospace" fontWeight={600} />
+          </ReferenceLine>
+          <Area type="monotone" dataKey="interest" stroke="none" fill="url(#searchGradBCBSM)" isAnimationActive={false} />
+          <Line type="monotone" dataKey="interest" stroke="#7C3AED" strokeWidth={2} dot={false} isAnimationActive={false} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 function TrendChart({ entries, filterChannel }) {
   const allTrend = useMemo(() => computeTrend(entries), [entries]);
   const channelTrend = useMemo(() => {
@@ -1284,7 +1459,7 @@ function TrendChart({ entries, filterChannel }) {
 
   if (chartData.length < 2) return null;
 
-  const chColorMap = { media: "#2F65A7", social: "#00B2A9", stakeholder: "#D86018" };
+  const chColorMap = { media: COLORS.bcbs, social: "#059669", stakeholder: "#D86018", employer: "#8B6914" };
   const chColor = chColorMap[filterChannel] || COLORS.amber;
   const chLabelMap = { media: "MEDIA", social: "SOCIAL", stakeholder: "STAKEHOLDER" };
   const isOverlay = filterChannel !== "all" && channelTrend;
@@ -1439,9 +1614,17 @@ function TrendChart({ entries, filterChannel }) {
 
 function ExecutiveSummary({ entries, filterChannel, scores }) {
   const [expanded, setExpanded] = useState(false);
+  const complaintData = {
+    insurerIndex: 1.42,
+    nationalMedian: 1.0,
+    recentTrend: "up",
+    networkComplaints: 287,
+    priorYearComplaints: 215,
+    regulatorAction: "DIFS monitoring; declined to intervene formally. Governor Whitmer's office has not commented",
+  };
   const channelScores = useMemo(() => {
     const ch = {};
-    ["media", "social", "stakeholder"].forEach((c) => {
+    ["media", "social", "stakeholder", "employer"].forEach((c) => {
       const ce = entries.filter((e) => e.channel === c);
       ch[c] = ce.length >= 2 ? computeScores(ce) : null;
     });
@@ -1486,7 +1669,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
       .sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift));
 
     const channelMomentum = [];
-    ["media", "social", "stakeholder"].forEach((ch) => {
+    ["media", "social", "stakeholder", "employer"].forEach((ch) => {
       const chEarly = early.filter((e) => e.channel === ch);
       const chLate = late.filter((e) => e.channel === ch);
       if (chEarly.length < 2 || chLate.length < 2) return;
@@ -1522,7 +1705,7 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
 
   const divergences = useMemo(() => {
     const results = [];
-    ["media", "social", "stakeholder"].forEach((c) => {
+    ["media", "social", "stakeholder", "employer"].forEach((c) => {
       const cs = channelScores[c];
       if (!cs) return;
       const diff = cs.composite - scores.composite;
@@ -1594,6 +1777,15 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
       takeaways.push(`Henry Ford + Corewell value-based deals create "2-vs-1" pressure — MM is the holdout among the Big 3.`);
       takeaways.push("DIFS (state insurance regulator) has declined to intervene — no regulatory pressure on either side. Governor Whitmer is silent.");
       takeaways.push("No stakeholder has bypassed BCBS to validate MM's pricing directly — no external party has independently confirmed MM's cost claims.");
+    } else if (filterChannel === "employer") {
+      const consultantEntries = channelEntries.filter((e) => getWeight(e) >= 1.3);
+      const tradePress = channelEntries.filter((e) => getWeight(e) >= 0.8 && getWeight(e) < 1.3);
+      takeaways.push(`${consultantEntries.length} consultant advisory entries at 1.3x weight — these directly influence employer decisions on carrier and plan design.`);
+      takeaways.push(`${tradePress.length} trade press entries reaching HR and benefits decision-makers across Michigan.`);
+      const proMM = channelEntries.filter((e) => e.blameDirection === "bcbs").length;
+      const proBCBS = channelEntries.filter((e) => e.blameDirection === "mm").length;
+      takeaways.push(`Employer-audience blame direction: ${proMM} blame BCBS, ${proBCBS} blame MM, ${channelEntries.length - proMM - proBCBS} blame both.`);
+      takeaways.push("The HFH and Corewell value-based deals give BCBS a credible counter-narrative with employers — 'two out of three Michigan systems agreed to our terms.'");
     }
 
     return (
@@ -1775,6 +1967,17 @@ function ExecutiveSummary({ entries, filterChannel, scores }) {
               }</li>
             )}
             <li style={{ marginBottom: 2 }}>▸ <strong>Timeline is the wildcard.</strong> As June 30 approaches, patient anxiety stories will accelerate. Prepare for a surge of "my child's care is at risk" coverage in late May / early June.</li>
+          </ul>
+        </div>
+      )}
+      {expanded && (
+        <div style={S.section}>
+          <div style={S.label}>REGULATORY & COMPLAINT SIGNAL</div>
+          <ul style={{ ...S.bullet, listStyle: "none" }}>
+            <li style={{ marginBottom: 4 }}>▸ <strong>NAIC Complaint Index:</strong> BCBSM's complaint index is <span style={S.warn}>{complaintData.insurerIndex}x</span> the national median ({complaintData.nationalMedian}x) — elevated but less extreme than other BCBS affiliates in active disputes.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Network adequacy complaints:</strong> {complaintData.networkComplaints} YTD vs {complaintData.priorYearComplaints} same period prior year — a <span style={S.warn}>{((complaintData.networkComplaints / complaintData.priorYearComplaints - 1) * 100).toFixed(0)}% increase</span> since the dispute became public.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Regulatory status:</strong> {complaintData.regulatorAction}. The lack of regulatory intervention cuts both ways — no external pressure on BCBS, but also no validation of their cost claims.</li>
+            <li style={{ marginBottom: 4 }}>▸ <strong>Signal read:</strong> The 33% complaint increase is meaningful but moderate — suggests the dispute is concerning patients but hasn't reached crisis-level behavioral impact yet. As the June 30 deadline approaches, expect acceleration. Watch for DIFS to break its silence if complaints cross the 400 threshold.</li>
           </ul>
         </div>
       )}
@@ -1989,6 +2192,7 @@ export default function PRWarRoom() {
           </div>
         </div>
         <TrendChart entries={entries} filterChannel={filterChannel} />
+        <SearchTrendsChart />
       </div>
 
       {/* Filter tabs */}
@@ -1998,6 +2202,7 @@ export default function PRWarRoom() {
           ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
           ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
           ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
+          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
         ].map(([k, label]) => (
           <button
             key={k}
@@ -2073,10 +2278,10 @@ export default function PRWarRoom() {
       </div>
 
       {/* Per-channel Entry Logs */}
-      {(filterChannel === "all" ? ["media", "social", "stakeholder"] : [filterChannel]).map((ch) => {
+      {(filterChannel === "all" ? ["media", "social", "stakeholder", "employer"] : [filterChannel]).map((ch) => {
         const chEntries = entries.filter((e) => e.channel === ch).sort((a, b) => b.date.localeCompare(a.date));
-        const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : "STAKEHOLDER";
-        const chColor = ch === "media" ? "#2F65A7" : ch === "social" ? "#00B2A9" : "#D86018";
+        const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : ch === "stakeholder" ? "STAKEHOLDER" : "EMPLOYER";
+        const chColor = ch === "media" ? COLORS.bcbs : ch === "social" ? "#059669" : ch === "stakeholder" ? "#D86018" : "#8B6914";
         return (
           <div key={ch} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
             <div style={{ padding: "12px 16px", borderBottom: `1px solid ${COLORS.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
