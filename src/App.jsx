@@ -1,9 +1,7 @@
-import { useState, lazy, Suspense } from "react";
-import BCBSMDashboard from "./BCBSMDashboard.jsx";
-import MtSinaiDashboard from "./MtSinaiDashboard.jsx";
+import { useState } from "react";
 import WarRoomDashboard from "./WarRoomDashboard.jsx";
 
-// Import configs as they're created
+// Import all configs dynamically
 const configs = {};
 const configModules = import.meta.glob("./configs/*.js", { eager: true });
 Object.entries(configModules).forEach(([path, mod]) => {
@@ -11,34 +9,22 @@ Object.entries(configModules).forEach(([path, mod]) => {
   configs[key] = mod.default;
 });
 
-// Build dashboard registry — legacy dashboards first, then config-based ones
-const DASHBOARDS = [
-  { id: "bcbsm", label: "BCBSM vs Michigan Medicine", short: "BCBSM v. MM", legacy: true },
-  { id: "mtsinai", label: "Mt Sinai vs Anthem BCBS", short: "Mt Sinai v. Anthem", legacy: true },
-];
-
-// Add config-based dashboards
-Object.entries(configs).forEach(([key, config]) => {
-  // Skip if already in legacy list
-  if (DASHBOARDS.some((d) => d.id === key)) return;
-  DASHBOARDS.push({
-    id: key,
-    label: config.title,
-    short: config.navShort || config.title,
-    config,
-  });
-});
+// Build dashboard registry from configs
+const DASHBOARDS = Object.entries(configs).map(([key, config]) => ({
+  id: key,
+  label: config.title,
+  short: config.navShort || config.title,
+  config,
+}));
 
 function DashboardRenderer({ id }) {
-  if (id === "bcbsm") return <BCBSMDashboard />;
-  if (id === "mtsinai") return <MtSinaiDashboard />;
   const dash = DASHBOARDS.find((d) => d.id === id);
   if (dash?.config) return <WarRoomDashboard key={id} config={dash.config} />;
   return <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Dashboard not found</div>;
 }
 
 export default function App({ onLogout }) {
-  const [active, setActive] = useState("bcbsm");
+  const [active, setActive] = useState(DASHBOARDS[0]?.id || "bcbsm");
 
   return (
     <div style={{ position: "relative" }}>
