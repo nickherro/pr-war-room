@@ -1496,10 +1496,11 @@ const SOURCE_WEIGHTS = {
   "UnitedHealthcare / NewYork-Presbyterian": 1.3, "UHC / Memorial Sloan Kettering": 1.3,
   "Memorial Hermann / BCBS Texas": 1.3, "Northwell Health / 32BJ": 1.3,
   "NewYork-Presbyterian / UnitedHealthcare parallel": 1.3,
-  // Tier 8 — Employer/Benefits trade press
-  "BenefitsPRO": 1.0, "Employee Benefit News": 1.0, "Business Insurance": 1.0,
-  "SHRM": 0.8, "LinkedIn (Benefits Consultant)": 0.7,
-  "Mercer (client advisory)": 1.3, "Willis Towers Watson (webinar)": 1.3,
+  // Tier 8 — Employer/Benefits (1.5x trade press, 1.8x consultant advisories)
+  // Weighted above stakeholder — employer audience is the swing constituency
+  "BenefitsPRO": 1.5, "Employee Benefit News": 1.5, "Business Insurance": 1.5,
+  "SHRM": 1.2, "LinkedIn (Benefits Consultant)": 1.0,
+  "Mercer (client advisory)": 1.8, "Willis Towers Watson (webinar)": 1.8,
 };
 // Fallback by sourceType
 const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };

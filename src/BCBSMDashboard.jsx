@@ -1274,11 +1274,12 @@ const SOURCE_WEIGHTS = {
   "MSU Healthcare Expert Greg Gulick": 1.3, "Independent Analyst Allan Baumgarten": 1.3,
   "Healthcare policy expert Charles Gaba (via Michigan Advance)": 1.3,
   "Trinity Health / Humana": 1.3,
-  // Tier 8 — Employer/Benefits trade press
-  "BenefitsPRO": 1.0, "Employee Benefit News": 1.0, "Business Insurance": 1.0,
-  "Crain's Detroit Business (Benefits column)": 1.2,
-  "SHRM Michigan Chapter": 0.8, "LinkedIn (Benefits Consultant)": 0.7,
-  "Mercer (client advisory)": 1.3,
+  // Tier 8 — Employer/Benefits (1.5x trade press, 1.8x consultant advisories)
+  // Weighted above stakeholder — employer audience is the swing constituency
+  "BenefitsPRO": 1.5, "Employee Benefit News": 1.5, "Business Insurance": 1.5,
+  "Crain's Detroit Business (Benefits column)": 1.5,
+  "SHRM Michigan Chapter": 1.2, "LinkedIn (Benefits Consultant)": 1.0,
+  "Mercer (client advisory)": 1.8,
 };
 const SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
 function getWeight(entry) {
