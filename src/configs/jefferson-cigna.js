@@ -761,6 +761,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "jefferson",
   payorKey: "cigna",

@@ -933,6 +933,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "scripps",
   payorKey: "anthem",

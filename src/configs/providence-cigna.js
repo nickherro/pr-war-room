@@ -640,6 +640,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "providence",
   payorKey: "cigna",

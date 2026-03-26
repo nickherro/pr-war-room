@@ -794,6 +794,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "msk",
   payorKey: "uhc",

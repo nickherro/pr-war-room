@@ -1030,6 +1030,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "tenet",
   payorKey: "cigna",

@@ -1509,6 +1509,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: true,
   // Identity
   providerKey: "mtsinai",
   payorKey: "anthem",

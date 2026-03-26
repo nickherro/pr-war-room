@@ -949,6 +949,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "osu",
   payorKey: "anthem",

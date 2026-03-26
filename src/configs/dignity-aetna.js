@@ -3,6 +3,7 @@
 // Resolved: April 25, 2024
 
 export default {
+  active: false,
   title: "Dignity Health vs Aetna",
   navShort: "Dignity v. Aetna",
   subtitle: "Multi-state contract dispute (CA, AZ, NV) — Feb-Apr 2024",

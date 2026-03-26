@@ -1180,6 +1180,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: true,
   // Identity
   providerKey: "mh",
   payorKey: "bcbstx",

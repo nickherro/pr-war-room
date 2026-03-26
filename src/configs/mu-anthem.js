@@ -1407,6 +1407,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "mu",
   payorKey: "anthem",

@@ -978,6 +978,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: false,
   // Identity
   providerKey: "bonsecours",
   payorKey: "cigna",

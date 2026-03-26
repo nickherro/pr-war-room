@@ -1296,6 +1296,7 @@ const SEARCH_TRENDS = [
 ];
 
 export default {
+  active: true,
   // Identity
   providerKey: "mm",
   payorKey: "bcbs",
