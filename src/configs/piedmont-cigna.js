@@ -871,4 +871,9 @@ export default {
       "Open enrollment had already closed for many employers when the December deadline approached — employers and employees felt trapped with no ability to switch plans.",
     ],
   },
+  timeline: [
+    { date: "2025-10-15", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-12-31", type: "termination", label: "Contract set to terminate" },
+    { date: "2025-12-31", type: "agreement", label: "Agreement reached" },
+  ],
 };

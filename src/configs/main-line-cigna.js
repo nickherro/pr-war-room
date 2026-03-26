@@ -1018,4 +1018,9 @@ export default {
       "Jefferson Health-Cigna failure to resolve (March 15) retroactively validated every employer concern raised during the MLH dispute — Cigna's Philadelphia reputation was severely damaged.",
     ],
   },
+  timeline: [
+    { date: "2024-11-15", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-01-01", type: "termination", label: "MA contract terminates" },
+    { date: "2025-02-15", type: "agreement", label: "Commercial agreement reached" },
+  ],
 };

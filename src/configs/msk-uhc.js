@@ -857,4 +857,9 @@ export default {
       "UHC's $469M cost framing is their strongest employer argument, but cancer treatment disruption for employees creates counter-pressure that employers can't ignore.",
     ],
   },
+  timeline: [
+    { date: "2025-06-19", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-06-30", type: "termination", label: "Contract terminates" },
+    { date: "2025-07-01", type: "agreement", label: "Agreement reached" },
+  ],
 };

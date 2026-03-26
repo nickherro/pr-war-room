@@ -826,4 +826,9 @@ export default {
       "Retroactive coverage resolution neutralized the employer impact — but the disruption created lasting questions about Cigna network stability in Philadelphia market.",
     ],
   },
+  timeline: [
+    { date: "2025-03-12", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-03-15", type: "termination", label: "Contract terminates" },
+    { date: "2025-04-04", type: "agreement", label: "Agreement reached" },
+  ],
 };

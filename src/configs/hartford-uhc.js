@@ -829,4 +829,9 @@ export default {
       "Self-insured employers faced dual pressure: UHC cost warnings vs. employee access to CT's 2nd-largest system. Neither side could fully capture employer sympathy.",
     ],
   },
+  timeline: [
+    { date: "2025-02-20", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-03-31", type: "termination", label: "Contract terminates" },
+    { date: "2025-04-01", type: "agreement", label: "Agreement reached" },
+  ],
 };

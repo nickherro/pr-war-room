@@ -878,4 +878,9 @@ export default {
       "Self-insured employers face direct cost impact from rate changes — UHC's cost framing resonates here more than anywhere else.",
     ],
   },
+  timeline: [
+    { date: "2024-10-10", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2024-10-15", type: "termination", label: "Helen Keller Hospital exits network" },
+    { date: "2024-11-14", type: "agreement", label: "Agreement reached" },
+  ],
 };

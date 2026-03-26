@@ -743,6 +743,70 @@ function ScoreGauge({ value, label, subtext, config }) {
   );
 }
 
+function DisputeTimeline({ config }) {
+  const { timeline, colors } = config;
+  if (!timeline || timeline.length === 0) return null;
+
+  const sorted = [...timeline].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const startMs = new Date(sorted[0].date).getTime();
+  const endMs = new Date(sorted[sorted.length - 1].date).getTime();
+  const rangeMs = endMs - startMs || 1;
+
+  const typeStyles = {
+    newsBreak: { color: "#E87722", label: "News Breaks" },
+    termination: { color: "#DC2626", label: "Termination Date" },
+    extension: { color: "#7C3AED", label: "Extension" },
+    agreement: { color: "#16A34A", label: "Agreement Reached" },
+    other: { color: colors.textMuted, label: "Other" },
+  };
+
+  const fmt = (d) => {
+    const dt = new Date(d + "T12:00:00");
+    return dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
+
+  return (
+    <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 10, padding: "16px 24px", marginBottom: 20 }}>
+      <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 14 }}>
+        DISPUTE TIMELINE
+      </div>
+      <div style={{ position: "relative", height: 60, marginBottom: 8 }}>
+        {/* Main line */}
+        <div style={{ position: "absolute", top: 20, left: 0, right: 0, height: 2, background: colors.border }} />
+        {/* Events */}
+        {sorted.map((evt, i) => {
+          const pct = ((new Date(evt.date).getTime() - startMs) / rangeMs) * 100;
+          const style = typeStyles[evt.type] || typeStyles.other;
+          return (
+            <div key={i} style={{ position: "absolute", left: `${pct}%`, top: 0, transform: "translateX(-50%)", textAlign: "center", zIndex: 2 }}>
+              <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: colors.textMuted, whiteSpace: "nowrap", marginBottom: 2 }}>
+                {fmt(evt.date)}
+              </div>
+              <div style={{
+                width: 12, height: 12, borderRadius: "50%", background: style.color,
+                border: `2px solid ${colors.bg}`, boxShadow: `0 0 0 1px ${style.color}40`,
+                margin: "0 auto",
+              }} />
+              <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: style.color, fontWeight: 600, whiteSpace: "nowrap", marginTop: 2, maxWidth: 120 }}>
+                {evt.label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* Legend */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
+        {Object.entries(typeStyles).filter(([k]) => sorted.some(e => e.type === k)).map(([k, v]) => (
+          <div key={k} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: colors.textMuted }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: v.color }} />
+            {v.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DistBar({ label, values, barColors, labels: segLabels, config }) {
   const total = values.reduce((a, b) => a + b, 0) || 1;
   return (
@@ -920,6 +984,9 @@ export default function WarRoomDashboard({ config }) {
         <TrendChart entries={entries} filterChannel={filterChannel} config={config} />
         {config.searchTrends && config.searchTrends.length > 0 && <SearchTrendsChart entries={entries} config={config} />}
       </div>
+
+      {/* Dispute Timeline */}
+      <DisputeTimeline config={config} />
 
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>

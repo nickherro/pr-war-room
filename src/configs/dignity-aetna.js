@@ -1154,4 +1154,9 @@ export default {
       notes: "Resolution notification to employer clients. Retroactive to April 1 — no member cost exposure for the gap period. Key relief for HR/benefits teams.",
     },
   ],
+  timeline: [
+    { date: "2024-02-01", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2024-04-01", type: "termination", label: "Aetna contract terminates" },
+    { date: "2024-04-25", type: "agreement", label: "Agreement reached" },
+  ],
 };

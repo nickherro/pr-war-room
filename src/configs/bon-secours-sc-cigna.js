@@ -1042,4 +1042,10 @@ export default {
       "InsuranceNewsNet coverage of the resolution reaches the broker/agent channel directly — the dispute will factor into employer renewal decisions and RFP evaluations for Cigna.",
     ],
   },
+  timeline: [
+    { date: "2024-11-20", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-01-01", type: "termination", label: "MA contract terminates" },
+    { date: "2025-03-31", type: "extension", label: "24-hour extension granted" },
+    { date: "2025-04-01", type: "agreement", label: "Commercial agreement reached" },
+  ],
 };

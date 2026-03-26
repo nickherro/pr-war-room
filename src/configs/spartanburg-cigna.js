@@ -957,4 +957,9 @@ export default {
       "Second disruption in four years damages Cigna's network reliability reputation with Upstate SC employers and brokers.",
     ],
   },
+  timeline: [
+    { date: "2024-11-20", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2024-12-31", type: "termination", label: "Contract terminates" },
+    { date: "2025-02-15", type: "agreement", label: "Agreement reached" },
+  ],
 };

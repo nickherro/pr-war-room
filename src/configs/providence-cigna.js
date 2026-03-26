@@ -724,4 +724,8 @@ export default {
       "UNITE HERE union engagement added labor voice to the predominantly corporate negotiation.",
     ],
   },
+  timeline: [
+    { date: "2024-07-16", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2024-08-08", type: "agreement", label: "Agreement reached" },
+  ],
 };

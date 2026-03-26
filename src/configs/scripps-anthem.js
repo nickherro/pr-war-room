@@ -1000,4 +1000,9 @@ export default {
       "~10,000 UFCW Local 135 workers created direct employer pressure — union benefits are a negotiated contract item, not just an insurance product.",
     ],
   },
+  timeline: [
+    { date: "2024-10-17", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-01-01", type: "termination", label: "Contract terminates" },
+    { date: "2025-05-06", type: "extension", label: "Extension agreement through Sept 2026" },
+  ],
 };

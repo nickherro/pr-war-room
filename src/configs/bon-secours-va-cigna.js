@@ -1003,4 +1003,10 @@ export default {
       "Cigna's employer-facing framing ('rate increases detrimental to customers') was their strongest argument but was undercut by employee anxiety about losing access to their doctors.",
     ],
   },
+  timeline: [
+    { date: "2025-02-13", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-03-31", type: "termination", label: "Contract set to terminate" },
+    { date: "2025-03-31", type: "extension", label: "24-hour extension granted" },
+    { date: "2025-04-01", type: "agreement", label: "Agreement reached" },
+  ],
 };

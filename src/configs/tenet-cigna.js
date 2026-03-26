@@ -1085,4 +1085,9 @@ export default {
       "Open enrollment timing (Oct-Nov) meant some employers may have begun exploring alternatives to Cigna for 2026, creating commercial pressure beyond the immediate dispute.",
     ],
   },
+  timeline: [
+    { date: "2025-10-02", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2025-12-31", type: "termination", label: "Contract set to terminate" },
+    { date: "2025-12-31", type: "agreement", label: "Agreement reached" },
+  ],
 };

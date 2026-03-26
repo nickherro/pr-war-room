@@ -1260,4 +1260,10 @@ export default {
       "BSW's counter-notifications to patients created a dueling-communication dynamic that confused employer plan participants.",
     ],
   },
+  timeline: [
+    { date: "2024-05-07", type: "newsBreak", label: "News breaks publicly" },
+    { date: "2024-07-01", type: "termination", label: "Contract set to terminate" },
+    { date: "2024-06-27", type: "extension", label: "Temporary extension" },
+    { date: "2024-09-27", type: "agreement", label: "Agreement reached" },
+  ],
 };
