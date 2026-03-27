@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine, Tooltip, Legend, ResponsiveContainer, Label } from "recharts";
+import DeepAnalysis from "./DeepAnalysis.jsx";
 
 // === SHARED COMPUTATION LOGIC ===
 
@@ -1239,6 +1240,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
   const { providerName, payorName, providerShort, payorShort, colors, labels, entries: initialEntries } = config;
   const [entries, setEntries] = useState(initialEntries);
   const [filterChannel, setFilterChannel] = useState("all");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const filtered = useMemo(
     () => (filterChannel === "all" ? entries : entries.filter((e) => e.channel === filterChannel)),
@@ -1281,6 +1283,38 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
         </p>
       </div>
 
+      {/* Tab Toggle */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
+        {[
+          ["dashboard", "DASHBOARD"],
+          ["analysis", "DEEP ANALYSIS"],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            style={{
+              padding: "7px 18px",
+              fontSize: 10,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontWeight: 700,
+              letterSpacing: 1.2,
+              borderRadius: 4,
+              border: `1px solid ${activeTab === key ? colors.accent : colors.border}`,
+              cursor: "pointer",
+              background: activeTab === key ? colors.accent : "transparent",
+              color: activeTab === key ? "#fff" : colors.textMuted,
+              transition: "all 0.15s ease",
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "analysis" ? (
+        <DeepAnalysis entries={entries} config={config} weightOverrides={weightOverrides} />
+      ) : (
+      <>
       {/* Composite Score */}
       <div
         style={{
@@ -1443,6 +1477,8 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
 
       {/* Per-channel Entry Logs */}
       <EntryLogs entries={entries} filterChannel={filterChannel} onDelete={deleteEntry} config={config} />
+      </>
+      )}
     </div>
   );
 }
