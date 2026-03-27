@@ -203,7 +203,7 @@ Default weights in `WarRoomDashboard.jsx` (`DEFAULT_DIMENSION_WEIGHTS`, `DEFAULT
 |--------|----------|-------|---------|--------|
 | bcbsm | Michigan Medicine | BCBSM | 84 | Active |
 | mtsinai | Mt Sinai | Anthem BCBS | 100 | Active |
-| memorial-hermann-bcbstx | Memorial Hermann | BCBS TX | — | Active |
+| memorial-hermann-bcbstx | Memorial Hermann | BCBS TX | 75 | Active |
 | scripps-anthem | Scripps Health | Anthem Blue Cross | 60 | Active |
 | msk-uhc | MSK | UnitedHealthcare | 50 | Resolved |
 | dignity-aetna | Dignity Health | Aetna | 71 | Resolved |
@@ -211,12 +211,12 @@ Default weights in `WarRoomDashboard.jsx` (`DEFAULT_DIMENSION_WEIGHTS`, `DEFAULT
 | hartford-uhc | Hartford HealthCare | UHC | 48 | Resolved |
 | huntsville-uhc | Huntsville Hospital | UHC | 51 | Resolved |
 | jefferson-cigna | Jefferson Health | Cigna | 48 | Resolved |
-| duke-aetna | Duke Health | Aetna | 56 | Resolved |
-| unc-cigna | UNC Health | Cigna | 51 | Resolved |
-| providence-aetna | Providence | Aetna | 44 | Resolved |
-| uw-aetna | UW Medicine | Aetna | 45 | Resolved |
-| ahn-cigna | Allegheny Health Network | Cigna | 44 | Resolved |
-| dignity-bcbsaz | Dignity Health | BCBS Arizona | 45 | Resolved |
+| duke-aetna | Duke Health | Aetna | 77 | Resolved |
+| unc-cigna | UNC Health | Cigna | 69 | Resolved |
+| providence-aetna | Providence | Aetna | 68 | Resolved |
+| uw-aetna | UW Medicine | Aetna | 55 | Resolved |
+| ahn-cigna | Allegheny Health Network | Cigna | 62 | Resolved |
+| dignity-bcbsaz | Dignity Health | BCBS Arizona | 78 | Resolved |
 | providence-cigna | Providence | Cigna | 41 | Resolved |
 | bon-secours-sc-cigna | Bon Secours St. Francis | Cigna | 60 | Resolved |
 | spartanburg-cigna | Spartanburg Regional | Cigna | 56 | Resolved |
@@ -224,9 +224,9 @@ Default weights in `WarRoomDashboard.jsx` (`DEFAULT_DIMENSION_WEIGHTS`, `DEFAULT
 | bon-secours-va-cigna | Bon Secours | Cigna | 60 | Resolved |
 | tenet-cigna | Tenet/Baptist | Cigna | 65 | Resolved |
 | piedmont-cigna | Piedmont Medical Center | Cigna | 50 | Resolved |
-| mu-anthem | MU Health | Anthem | — | Resolved |
-| northern-light-anthem | Northern Light | Anthem | — | Resolved |
-| osu-anthem | OSU Health | Anthem | — | Resolved |
+| mu-anthem | MU Health | Anthem | 88 | Resolved |
+| northern-light-anthem | Northern Light | Anthem | 95 | Resolved |
+| osu-anthem | OSU Health | Anthem | 60 | Resolved |
 
 ---
 
