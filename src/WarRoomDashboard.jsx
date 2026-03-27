@@ -709,7 +709,7 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
               <>
                 <div style={{ ...S.label, marginTop: 14 }}>KEY TAKEAWAYS</div>
                 <ul style={{ ...S.bullet, listStyle: "none" }}>
-                  {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }}>▸ {t}</li>)}
+                  {takeaways.map((t, i) => <li key={i} style={{ marginBottom: 4 }} dangerouslySetInnerHTML={{ __html: "▸ " + t }} />)}
                 </ul>
               </>
             )}
@@ -814,7 +814,7 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
               <ul style={{ ...S.bullet, listStyle: "none" }}>
                 {trendDrivers.topLateEntries.map((e, i) => (
                   <li key={i} style={{ marginBottom: 3 }}>
-                    ▸ <span style={S.muted}>{e.weight.toFixed(1)}x</span> {e.source} — <em>{e.headline.length > 80 ? e.headline.slice(0, 80) + "…" : e.headline}</em>
+                    ▸ {e.source} — <em>{e.headline.length > 80 ? e.headline.slice(0, 80) + "…" : e.headline}</em>
                   </li>
                 ))}
               </ul>
@@ -843,7 +843,7 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
           <div style={S.label}>KEY MESSAGES RESONATING</div>
           <ul style={{ ...S.bullet, listStyle: "none" }}>
             {keyMessages.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
-            {(summaryText.keyMessages || []).map((m, i) => <li key={`km${i}`} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+            {(summaryText.keyMessages || []).map((m, i) => <li key={`km${i}`} style={{ marginBottom: 2 }} dangerouslySetInnerHTML={{ __html: "▸ " + m }} />)}
             {topPatientStories.length > 0 && (
               <li style={{ marginBottom: 2 }}>▸ Top patient stories: {topPatientStories.map((e) => e.headline.split("—")[0].trim()).join("; ")}.</li>
             )}
@@ -855,7 +855,7 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
         <div style={S.section}>
           <div style={S.label}>MARCOMM CONSIDERATIONS</div>
           <ul style={{ ...S.bullet, listStyle: "none" }}>
-            {summaryText.marcomm.map((m, i) => <li key={i} style={{ marginBottom: 2 }}>▸ {m}</li>)}
+            {summaryText.marcomm.map((m, i) => <li key={i} style={{ marginBottom: 2 }} dangerouslySetInnerHTML={{ __html: "▸ " + m }} />)}
             {channelScores.social && channelScores.media && Math.abs(channelScores.social.composite - channelScores.media.composite) > 15 && (
               <li style={{ marginBottom: 2 }}>▸ <strong>Social-media gap:</strong> Social ({fmtScore(channelScores.social.composite)}) diverges from media ({fmtScore(channelScores.media.composite)}) — {
                 channelScores.social.composite > channelScores.media.composite
