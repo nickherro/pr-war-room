@@ -1323,40 +1323,6 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
       {/* Dispute Timeline */}
       <DisputeTimeline config={config} />
 
-      {/* Arguments */}
-      <ArgumentsSection config={config} />
-
-      {/* Filter tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
-        {[
-          ["all", `All (${entries.length})`],
-          ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
-          ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
-          ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
-          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
-        ].map(([k, label]) => (
-          <button
-            key={k}
-            onClick={() => setFilterChannel(k)}
-            style={{
-              padding: "6px 14px",
-              fontSize: 11,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontWeight: 600,
-              borderRadius: 4,
-              border: "none",
-              cursor: "pointer",
-              background: filterChannel === k ? colors.accent : colors.surface,
-              color: filterChannel === k ? colors.bg : colors.textMuted,
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} overrides={weightOverrides} />
-
       {/* Gauges + Distributions */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
         <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 16 }}>
@@ -1440,6 +1406,40 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
           </div>
         </div>
       </div>
+
+      {/* Arguments */}
+      <ArgumentsSection config={config} />
+
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+        {[
+          ["all", `All (${entries.length})`],
+          ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
+          ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
+          ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
+          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
+        ].map(([k, label]) => (
+          <button
+            key={k}
+            onClick={() => setFilterChannel(k)}
+            style={{
+              padding: "6px 14px",
+              fontSize: 11,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontWeight: 600,
+              borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
+              background: filterChannel === k ? colors.accent : colors.surface,
+              color: filterChannel === k ? colors.bg : colors.textMuted,
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} overrides={weightOverrides} />
 
       {/* Per-channel Entry Logs */}
       <EntryLogs entries={entries} filterChannel={filterChannel} onDelete={deleteEntry} config={config} />
