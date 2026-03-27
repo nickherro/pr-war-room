@@ -79,7 +79,6 @@ function WeeklyCoverage({ entries, config }) {
   if (data.weeks.length < 2) return null;
 
   const maxVol = Math.max(...data.weeks.map((d) => d.provFav + d.payFav + d.neutral), 1);
-  const maxSrc = Math.max(...data.weeks.map((d) => d.uniqueSources), 1);
 
   const sharedXAxis = (hide) => (
     <XAxis
@@ -100,7 +99,7 @@ function WeeklyCoverage({ entries, config }) {
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={data.weeks} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border} opacity={0.4} vertical={false} />
-          {sharedXAxis(true)}
+          {sharedXAxis(false)}
           <YAxis domain={[0, maxVol + 2]} tick={{ fill: colors.textMuted, fontSize: 9, fontFamily: MONO }} axisLine={false} tickLine={false} width={24} />
           <Tooltip
             content={({ active, payload }) => {
@@ -136,36 +135,6 @@ function WeeklyCoverage({ entries, config }) {
         </span>
       </div>
 
-      {/* Chart 2: Source type by volume */}
-      <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700, marginBottom: 8 }}>
-        UNIQUE SOURCES PER WEEK
-      </div>
-      <ResponsiveContainer width="100%" height={160}>
-        <BarChart data={data.weeks} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={colors.border} opacity={0.4} vertical={false} />
-          {sharedXAxis(false)}
-          <YAxis domain={[0, maxSrc + 2]} tick={{ fill: colors.textMuted, fontSize: 9, fontFamily: MONO }} axisLine={false} tickLine={false} width={24} />
-          <Tooltip
-            content={({ active, payload }) => {
-              if (!active || !payload?.length) return null;
-              const d = payload[0].payload;
-              return (
-                <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${colors.border}`, borderRadius: 6, padding: "8px 10px", fontFamily: MONO, fontSize: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
-                  <div style={{ fontWeight: 700 }}>{d.uniqueSources} unique sources</div>
-                  <div style={{ color: colors.textMuted }}>{d.total} total entries</div>
-                </div>
-              );
-            }}
-          />
-          <Bar dataKey="uniqueSources" fill={colors.accent} opacity={0.6} radius={[2, 2, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
-      <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 4, marginBottom: 16, fontSize: 9, fontFamily: MONO, color: colors.textMuted }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-          <span style={{ width: 8, height: 8, background: colors.accent, opacity: 0.6, borderRadius: 2, display: "inline-block" }} />
-          Unique sources
-        </span>
-      </div>
 
       {/* Top sources table */}
       <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, overflow: "hidden" }}>
