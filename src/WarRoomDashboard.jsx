@@ -4,10 +4,34 @@ import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceL
 // === SHARED COMPUTATION LOGIC ===
 
 export const DEFAULT_SOURCE_TYPE_WEIGHTS = { tv: 1.2, radio: 1.2, news: 1.0, social: 0.7, owned: 0.3, opinion: 0.8, other: 1.0 };
-export const DEFAULT_DIMENSION_WEIGHTS = { frame: 0.3, sentiment: 0.3, blame: 0.25, patientStory: 0.15 };
+export const DEFAULT_DIMENSION_WEIGHTS = { reach: 0.25, sophistication: 0.20, callToAction: 0.20, independence: 0.15, stakeholder: 0.20 };
+
+// Source independence scores by sourceType
+const SOURCE_INDEPENDENCE = { news: 1.0, tv: 1.0, radio: 1.0, opinion: 0.6, social: 0.4, owned: 0.1, other: 0.5 };
+
+// Reach multipliers
+const REACH_MULT = { high: 3, medium: 2, low: 1 };
 
 function getWeight(entry, sourceWeights, sourceTypeWeights) {
   return sourceWeights[entry.source] ?? sourceTypeWeights[entry.sourceType] ?? 1.0;
+}
+
+// Compute per-entry favorability from existing coded fields: -1 (payor) to +1 (provider)
+function entryFavorability(entry, providerKey, payorKey) {
+  let signals = 0, count = 0;
+  if (entry.frameAdoption === providerKey) { signals += 1; count++; }
+  else if (entry.frameAdoption === payorKey) { signals -= 1; count++; }
+  else { count++; } // balanced = 0
+
+  if (entry.sentiment === `negative_${payorKey}` || entry.sentiment === `positive_${providerKey}`) { signals += 1; count++; }
+  else if (entry.sentiment === `negative_${providerKey}` || entry.sentiment === `positive_${payorKey}`) { signals -= 1; count++; }
+  else { count++; } // neutral = 0
+
+  if (entry.blameDirection === payorKey) { signals += 1; count++; }
+  else if (entry.blameDirection === providerKey) { signals -= 1; count++; }
+  else { count++; } // both = 0
+
+  return count > 0 ? signals / count : 0;
 }
 
 function computeScores(entries, config, overrides) {
@@ -22,23 +46,50 @@ function computeScores(entries, config, overrides) {
   const stakeholderEntries = entries.filter((e) => e.channel === "stakeholder");
   const employerEntries = entries.filter((e) => e.channel === "employer");
 
-  const frameProvider = entries.filter((e) => e.frameAdoption === providerKey).reduce((s, e) => s + gw(e), 0);
-  const framePayor = entries.filter((e) => e.frameAdoption === payorKey).reduce((s, e) => s + gw(e), 0);
-  const frameScore = ((frameProvider - framePayor) / totalW) * 100;
+  // Per-entry favorability
+  const fav = (e) => entryFavorability(e, providerKey, payorKey);
 
-  const sentNegPayor = entries.filter((e) => e.sentiment === `negative_${payorKey}` || e.sentiment === `positive_${providerKey}`).reduce((s, e) => s + gw(e), 0);
-  const sentNegProvider = entries.filter((e) => e.sentiment === `negative_${providerKey}` || e.sentiment === `positive_${payorKey}`).reduce((s, e) => s + gw(e), 0);
-  const sentScore = ((sentNegPayor - sentNegProvider) / totalW) * 100;
+  // 1. Reach/Amplification: high-reach, high-credibility coverage weighted by favorability
+  const reachTotalW = entries.reduce((s, e) => s + gw(e) * (REACH_MULT[e.reachEstimate] || 1), 0) || 1;
+  const reachScore = entries.reduce((s, e) => s + fav(e) * gw(e) * (REACH_MULT[e.reachEstimate] || 1), 0) / reachTotalW * 100;
 
-  const blamePayor = entries.filter((e) => e.blameDirection === payorKey).reduce((s, e) => s + gw(e), 0);
-  const blameProvider = entries.filter((e) => e.blameDirection === providerKey).reduce((s, e) => s + gw(e), 0);
-  const blameScore = ((blamePayor - blameProvider) / totalW) * 100;
+  // 2. Narrative Sophistication: balanced/analytical coverage from independent, high-tier sources
+  // Sophistication heuristic: independent sources (news/tv/radio) with balanced framing = high sophistication
+  // Owned/social echoing one side = low sophistication
+  const sophWeight = (e) => {
+    const indep = SOURCE_INDEPENDENCE[e.sourceType] || 0.5;
+    const balanceBonus = e.frameAdoption === "balanced" ? 1.5 : 1.0;
+    return gw(e) * indep * balanceBonus;
+  };
+  const sophTotalW = entries.reduce((s, e) => s + sophWeight(e), 0) || 1;
+  const sophScore = entries.reduce((s, e) => s + fav(e) * sophWeight(e), 0) / sophTotalW * 100;
 
-  const patientW = entries.filter((e) => e.patientStory).reduce((s, e) => s + gw(e), 0);
-  const patientScore = (patientW / totalW) * 100;
+  // 3. Call to Action: patient stories + owned media mobilization + stakeholder entries with strong blame
+  const ctaWeight = (e) => {
+    let mult = 1.0;
+    if (e.patientStory) mult += 1.5;
+    if (e.sourceType === "owned") mult += 1.0; // party mobilization
+    if ((e.channel === "stakeholder" || e.channel === "employer") && e.blameDirection !== "both") mult += 0.5;
+    return gw(e) * mult;
+  };
+  const ctaTotalW = entries.reduce((s, e) => s + ctaWeight(e), 0) || 1;
+  const ctaScore = entries.reduce((s, e) => s + fav(e) * ctaWeight(e), 0) / ctaTotalW * 100;
 
-  const composite = frameScore * dw.frame + sentScore * dw.sentiment + blameScore * dw.blame + patientScore * dw.patientStory;
+  // 4. Source Independence: which side benefits from independent vs party-aligned sources?
+  const indepEntries = entries.filter((e) => (SOURCE_INDEPENDENCE[e.sourceType] || 0.5) >= 0.6);
+  const indepTotalW = indepEntries.reduce((s, e) => s + gw(e), 0) || 1;
+  const indepScore = indepEntries.reduce((s, e) => s + fav(e) * gw(e), 0) / indepTotalW * 100;
 
+  // 5. Stakeholder Mobilization: stakeholder + employer channel entries weighted by source credibility
+  const stakeEntries = entries.filter((e) => e.channel === "stakeholder" || e.channel === "employer");
+  const stakeTotalW = stakeEntries.reduce((s, e) => s + gw(e), 0) || 1;
+  const stakeScore = stakeEntries.length >= 2
+    ? stakeEntries.reduce((s, e) => s + fav(e) * gw(e), 0) / stakeTotalW * 100
+    : 0;
+
+  const composite = reachScore * dw.reach + sophScore * dw.sophistication + ctaScore * dw.callToAction + indepScore * dw.independence + stakeScore * dw.stakeholder;
+
+  // Legacy counts for distributions (still useful for UI)
   return {
     total: entries.length,
     totalWeighted: totalW,
@@ -46,7 +97,8 @@ function computeScores(entries, config, overrides) {
     socialCount: socialEntries.length,
     stakeholderCount: stakeholderEntries.length,
     employerCount: employerEntries.length,
-    frameScore, sentScore, blameScore, patientScore, composite,
+    reachScore, sophScore, ctaScore, indepScore, stakeScore, composite,
+    // Distribution counts (kept for UI)
     frameProvider: entries.filter((e) => e.frameAdoption === providerKey).length,
     framePayor: entries.filter((e) => e.frameAdoption === payorKey).length,
     frameBalanced: entries.filter((e) => e.frameAdoption === "balanced").length,
@@ -70,19 +122,22 @@ function computeTrend(entries, config, overrides, mode = "decay") {
   });
   const dates = Object.keys(dateMap).sort();
 
+  const makePoint = (s, d, cnt) => ({
+    date: d, composite: s.composite, count: cnt, dateCount: dateMap[d].length,
+    reach: s.reachScore, soph: s.sophScore, cta: s.ctaScore, indep: s.indepScore, stake: s.stakeScore,
+  });
+
   if (mode === "cumulative") {
     const points = [];
     const cumulative = [];
     dates.forEach((d) => {
       cumulative.push(...dateMap[d]);
-      const s = computeScores(cumulative, config, overrides);
-      points.push({ date: d, composite: s.composite, count: cumulative.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+      points.push(makePoint(computeScores(cumulative, config, overrides), d, cumulative.length));
     });
     return points;
   }
 
   if (mode === "rolling") {
-    // Rolling window — window size is 1/4 of the dispute duration (minimum 7 days)
     const firstDate = new Date(dates[0]);
     const lastDate = new Date(dates[dates.length - 1]);
     const totalDays = Math.max(1, (lastDate - firstDate) / 86400000);
@@ -96,13 +151,13 @@ function computeTrend(entries, config, overrides, mode = "decay") {
         return t > windowStart && t <= dTime;
       });
       if (windowEntries.length === 0) return;
-      const s = computeScores(windowEntries, config, overrides);
-      points.push({ date: d, composite: s.composite, count: windowEntries.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+      points.push(makePoint(computeScores(windowEntries, config, overrides), d, windowEntries.length));
     });
     return points;
   }
 
   // Default: exponential decay (half-life = 30 days)
+  // Apply decay as a time-weight multiplier on each entry, then run through the same 5-dimension model
   const HALF_LIFE = 30;
   const LAMBDA = Math.LN2 / HALF_LIFE;
   const points = [];
@@ -110,40 +165,55 @@ function computeTrend(entries, config, overrides, mode = "decay") {
   dates.forEach((d) => {
     allEntries.push(...dateMap[d]);
     const dTime = new Date(d).getTime();
-    const { providerKey, payorKey, sourceWeights } = config;
+    const { providerKey, payorKey, sourceWeights: sw } = config;
     const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
     const dw = overrides?.dimensionWeights || DEFAULT_DIMENSION_WEIGHTS;
-    const mergedSW = overrides?.sourceWeights ? { ...sourceWeights, ...overrides.sourceWeights } : sourceWeights;
+    const mergedSW = overrides?.sourceWeights ? { ...sw, ...overrides.sourceWeights } : sw;
 
-    let totalW = 0;
-    let frameP = 0, framePy = 0;
-    let sentNP = 0, sentNPr = 0;
-    let blameP = 0, blamePr = 0;
-    let patW = 0;
+    // Decay-weighted favorability computation for the 5 dimensions
+    let reachTotalW = 0, reachFavW = 0;
+    let sophTotalW = 0, sophFavW = 0;
+    let ctaTotalW = 0, ctaFavW = 0;
+    let indepTotalW = 0, indepFavW = 0;
+    let stakeTotalW = 0, stakeFavW = 0;
 
     allEntries.forEach((e) => {
       const ageInDays = (dTime - new Date(e.date).getTime()) / 86400000;
       const decay = Math.exp(-LAMBDA * ageInDays);
-      const baseW = getWeight(e, mergedSW, stw);
-      const w = baseW * decay;
-      totalW += w;
-      if (e.frameAdoption === providerKey) frameP += w;
-      if (e.frameAdoption === payorKey) framePy += w;
-      if (e.sentiment === `negative_${payorKey}` || e.sentiment === `positive_${providerKey}`) sentNP += w;
-      if (e.sentiment === `negative_${providerKey}` || e.sentiment === `positive_${payorKey}`) sentNPr += w;
-      if (e.blameDirection === payorKey) blameP += w;
-      if (e.blameDirection === providerKey) blamePr += w;
-      if (e.patientStory) patW += w;
+      const baseW = getWeight(e, mergedSW, stw) * decay;
+      const f = entryFavorability(e, providerKey, payorKey);
+      const rm = REACH_MULT[e.reachEstimate] || 1;
+      const indep = SOURCE_INDEPENDENCE[e.sourceType] || 0.5;
+
+      // Reach
+      const rw = baseW * rm;
+      reachTotalW += rw; reachFavW += f * rw;
+      // Sophistication
+      const balBonus = e.frameAdoption === "balanced" ? 1.5 : 1.0;
+      const sw2 = baseW * indep * balBonus;
+      sophTotalW += sw2; sophFavW += f * sw2;
+      // Call to Action
+      let ctaMult = 1.0;
+      if (e.patientStory) ctaMult += 1.5;
+      if (e.sourceType === "owned") ctaMult += 1.0;
+      if ((e.channel === "stakeholder" || e.channel === "employer") && e.blameDirection !== "both") ctaMult += 0.5;
+      const cw = baseW * ctaMult;
+      ctaTotalW += cw; ctaFavW += f * cw;
+      // Independence
+      if (indep >= 0.6) { indepTotalW += baseW; indepFavW += f * baseW; }
+      // Stakeholder
+      if (e.channel === "stakeholder" || e.channel === "employer") { stakeTotalW += baseW; stakeFavW += f * baseW; }
     });
 
-    if (totalW === 0) return;
-    const frameScore = ((frameP - framePy) / totalW) * 100;
-    const sentScore = ((sentNP - sentNPr) / totalW) * 100;
-    const blameScore = ((blameP - blamePr) / totalW) * 100;
-    const patientScore = (patW / totalW) * 100;
-    const composite = frameScore * dw.frame + sentScore * dw.sentiment + blameScore * dw.blame + patientScore * dw.patientStory;
+    if (reachTotalW === 0) return;
+    const rs = (reachFavW / reachTotalW) * 100;
+    const ss = (sophFavW / (sophTotalW || 1)) * 100;
+    const cs = (ctaFavW / (ctaTotalW || 1)) * 100;
+    const is2 = indepTotalW > 0 ? (indepFavW / indepTotalW) * 100 : 0;
+    const st = stakeTotalW > 0 ? (stakeFavW / stakeTotalW) * 100 : 0;
+    const composite = rs * dw.reach + ss * dw.sophistication + cs * dw.callToAction + is2 * dw.independence + st * dw.stakeholder;
 
-    points.push({ date: d, composite, count: allEntries.length, dateCount: dateMap[d].length, frame: frameScore, sent: sentScore, blame: blameScore });
+    points.push({ date: d, composite, count: allEntries.length, dateCount: dateMap[d].length, reach: rs, soph: ss, cta: cs, indep: is2, stake: st });
   });
   return points;
 }
@@ -514,10 +584,11 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
     const lateScores = computeScores(late, config, overrides);
 
     const dims = [
-      { name: "Frame Adoption", key: "frameScore", weight: "30%", early: earlyScores.frameScore, late: lateScores.frameScore },
-      { name: "Sentiment", key: "sentScore", weight: "30%", early: earlyScores.sentScore, late: lateScores.sentScore },
-      { name: "Blame Direction", key: "blameScore", weight: "25%", early: earlyScores.blameScore, late: lateScores.blameScore },
-      { name: "Patient Stories", key: "patientScore", weight: "15%", early: earlyScores.patientScore, late: lateScores.patientScore },
+      { name: "Reach/Amplification", key: "reachScore", weight: "25%", early: earlyScores.reachScore, late: lateScores.reachScore },
+      { name: "Narrative Sophistication", key: "sophScore", weight: "20%", early: earlyScores.sophScore, late: lateScores.sophScore },
+      { name: "Call to Action", key: "ctaScore", weight: "20%", early: earlyScores.ctaScore, late: lateScores.ctaScore },
+      { name: "Source Independence", key: "indepScore", weight: "15%", early: earlyScores.indepScore, late: lateScores.indepScore },
+      { name: "Stakeholder Mobilization", key: "stakeScore", weight: "20%", early: earlyScores.stakeScore, late: lateScores.stakeScore },
     ];
     const dimShifts = dims
       .map((d) => ({ ...d, shift: d.late - d.early }))
@@ -535,14 +606,16 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
       if (Math.abs(shift) > 5) {
         const label = ch.charAt(0).toUpperCase() + ch.slice(1);
         const drivers = [];
-        const frameDiff = lScores.frameScore - eScores.frameScore;
-        const sentDiff = lScores.sentScore - eScores.sentScore;
-        const blameDiff = lScores.blameScore - eScores.blameScore;
-        const patDiff = lScores.patientScore - eScores.patientScore;
-        if (Math.abs(frameDiff) > 5) drivers.push(`frame adoption ${frameDiff > 0 ? `shifting toward ${providerShort}` : `shifting toward ${payorShort}`} (${frameDiff > 0 ? "+" : ""}${frameDiff.toFixed(0)})`);
-        if (Math.abs(sentDiff) > 5) drivers.push(`sentiment ${sentDiff > 0 ? `turning more anti-${payorShort}` : `turning more anti-${providerShort}`} (${sentDiff > 0 ? "+" : ""}${sentDiff.toFixed(0)})`);
-        if (Math.abs(blameDiff) > 5) drivers.push(`blame direction ${blameDiff > 0 ? `increasingly on ${payorShort}` : `increasingly on ${providerShort}`} (${blameDiff > 0 ? "+" : ""}${blameDiff.toFixed(0)})`);
-        if (Math.abs(patDiff) > 5) drivers.push(`patient story saturation ${patDiff > 0 ? "increasing" : "decreasing"} (${patDiff > 0 ? "+" : ""}${patDiff.toFixed(0)})`);
+        const reachDiff = lScores.reachScore - eScores.reachScore;
+        const sophDiff = lScores.sophScore - eScores.sophScore;
+        const ctaDiff = lScores.ctaScore - eScores.ctaScore;
+        const indepDiff = lScores.indepScore - eScores.indepScore;
+        const stakeDiff = lScores.stakeScore - eScores.stakeScore;
+        if (Math.abs(reachDiff) > 5) drivers.push(`reach ${reachDiff > 0 ? `shifting toward ${providerShort}` : `shifting toward ${payorShort}`} (${reachDiff > 0 ? "+" : ""}${reachDiff.toFixed(0)})`);
+        if (Math.abs(sophDiff) > 5) drivers.push(`narrative sophistication ${sophDiff > 0 ? `favoring ${providerShort}` : `favoring ${payorShort}`} (${sophDiff > 0 ? "+" : ""}${sophDiff.toFixed(0)})`);
+        if (Math.abs(ctaDiff) > 5) drivers.push(`call-to-action mobilization ${ctaDiff > 0 ? `increasing for ${providerShort}` : `increasing for ${payorShort}`} (${ctaDiff > 0 ? "+" : ""}${ctaDiff.toFixed(0)})`);
+        if (Math.abs(indepDiff) > 5) drivers.push(`independent source coverage ${indepDiff > 0 ? `shifting toward ${providerShort}` : `shifting toward ${payorShort}`} (${indepDiff > 0 ? "+" : ""}${indepDiff.toFixed(0)})`);
+        if (Math.abs(stakeDiff) > 5) drivers.push(`stakeholder mobilization ${stakeDiff > 0 ? `favoring ${providerShort}` : `favoring ${payorShort}`} (${stakeDiff > 0 ? "+" : ""}${stakeDiff.toFixed(0)})`);
 
         const earlySourceSet = new Set(chEarly.map((e) => e.source));
         const newSources = [...new Set(chLate.filter((e) => !earlySourceSet.has(e.source) && gw(e) >= 1.0).map((e) => e.source))];
@@ -705,14 +778,16 @@ function ExecutiveSummary({ entries, filterChannel, scores, config, overrides })
                 {trendDrivers.dimShifts.map((d) => (
                   <li key={d.name} style={{ marginBottom: 4 }}>
                     ▸ <strong>{d.name}</strong> ({d.weight}): moved <span style={d.shift > 0 ? S.accent : S.warn}>{d.shift > 0 ? "+" : ""}{d.shift.toFixed(0)} pts</span> — from {fmtScore(d.early)} to {fmtScore(d.late)}.
-                    {d.key === "frameScore" && d.shift > 0 && ` More recent coverage is adopting ${providerName}'s framing.`}
-                    {d.key === "frameScore" && d.shift < 0 && ` ${payorName}'s framing is gaining traction in recent coverage.`}
-                    {d.key === "sentScore" && d.shift > 0 && ` Recent tone has turned more critical of ${payorShort}.`}
-                    {d.key === "sentScore" && d.shift < 0 && ` Recent tone has softened toward ${payorShort} or hardened toward ${providerShort}.`}
-                    {d.key === "blameScore" && d.shift > 0 && ` Sources are increasingly holding ${payorShort} responsible.`}
-                    {d.key === "blameScore" && d.shift < 0 && ` Blame is shifting toward ${providerName} in recent coverage.`}
-                    {d.key === "patientScore" && d.shift > 0 && " Patient stories are appearing more frequently, reinforcing the human cost narrative."}
-                    {d.key === "patientScore" && d.shift < 0 && " Fewer patient stories in recent coverage — the human angle is fading."}
+                    {d.key === "reachScore" && d.shift > 0 && ` ${providerShort} is gaining ground in high-reach outlets.`}
+                    {d.key === "reachScore" && d.shift < 0 && ` ${payorShort} is gaining ground in high-reach outlets.`}
+                    {d.key === "sophScore" && d.shift > 0 && ` Analytical and investigative coverage is trending more favorable to ${providerShort}.`}
+                    {d.key === "sophScore" && d.shift < 0 && ` Deeper analytical coverage is trending more favorable to ${payorShort}.`}
+                    {d.key === "ctaScore" && d.shift > 0 && ` ${providerShort}'s mobilization efforts and patient advocacy are intensifying.`}
+                    {d.key === "ctaScore" && d.shift < 0 && ` ${payorShort}'s mobilization and counter-narrative are gaining traction.`}
+                    {d.key === "indepScore" && d.shift > 0 && ` Independent sources are increasingly favoring ${providerShort}'s position.`}
+                    {d.key === "indepScore" && d.shift < 0 && ` Independent sources are increasingly favoring ${payorShort}'s position.`}
+                    {d.key === "stakeScore" && d.shift > 0 && ` Third-party stakeholders are mobilizing in ${providerShort}'s favor.`}
+                    {d.key === "stakeScore" && d.shift < 0 && ` Third-party stakeholders are mobilizing in ${payorShort}'s favor.`}
                   </li>
                 ))}
               </ul>
@@ -1234,10 +1309,11 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
             <div style={{ fontSize: 14, fontWeight: 600, color: compositeColor, marginTop: 4 }}>{compositeLabel}</div>
           </div>
           <div style={{ textAlign: "right", fontSize: 11, color: colors.textMuted, lineHeight: 1.8, fontFamily: "'JetBrains Mono', monospace" }}>
-            <div>Frame Adoption (30%): <span style={{ color: colors.text }}>{scores.frameScore > 0 ? "+" : ""}{scores.frameScore.toFixed(0)}</span></div>
-            <div>Sentiment (30%): <span style={{ color: colors.text }}>{scores.sentScore > 0 ? "+" : ""}{scores.sentScore.toFixed(0)}</span></div>
-            <div>Blame Direction (25%): <span style={{ color: colors.text }}>{scores.blameScore > 0 ? "+" : ""}{scores.blameScore.toFixed(0)}</span></div>
-            <div>Patient Story Saturation (15%): <span style={{ color: colors.text }}>{scores.patientScore.toFixed(0)}%</span></div>
+            <div>Reach/Amplification (25%): <span style={{ color: colors.text }}>{scores.reachScore > 0 ? "+" : ""}{scores.reachScore.toFixed(0)}</span></div>
+            <div>Narrative Sophistication (20%): <span style={{ color: colors.text }}>{scores.sophScore > 0 ? "+" : ""}{scores.sophScore.toFixed(0)}</span></div>
+            <div>Call to Action (20%): <span style={{ color: colors.text }}>{scores.ctaScore > 0 ? "+" : ""}{scores.ctaScore.toFixed(0)}</span></div>
+            <div>Source Independence (15%): <span style={{ color: colors.text }}>{scores.indepScore > 0 ? "+" : ""}{scores.indepScore.toFixed(0)}</span></div>
+            <div>Stakeholder Mobilization (20%): <span style={{ color: colors.text }}>{scores.stakeScore > 0 ? "+" : ""}{scores.stakeScore.toFixed(0)}</span></div>
           </div>
         </div>
         <TrendChart entries={entries} filterChannel={filterChannel} config={config} overrides={weightOverrides} />
@@ -1287,13 +1363,11 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
           <div style={{ fontSize: 11, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 14 }}>
             DIMENSION SCORES
           </div>
-          <ScoreGauge value={scores.frameScore} label="Frame Adoption" subtext="Whose numbers get cited?" config={config} />
-          <ScoreGauge value={scores.sentScore} label="Sentiment" subtext="Tone of coverage" config={config} />
-          <ScoreGauge value={scores.blameScore} label="Blame Direction" subtext="Who's the villain?" config={config} />
-          <div style={{ marginTop: 8, padding: "8px 10px", background: colors.bg, borderRadius: 4, fontSize: 11, color: colors.textMuted }}>
-            <strong style={{ color: colors.accent }}>Patient Story Saturation:</strong>{" "}
-            {scores.patientStories}/{scores.total} entries ({scores.patientScore.toFixed(0)}%) — favors {providerShort} as provider
-          </div>
+          <ScoreGauge value={scores.reachScore} label="Reach / Amplification" subtext="High-visibility coverage advantage" config={config} />
+          <ScoreGauge value={scores.sophScore} label="Narrative Sophistication" subtext="Analytical depth of coverage" config={config} />
+          <ScoreGauge value={scores.ctaScore} label="Call to Action" subtext="Mobilization & patient stories" config={config} />
+          <ScoreGauge value={scores.indepScore} label="Source Independence" subtext="Independent vs party-aligned" config={config} />
+          <ScoreGauge value={scores.stakeScore} label="Stakeholder Mobilization" subtext="Third-party interventions" config={config} />
         </div>
 
         <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 16 }}>
@@ -1324,11 +1398,11 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
           <div style={{ marginTop: 16, padding: 12, background: colors.bg, borderRadius: 6, fontSize: 11, lineHeight: 1.7, color: colors.textMuted }}>
             <strong style={{ color: colors.accent }}>SCORING METHODOLOGY</strong>
             <br />
-            Each dimension: (pro-{providerShort} count − pro-{payorShort} count) / total × 100
+            Entry favorability derived from frame adoption + sentiment + blame direction
             <br />
             Positive = {providerShort} winning · Negative = {payorShort} winning
             <br />
-            Composite = Frame(30%) + Sentiment(30%) + Blame(25%) + PatientStory(15%)
+            Composite = Reach(25%) + Sophistication(20%) + CTA(20%) + Independence(15%) + Stakeholder(20%)
           </div>
         </div>
       </div>

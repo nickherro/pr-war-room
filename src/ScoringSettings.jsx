@@ -5,10 +5,11 @@ const MONO = "'JetBrains Mono', monospace";
 const SERIF = "'Source Serif 4', Georgia, serif";
 
 const DIMENSION_LABELS = {
-  frame: "Frame Adoption",
-  sentiment: "Sentiment",
-  blame: "Blame Direction",
-  patientStory: "Patient Story Saturation",
+  reach: "Reach / Amplification",
+  sophistication: "Narrative Sophistication",
+  callToAction: "Call to Action",
+  independence: "Source Independence",
+  stakeholder: "Stakeholder Mobilization",
 };
 
 const SOURCE_TYPE_LABELS = {
