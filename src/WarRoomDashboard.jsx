@@ -313,11 +313,10 @@ const TREND_MODES = [
   { key: "rolling", label: "ROLLING WINDOW", desc: "Proportional sliding window" },
 ];
 
-function TrendChart({ entries, filterChannel, config, overrides }) {
+function TrendChart({ entries, filterChannel, config, overrides, trendMode, setTrendMode }) {
   const { disputePublicDate, colors, gradientId } = config;
   const providerFavLabel = config.providerShort + " FAV";
   const payorFavLabel = config.payorShort + " FAV";
-  const [trendMode, setTrendMode] = useState("decay");
 
   const allTrend = useMemo(() => computeTrend(entries, config, overrides, trendMode), [entries, config, overrides, trendMode]);
   const channelTrend = useMemo(() => {
@@ -1241,12 +1240,29 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
   const [entries, setEntries] = useState(initialEntries);
   const [filterChannel, setFilterChannel] = useState("all");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [trendMode, setTrendMode] = useState("decay");
 
   const filtered = useMemo(
     () => (filterChannel === "all" ? entries : entries.filter((e) => e.channel === filterChannel)),
     [entries, filterChannel]
   );
-  const scores = useMemo(() => computeScores(filtered, config, weightOverrides), [filtered, config, weightOverrides]);
+
+  // Compute scores based on selected trend mode
+  const scores = useMemo(() => {
+    const base = computeScores(filtered, config, weightOverrides);
+    const trend = computeTrend(filtered, config, weightOverrides, trendMode);
+    if (trend.length === 0) return base;
+    const last = trend[trend.length - 1];
+    return {
+      ...base,
+      composite: last.composite,
+      reachScore: last.reach,
+      sophScore: last.soph,
+      ctaScore: last.cta,
+      indepScore: last.indep,
+      stakeScore: last.stake,
+    };
+  }, [filtered, config, weightOverrides, trendMode]);
 
   const deleteEntry = useCallback((id) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
 
@@ -1334,7 +1350,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               COMPOSITE NARRATIVE ADVANTAGE
             </div>
             <div style={{ fontSize: 9, color: "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>
-              Monitoring period: {config.monitorStart} — {config.monitorEnd || "Present"}
+              Monitoring period: {config.monitorStart} — {config.monitorEnd || "Present"} · {TREND_MODES.find((m) => m.key === trendMode)?.desc}
             </div>
             <div style={{ fontSize: 40, fontWeight: 700, color: compositeColor, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>
               {scores.composite > 0 ? "+" : ""}
@@ -1350,7 +1366,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
             <div>Stakeholder Mobilization (20%): <span style={{ color: colors.text }}>{scores.stakeScore > 0 ? "+" : ""}{scores.stakeScore.toFixed(0)}</span></div>
           </div>
         </div>
-        <TrendChart entries={entries} filterChannel={filterChannel} config={config} overrides={weightOverrides} />
+        <TrendChart entries={entries} filterChannel={filterChannel} config={config} overrides={weightOverrides} trendMode={trendMode} setTrendMode={setTrendMode} />
         {config.searchTrends && config.searchTrends.length > 0 && <SearchTrendsChart entries={entries} config={config} overrides={weightOverrides} />}
       </div>
 
