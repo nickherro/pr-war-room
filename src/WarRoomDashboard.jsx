@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine, Tooltip, Legend, ResponsiveContainer, Label } from "recharts";
 import DeepAnalysis from "./DeepAnalysis.jsx";
+import PrintReport from "./PrintReport.jsx";
 
 // === SHARED COMPUTATION LOGIC ===
 
@@ -1241,6 +1242,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
   const [filterChannel, setFilterChannel] = useState("all");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [trendMode, setTrendMode] = useState("decay");
+  const [showPrint, setShowPrint] = useState(false);
 
   const filtered = useMemo(
     () => (filterChannel === "all" ? entries : entries.filter((e) => e.channel === filterChannel)),
@@ -1271,6 +1273,10 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
 
   const distColors = config.distColors || [colors.providerColor, "#5D7380", colors.payorColor];
 
+  if (showPrint) {
+    return <PrintReport config={config} weightOverrides={weightOverrides} onClose={() => setShowPrint(false)} />;
+  }
+
   return (
     <div
       style={{
@@ -1300,7 +1306,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
       </div>
 
       {/* Tab Toggle */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 20, alignItems: "center" }}>
         {[
           ["dashboard", "DASHBOARD"],
           ["media", "MEDIA SUMMARY"],
@@ -1326,6 +1332,25 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
             {label}
           </button>
         ))}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => { setShowPrint(true); window.scrollTo(0, 0); }}
+          style={{
+            padding: "7px 14px",
+            fontSize: 10,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontWeight: 700,
+            letterSpacing: 1.2,
+            borderRadius: 4,
+            border: `1px solid ${colors.border}`,
+            cursor: "pointer",
+            background: "transparent",
+            color: colors.textMuted,
+            transition: "all 0.15s ease",
+          }}
+        >
+          EXPORT PDF
+        </button>
       </div>
 
       {activeTab === "analysis" ? (

@@ -42,6 +42,7 @@ Deployed on Vercel (zero-config from GitHub main branch). SPA rewrite configured
 | `src/DeepAnalysis.jsx` | Coverage Analysis tab: weekly favorability chart, message discipline, top sources |
 | `src/ScoringSettings.jsx` | Scoring weight configuration panel |
 | `src/Methodologies.jsx` | Full methodology page: scoring framework, trend modes, data aggregation |
+| `src/PrintReport.jsx` | Print-optimized PDF export of dashboard (via browser print dialog) |
 | `src/configs/*.js` | 26 dispute config files |
 
 ### Dashboard Features
