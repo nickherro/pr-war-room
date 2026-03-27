@@ -28,7 +28,6 @@ function WeeklyCoverage({ entries, config }) {
       cur.setDate(cur.getDate() + 7);
     }
 
-    const seenSources = new Set();
     const weeks = weekBuckets.map((w) => {
       const weekEntries = sorted.filter((e) => {
         const d = new Date(e.date);
@@ -46,16 +45,10 @@ function WeeklyCoverage({ entries, config }) {
 
       // Source types
       const uniqueSources = new Set(weekEntries.map((e) => e.source));
-      let newCount = 0;
-      uniqueSources.forEach((s) => {
-        if (!seenSources.has(s)) { newCount++; seenSources.add(s); }
-      });
-      const returning = Math.max(0, uniqueSources.size - newCount);
 
       return {
         label: w.label,
         provFav, payFav, neutral,
-        returning, newSources: newCount,
         uniqueSources: uniqueSources.size,
         total: weekEntries.length,
       };
@@ -109,7 +102,7 @@ function WeeklyCoverage({ entries, config }) {
   if (data.weeks.length < 2) return null;
 
   const maxVol = Math.max(...data.weeks.map((d) => d.provFav + d.payFav + d.neutral), 1);
-  const maxSrc = Math.max(...data.weeks.map((d) => d.returning + d.newSources), 1);
+  const maxSrc = Math.max(...data.weeks.map((d) => d.uniqueSources), 1);
 
   const statusLabel = (ratio) => ratio > 1.3 ? "ACCELERATING" : ratio < 0.7 ? "DECELERATING" : "STEADY";
   const statusColor = (ratio) => ratio > 1.3 ? "#DC2626" : ratio < 0.7 ? "#16A34A" : colors.accent;
@@ -206,25 +199,19 @@ function WeeklyCoverage({ entries, config }) {
               const d = payload[0].payload;
               return (
                 <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${colors.border}`, borderRadius: 6, padding: "8px 10px", fontFamily: MONO, fontSize: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
-                  <div style={{ fontWeight: 700, marginBottom: 2 }}>{d.uniqueSources} unique sources</div>
-                  <div style={{ color: colors.accent }}>{d.returning} returning</div>
-                  <div style={{ color: "#16A34A" }}>{d.newSources} new</div>
+                  <div style={{ fontWeight: 700 }}>{d.uniqueSources} unique sources</div>
+                  <div style={{ color: colors.textMuted }}>{d.total} total entries</div>
                 </div>
               );
             }}
           />
-          <Bar dataKey="returning" stackId="src" fill={colors.accent} opacity={0.5} />
-          <Bar dataKey="newSources" stackId="src" fill="#16A34A" opacity={0.7} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="uniqueSources" fill={colors.accent} opacity={0.6} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
       <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 4, marginBottom: 16, fontSize: 9, fontFamily: MONO, color: colors.textMuted }}>
         <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-          <span style={{ width: 8, height: 8, background: colors.accent, opacity: 0.5, borderRadius: 2, display: "inline-block" }} />
-          Returning
-        </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-          <span style={{ width: 8, height: 8, background: "#16A34A", opacity: 0.7, borderRadius: 2, display: "inline-block" }} />
-          New
+          <span style={{ width: 8, height: 8, background: colors.accent, opacity: 0.6, borderRadius: 2, display: "inline-block" }} />
+          Unique sources
         </span>
       </div>
 
