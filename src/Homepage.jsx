@@ -65,12 +65,16 @@ function formatDate(dateStr) {
 
 export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
   const scored = useMemo(() => {
+    const now = Date.now();
+    const cutoff48h = now - 48 * 60 * 60 * 1000;
     return dashboards.map((d) => {
       const entries = d.config.entries || [];
-      if (entries.length < 2) return { ...d, composite: 0, entryCount: entries.length };
+      if (entries.length < 2) return { ...d, composite: 0, entryCount: entries.length, hasNewContent: false };
       const trend = computeTrend(entries, d.config, weightOverrides, "decay");
       const last = trend.length > 0 ? trend[trend.length - 1].composite : 0;
-      return { ...d, composite: last, entryCount: entries.length };
+      const latestDate = entries.reduce((max, e) => e.date > max ? e.date : max, "");
+      const hasNewContent = latestDate && new Date(latestDate + "T23:59:59").getTime() >= cutoff48h;
+      return { ...d, composite: last, entryCount: entries.length, hasNewContent };
     }).sort((a, b) => (b.config.disputePublicDate || "").localeCompare(a.config.disputePublicDate || ""));
   }, [dashboards, weightOverrides]);
 
@@ -132,8 +136,14 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
               <div style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 600, color: "#053b57", marginBottom: 2 }}>
                 {d.config.providerShort} vs. {d.config.payorShort}
               </div>
-              <div style={{ fontSize: 11, color: "#93c4e3", fontFamily: MONO }}>
+              <div style={{ fontSize: 11, color: "#93c4e3", fontFamily: MONO, display: "flex", alignItems: "center", gap: 6 }}>
                 {d.entryCount} entries
+                {d.hasNewContent && (
+                  <span style={{
+                    fontSize: 8, fontFamily: MONO, fontWeight: 700, letterSpacing: 0.6,
+                    color: "#fff", background: "#2593d0", borderRadius: 3, padding: "1px 5px",
+                  }}>NEW</span>
+                )}
               </div>
             </div>
             <div style={{ textAlign: "center" }}>
