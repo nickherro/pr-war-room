@@ -1386,21 +1386,47 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
             config={config}
           />
           <DistBar
-            label="SOURCE INDEPENDENCE"
+            label="NARRATIVE SOPHISTICATION"
             values={[
-              entries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType)).length,
-              entries.filter((e) => ["opinion", "other"].includes(e.sourceType)).length,
-              entries.filter((e) => ["owned", "social"].includes(e.sourceType)).length,
+              filtered.filter((e) => ["news", "tv", "radio"].includes(e.sourceType) && e.frameAdoption === "balanced").length,
+              filtered.filter((e) => ["news", "tv", "radio"].includes(e.sourceType) && e.frameAdoption !== "balanced").length,
+              filtered.filter((e) => !["news", "tv", "radio"].includes(e.sourceType)).length,
             ]}
             barColors={[distColors[0], "#465E85", distColors[2]]}
-            labels={["Independent", "Mixed", "Party/Social"]}
+            labels={["Deep", "Directed", "Echo"]}
             config={config}
           />
           <DistBar
-            label="CHANNEL MIX"
-            values={[scores.mediaCount, scores.socialCount, scores.stakeholderCount, scores.employerCount]}
-            barColors={[distColors[0], "#059669", "#D86018", "#8B6914"]}
-            labels={["Media", "Social", "Stkhld", "Emplyr"]}
+            label="CALL TO ACTION"
+            values={[
+              filtered.filter((e) => e.patientStory).length,
+              filtered.filter((e) => !e.patientStory && e.sourceType === "owned").length,
+              filtered.filter((e) => !e.patientStory && e.sourceType !== "owned").length,
+            ]}
+            barColors={[distColors[0], "#D86018", "#465E85"]}
+            labels={["Patient", "Owned", "Other"]}
+            config={config}
+          />
+          <DistBar
+            label="SOURCE INDEPENDENCE"
+            values={[
+              filtered.filter((e) => ["news", "tv", "radio"].includes(e.sourceType)).length,
+              filtered.filter((e) => ["opinion", "other"].includes(e.sourceType)).length,
+              filtered.filter((e) => ["owned", "social"].includes(e.sourceType)).length,
+            ]}
+            barColors={[distColors[0], "#465E85", distColors[2]]}
+            labels={["Independent", "Mixed", "Party"]}
+            config={config}
+          />
+          <DistBar
+            label="STAKEHOLDER MOBILIZATION"
+            values={[
+              filtered.filter((e) => e.channel === "stakeholder").length,
+              filtered.filter((e) => e.channel === "employer").length,
+              filtered.filter((e) => e.channel !== "stakeholder" && e.channel !== "employer").length,
+            ]}
+            barColors={[distColors[0], "#8B6914", "#465E85"]}
+            labels={["Stkhld", "Emplyr", "Other"]}
             config={config}
           />
           <div style={{ marginTop: 16, padding: 12, background: colors.bg, borderRadius: 6, fontSize: 11, lineHeight: 1.7, color: colors.textMuted }}>
