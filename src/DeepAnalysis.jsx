@@ -46,9 +46,11 @@ function NarrativeVelocity({ entries, config }) {
 
   const maxCount = Math.max(...data.map((d) => d.provFav + d.payFav + d.neutral), 1);
 
-  const mid = Math.floor(data.length / 2);
-  const firstHalf = data.slice(0, mid);
-  const secondHalf = data.slice(mid);
+  // Only compare weeks that have coverage (exclude pre-dispute empty weeks)
+  const activeWeeks = data.filter((d) => d.provFav + d.payFav + d.neutral > 0);
+  const mid = Math.floor(activeWeeks.length / 2);
+  const firstHalf = activeWeeks.slice(0, mid);
+  const secondHalf = activeWeeks.slice(mid);
   const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, d) => s + d.provFav + d.payFav + d.neutral, 0) / firstHalf.length : 0;
   const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, d) => s + d.provFav + d.payFav + d.neutral, 0) / secondHalf.length : 0;
   const velocityRatio = firstAvg > 0 ? secondAvg / firstAvg : secondAvg > 0 ? 2 : 1;
@@ -293,10 +295,13 @@ function MediaFatigue({ entries, config }) {
         dropped: new Date(sourceLastWeek[source]) < new Date(sorted[sorted.length - 1].date.slice(0, 7) + "-01"),
       }));
 
-    const recentWeeks = weekData.slice(-3);
-    const earlyWeeks = weekData.slice(0, 3);
-    const recentUnique = recentWeeks.reduce((s, w) => s + w.uniqueSources, 0) / (recentWeeks.length || 1);
-    const earlyUnique = earlyWeeks.reduce((s, w) => s + w.uniqueSources, 0) / (earlyWeeks.length || 1);
+    // Only compare weeks with actual coverage
+    const activeWeeks = weekData.filter((w) => w.uniqueSources > 0);
+    const fatigueMid = Math.floor(activeWeeks.length / 2);
+    const earlyWeeks = activeWeeks.slice(0, fatigueMid);
+    const recentWeeks = activeWeeks.slice(fatigueMid);
+    const recentUnique = recentWeeks.length > 0 ? recentWeeks.reduce((s, w) => s + w.uniqueSources, 0) / recentWeeks.length : 0;
+    const earlyUnique = earlyWeeks.length > 0 ? earlyWeeks.reduce((s, w) => s + w.uniqueSources, 0) / earlyWeeks.length : 0;
 
     return { weeks: weekData, topSources, recentUnique, earlyUnique };
   }, [entries, config]);
