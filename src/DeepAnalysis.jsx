@@ -53,12 +53,15 @@ function NarrativeVelocity({ entries, config }) {
   const maxCount = Math.max(...data.map((d) => d.count), 1);
   const maxAccel = Math.max(...data.map((d) => Math.abs(d.acceleration)), 1);
 
-  // Compute velocity status
-  const recent3 = data.slice(-3);
-  const earlier3 = data.slice(-6, -3);
-  const recentAvg = recent3.reduce((s, d) => s + d.count, 0) / (recent3.length || 1);
-  const earlierAvg = earlier3.length > 0 ? earlier3.reduce((s, d) => s + d.count, 0) / earlier3.length : recentAvg;
-  const velocityRatio = earlierAvg > 0 ? recentAvg / earlierAvg : 1;
+  // Compute velocity status using second-half vs first-half average
+  const mid = Math.floor(data.length / 2);
+  const firstHalf = data.slice(0, mid);
+  const secondHalf = data.slice(mid);
+  const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, d) => s + d.count, 0) / firstHalf.length : 0;
+  const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, d) => s + d.count, 0) / secondHalf.length : 0;
+  const recentAvg = secondAvg;
+  const earlierAvg = firstAvg;
+  const velocityRatio = earlierAvg > 0 ? recentAvg / earlierAvg : recentAvg > 0 ? 2 : 1;
   const velocityLabel = velocityRatio > 1.3 ? "ACCELERATING" : velocityRatio < 0.7 ? "DECELERATING" : "STEADY";
   const velocityColor = velocityRatio > 1.3 ? "#DC2626" : velocityRatio < 0.7 ? "#16A34A" : colors.accent;
 
