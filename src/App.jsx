@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import WarRoomDashboard from "./WarRoomDashboard.jsx";
 import ScoringSettings from "./ScoringSettings.jsx";
 import Homepage from "./Homepage.jsx";
+import Methodologies from "./Methodologies.jsx";
 
 // Import all configs dynamically
 const configs = {};
@@ -55,6 +56,7 @@ function saveOverrides(overrides) {
 export default function App({ onLogout }) {
   const [active, setActive] = useState(getRouteFromPath);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMethods, setShowMethods] = useState(false);
   const [weightOverrides, setWeightOverrides] = useState(loadOverrides);
 
   // Sync browser back/forward
@@ -71,6 +73,7 @@ export default function App({ onLogout }) {
     }
     setActive(id);
     setShowSettings(false);
+    setShowMethods(false);
     window.scrollTo(0, 0);
   }, []);
 
@@ -130,11 +133,24 @@ export default function App({ onLogout }) {
             TRACKER HOME
           </span>
           <div style={{ flex: 1 }} />
+          <button
+            onClick={() => { setShowMethods(!showMethods); window.scrollTo(0, 0); }}
+            style={{
+              ...navBtnStyle,
+              background: showMethods ? "rgba(0,0,0,0.08)" : "transparent",
+            }}
+          >
+            METHODS
+          </button>
           <button onClick={onLogout} style={navBtnStyle}>
             LOGOUT
           </button>
         </div>
-        <Homepage dashboards={DASHBOARDS} weightOverrides={weightOverrides} onNavigate={navigate} />
+        {showMethods ? (
+          <Methodologies />
+        ) : (
+          <Homepage dashboards={DASHBOARDS} weightOverrides={weightOverrides} onNavigate={navigate} />
+        )}
       </div>
     );
   }
@@ -198,7 +214,7 @@ export default function App({ onLogout }) {
           ))}
         </select>
         <button
-          onClick={() => setShowSettings(!showSettings)}
+          onClick={() => { setShowSettings(!showSettings); setShowMethods(false); }}
           style={{
             ...navBtnStyle,
             background: showSettings ? "rgba(0,0,0,0.08)" : "transparent",
@@ -208,6 +224,15 @@ export default function App({ onLogout }) {
         >
           CONFIG
         </button>
+        <button
+          onClick={() => { setShowMethods(!showMethods); setShowSettings(false); window.scrollTo(0, 0); }}
+          style={{
+            ...navBtnStyle,
+            background: showMethods ? "rgba(0,0,0,0.08)" : "transparent",
+          }}
+        >
+          METHODS
+        </button>
         <div style={{ flex: 1 }} />
         <button onClick={onLogout} style={navBtnStyle}>
           LOGOUT
@@ -215,7 +240,7 @@ export default function App({ onLogout }) {
       </div>
 
       {/* Settings panel */}
-      {showSettings && activeConfig && (
+      {showSettings && !showMethods && activeConfig && (
         <div style={{ padding: "20px 20px 0" }}>
           <ScoringSettings
             config={activeConfig}
@@ -226,8 +251,10 @@ export default function App({ onLogout }) {
         </div>
       )}
 
-      {/* Dashboard content */}
-      {activeConfig ? (
+      {/* Methodologies page */}
+      {showMethods ? (
+        <Methodologies />
+      ) : activeConfig ? (
         <WarRoomDashboard key={active} config={activeConfig} weightOverrides={weightOverrides} />
       ) : (
         <div style={{ padding: 40, textAlign: "center", color: "#5D7380" }}>Dashboard not found</div>

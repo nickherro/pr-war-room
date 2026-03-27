@@ -41,6 +41,7 @@ Deployed on Vercel (zero-config from GitHub main branch). SPA rewrite configured
 | `src/WarRoomDashboard.jsx` | Main dashboard: 3 tabs (Dashboard, Media Summary, Coverage Analysis) |
 | `src/DeepAnalysis.jsx` | Coverage Analysis tab: weekly favorability chart, message discipline, top sources |
 | `src/ScoringSettings.jsx` | Scoring weight configuration panel |
+| `src/Methodologies.jsx` | Full methodology page: scoring framework, trend modes, data aggregation |
 | `src/configs/*.js` | 26 dispute config files |
 
 ### Dashboard Features
@@ -192,8 +193,8 @@ Default weights in `WarRoomDashboard.jsx` (`DEFAULT_DIMENSION_WEIGHTS`, `DEFAULT
 - `disputeStatus: "resolved"` — 22 disputes (have agreement timeline events)
 
 ## Nav Bar Layout
-- **Homepage**: `TRACKER HOME` (left) | spacer | `LOGOUT` (right)
-- **Dispute view**: `TRACKER HOME` (left, clickable) | `<select>` | `CONFIG` | spacer | `LOGOUT` (right)
+- **Homepage**: `TRACKER HOME` (left) | spacer | `METHODS` | `LOGOUT` (right)
+- **Dispute view**: `TRACKER HOME` (left, clickable) | `<select>` | `CONFIG` | `METHODS` | spacer | `LOGOUT` (right)
 
 ---
 
