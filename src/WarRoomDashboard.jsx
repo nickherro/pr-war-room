@@ -37,7 +37,7 @@ function entryFavorability(entry, providerKey, payorKey) {
 function computeScores(entries, config, overrides) {
   const { providerKey, payorKey, sourceWeights } = config;
   const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
-  const dw = overrides?.dimensionWeights || DEFAULT_DIMENSION_WEIGHTS;
+  const dw = { ...DEFAULT_DIMENSION_WEIGHTS, ...(overrides?.dimensionWeights || {}) };
   const mergedSourceWeights = overrides?.sourceWeights ? { ...sourceWeights, ...overrides.sourceWeights } : sourceWeights;
   const gw = (e) => getWeight(e, mergedSourceWeights, stw);
   const totalW = entries.reduce((s, e) => s + gw(e), 0) || 1;
@@ -167,7 +167,7 @@ function computeTrend(entries, config, overrides, mode = "decay") {
     const dTime = new Date(d).getTime();
     const { providerKey, payorKey, sourceWeights: sw } = config;
     const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
-    const dw = overrides?.dimensionWeights || DEFAULT_DIMENSION_WEIGHTS;
+    const dw = { ...DEFAULT_DIMENSION_WEIGHTS, ...(overrides?.dimensionWeights || {}) };
     const mergedSW = overrides?.sourceWeights ? { ...sw, ...overrides.sourceWeights } : sw;
 
     // Decay-weighted favorability computation for the 5 dimensions
@@ -1375,24 +1375,32 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
             DISTRIBUTIONS
           </div>
           <DistBar
-            label="FRAME ADOPTION"
-            values={[scores.frameProvider, scores.frameBalanced, scores.framePayor]}
-            barColors={distColors}
-            labels={[providerShort, "BAL", payorShort]}
+            label="REACH / AMPLIFICATION"
+            values={[
+              entries.filter((e) => e.reachEstimate === "high").length,
+              entries.filter((e) => e.reachEstimate === "medium").length,
+              entries.filter((e) => e.reachEstimate === "low").length,
+            ]}
+            barColors={[distColors[0], "#465E85", distColors[2]]}
+            labels={["High", "Med", "Low"]}
             config={config}
           />
           <DistBar
-            label="SENTIMENT"
-            values={[scores.sentNegPayor, scores.sentNeutral, scores.sentNegProvider]}
-            barColors={distColors}
-            labels={[`Anti-${payorShort}`, "Neutral", `Anti-${providerShort}`]}
+            label="SOURCE INDEPENDENCE"
+            values={[
+              entries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType)).length,
+              entries.filter((e) => ["opinion", "other"].includes(e.sourceType)).length,
+              entries.filter((e) => ["owned", "social"].includes(e.sourceType)).length,
+            ]}
+            barColors={[distColors[0], "#465E85", distColors[2]]}
+            labels={["Independent", "Mixed", "Party/Social"]}
             config={config}
           />
           <DistBar
-            label="BLAME DIRECTION"
-            values={[scores.blamePayor, scores.blameBoth, scores.blameProvider]}
-            barColors={distColors}
-            labels={[payorShort, "Both", providerShort]}
+            label="CHANNEL MIX"
+            values={[scores.mediaCount, scores.socialCount, scores.stakeholderCount, scores.employerCount]}
+            barColors={[distColors[0], "#059669", "#D86018", "#8B6914"]}
+            labels={["Media", "Social", "Stkhld", "Emplyr"]}
             config={config}
           />
           <div style={{ marginTop: 16, padding: 12, background: colors.bg, borderRadius: 6, fontSize: 11, lineHeight: 1.7, color: colors.textMuted }}>

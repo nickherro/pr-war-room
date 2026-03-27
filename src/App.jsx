@@ -23,7 +23,14 @@ const STORAGE_KEY = "_scoring_overrides";
 function loadOverrides() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Invalidate stale overrides from old dimension model (frame/sentiment/blame/patientStory)
+    if (parsed?.dimensionWeights && ("frame" in parsed.dimensionWeights || "sentiment" in parsed.dimensionWeights)) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
