@@ -1303,7 +1303,8 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
       <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
         {[
           ["dashboard", "DASHBOARD"],
-          ["analysis", "DEEP ANALYSIS"],
+          ["media", "MEDIA SUMMARY"],
+          ["analysis", "COVERAGE ANALYSIS"],
         ].map(([key, label]) => (
           <button
             key={key}
@@ -1329,6 +1330,42 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
 
       {activeTab === "analysis" ? (
         <DeepAnalysis entries={entries} config={config} weightOverrides={weightOverrides} />
+      ) : activeTab === "media" ? (
+      <>
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+        {[
+          ["all", `All (${entries.length})`],
+          ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
+          ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
+          ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
+          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
+        ].map(([k, label]) => (
+          <button
+            key={k}
+            onClick={() => setFilterChannel(k)}
+            style={{
+              padding: "6px 14px",
+              fontSize: 11,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontWeight: 600,
+              borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
+              background: filterChannel === k ? colors.accent : colors.surface,
+              color: filterChannel === k ? colors.bg : colors.textMuted,
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} overrides={weightOverrides} />
+
+      {/* Per-channel Entry Logs */}
+      <EntryLogs entries={entries} filterChannel={filterChannel} onDelete={deleteEntry} config={config} />
+      </>
       ) : (
       <>
       {/* Composite Score */}
@@ -1459,40 +1496,6 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
 
       {/* Arguments */}
       <ArgumentsSection config={config} />
-
-      {/* Filter tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
-        {[
-          ["all", `All (${entries.length})`],
-          ["media", `Media (${entries.filter((e) => e.channel === "media").length})`],
-          ["social", `Social (${entries.filter((e) => e.channel === "social").length})`],
-          ["stakeholder", `Stakeholder (${entries.filter((e) => e.channel === "stakeholder").length})`],
-          ["employer", `Employer (${entries.filter((e) => e.channel === "employer").length})`],
-        ].map(([k, label]) => (
-          <button
-            key={k}
-            onClick={() => setFilterChannel(k)}
-            style={{
-              padding: "6px 14px",
-              fontSize: 11,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontWeight: 600,
-              borderRadius: 4,
-              border: "none",
-              cursor: "pointer",
-              background: filterChannel === k ? colors.accent : colors.surface,
-              color: filterChannel === k ? colors.bg : colors.textMuted,
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <ExecutiveSummary entries={entries} filterChannel={filterChannel} scores={scores} config={config} overrides={weightOverrides} />
-
-      {/* Per-channel Entry Logs */}
-      <EntryLogs entries={entries} filterChannel={filterChannel} onDelete={deleteEntry} config={config} />
       </>
       )}
     </div>
