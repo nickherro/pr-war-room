@@ -45,6 +45,8 @@ Deployed on Vercel (zero-config from GitHub main branch). SPA rewrite configured
 | `src/PrintReport.jsx` | Print-optimized PDF export of dashboard (via browser print dialog) |
 | `src/logos.jsx` | Logo lookup by providerKey/payorKey, OrgLogo component |
 | `public/logos/*.png` | Organization favicon/logos (30 files, sourced from Google favicons) |
+| `public/logos/jarrard-full.svg` | Jarrard horizontal wordmark (includes "A Chartis Company") |
+| `public/logos/chartis-full.svg` | Chartis horizontal wordmark (blue) |
 | `src/configs/*.js` | 26 dispute config files |
 
 ### Dashboard Features
@@ -196,8 +198,12 @@ Default weights in `WarRoomDashboard.jsx` (`DEFAULT_DIMENSION_WEIGHTS`, `DEFAULT
 - `disputeStatus: "resolved"` — 22 disputes (have agreement timeline events)
 
 ## Nav Bar Layout
-- **Homepage**: `TRACKER HOME` (left) | spacer | `METHODS` | `LOGOUT` (right)
+- **Homepage header**: Jarrard × Chartis wordmark logos above title
+- **Homepage nav**: `TRACKER HOME` (left) | spacer | `METHODS` | `LOGOUT` (right)
 - **Dispute view**: `TRACKER HOME` (left, clickable) | `<select>` | `CONFIG` | `METHODS` | spacer | `LOGOUT` (right)
+- **Dispute dashboard**: Provider vs payor logos in header; `EXPORT PDF` button on tab bar
+- **Dispute rows (homepage)**: Paired provider + payor logos next to dispute name
+- **PDF report**: Provider vs payor logos in cover header
 
 ---
 
