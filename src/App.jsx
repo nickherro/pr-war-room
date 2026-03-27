@@ -120,15 +120,14 @@ export default function App({ onLogout }) {
           <span
             style={{
               fontSize: 10,
-              letterSpacing: 2,
+              letterSpacing: 1.5,
               color: "rgba(0,0,0,0.35)",
               fontFamily: "'JetBrains Mono', monospace",
               fontWeight: 600,
-              marginRight: 12,
               flexShrink: 0,
             }}
           >
-            MST
+            TRACKER HOME
           </span>
           <div style={{ flex: 1 }} />
           <button onClick={onLogout} style={navBtnStyle}>
@@ -151,7 +150,6 @@ export default function App({ onLogout }) {
           zIndex: 1000,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
           gap: 4,
           padding: "8px 16px",
           background: "rgba(255, 255, 255, 0.95)",
@@ -164,7 +162,7 @@ export default function App({ onLogout }) {
           onClick={() => navigate(null)}
           style={{
             fontSize: 10,
-            letterSpacing: 2,
+            letterSpacing: 1.5,
             color: "rgba(0,0,0,0.35)",
             fontFamily: "'JetBrains Mono', monospace",
             fontWeight: 600,
@@ -174,13 +172,12 @@ export default function App({ onLogout }) {
           }}
           title="Back to all disputes"
         >
-          MST
+          TRACKER HOME
         </span>
         <select
           value={active}
           onChange={(e) => navigate(e.target.value)}
           style={{
-            flex: 1,
             padding: "5px 8px",
             fontSize: 10,
             fontFamily: "'JetBrains Mono', monospace",
@@ -211,6 +208,7 @@ export default function App({ onLogout }) {
         >
           CONFIG
         </button>
+        <div style={{ flex: 1 }} />
         <button onClick={onLogout} style={navBtnStyle}>
           LOGOUT
         </button>
