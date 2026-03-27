@@ -82,6 +82,13 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 20px" }}>
       <div style={{ marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/logos/jarrard.png" alt="Jarrard" style={{ height: 32, objectFit: "contain" }} />
+            <span style={{ fontSize: 11, color: "#c8dce8", fontFamily: MONO, fontWeight: 400 }}>×</span>
+            <img src="/logos/chartis.png" alt="Chartis" style={{ height: 32, objectFit: "contain" }} />
+          </div>
+        </div>
         <div style={{ fontSize: 11, letterSpacing: 2, color: "#93c4e3", fontFamily: MONO, fontWeight: 700, marginBottom: 6 }}>
           MARKET SENTIMENT TRACKER
         </div>
