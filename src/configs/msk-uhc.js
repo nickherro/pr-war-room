@@ -845,6 +845,26 @@ export default {
     signalRead: "UHC's national complaint index is elevated (2.14x median) driven by multi-state provider disputes simultaneously. The 53% increase in network complaints reflects broader UHC-provider tensions, not just MSK. Post-Thompson sentiment creates amplified regulatory risk for UHC.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "19,000 cancer patients at risk", keywords: ["19,000", "20,000", "thousands.*cancer", "cancer patient", "patients.*cancer.*risk"] },
+      { name: "1.6% annual rate / below cost increases", keywords: ["1\\.6%", "1/3 of cost", "less than.*cost increase", "rate.*increase.*year"] },
+      { name: "Lower total cost per episode", keywords: ["4-16%.*lower", "lower.*cost.*episode", "total cost.*cancer", "fewer inpatient", "fewer outpatient"] },
+      { name: "Patient stories (active cancer)", keywords: ["Kolt", "Puccetti", "saved my life", "mastectomy", "mid-treatment", "chemotherapy", "unthinkable", "terrified"] },
+      { name: "Post-Thompson anti-UHC sentiment", keywords: ["Thompson", "anti-UHC", "post-Thompson", "defamation", "social media rage"] },
+      { name: "UHC national dispute pattern", keywords: ["pattern", "Mt Sinai", "Hartford", "M Health Fairview", "multiple.*front", "serial disruptor"] },
+      { name: "World-class cancer center brand", keywords: ["world-class", "NCI.*center", "NCI-designated", "highest standard", "cancer care"] },
+      { name: "11th-hour resolution / mediation", keywords: ["11th.hour", "midnight", "mediation", "just after midnight", "multi-year agreement"] },
+    ],
+    payor: [
+      { name: "30-36% price hike / $469M cost", keywords: ["30%", "36%", "\\$469M", "469.*million", "price hike", "average.*hike"] },
+      { name: "Already reimburse above peers", keywords: ["higher than other", "significantly higher", "above.*NCI", "reimburse.*higher"] },
+      { name: "Employer cost impact", keywords: ["self-insured", "employer.*cost", "ASO.*plan", "directly impact.*employer"] },
+      { name: "NY 60-day cooling-off protection", keywords: ["60.day", "cooling.off", "fully insured", "transitional"] },
+      { name: "MSK demanding excessive rates", keywords: ["demanding", "excessive", "MSK.*chose", "MSK.*decision"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: " The dispute resolved via 11th-hour deal just after midnight July 1 — no actual disruption occurred, but the PR damage to UHC was significant.",

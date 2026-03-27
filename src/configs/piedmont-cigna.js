@@ -857,6 +857,28 @@ export default {
     signalRead: "Cigna's national complaint index is elevated (1.82x median) driven by multi-state provider disputes in 2025. The 47% increase in network complaints reflects Cigna's aggressive posture across Tenet markets and parallel disputes with UNC Health, Allegheny Health Network, ProMedica, and Jefferson Health. Cigna's simultaneous E/M downcoding controversy and $5.7M ghost network settlement compound reputational risk.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "64 hospitals / national scale", keywords: ["64 hospital", "370 ASC", "2,000.*provider", "national contract", "national.*standoff"] },
+      { name: "Only hospital / limited alternatives", keywords: ["only.*hospital", "limited alternative", "where.*supposed to go", "dominant.*provider", "282-bed", "single-hospital"] },
+      { name: "NICU / trauma center at risk", keywords: ["NICU", "Level III", "trauma", "neonatal", "premature", "critically ill infant"] },
+      { name: "Unsure-ance campaign", keywords: ["unsure-ance", "unsureance", "KeepYourHealthcareAccess", "patient petition", "advocacy campaign"] },
+      { name: "Cigna below-inflation rates", keywords: ["below inflation", "well below inflation", "reasonable rate", "refused.*rate", "refused.*negotiate.*good faith"] },
+      { name: "Wendell Potter / insider critique", keywords: ["Wendell Potter", "former Cigna", "whistleblower", "Healthcare Uncovered", "insider"] },
+      { name: "Cigna pattern of disputes", keywords: ["UNC Health", "Allegheny", "serial.*disput", "pattern", "multi-state", "90 payer-provider", "133.*2024", "most active insurer"] },
+      { name: "Employer broken promises", keywords: ["chose Cigna.*because", "promise.*Piedmont", "broken promise", "employer.*disrupt", "open enrollment.*closed"] },
+    ],
+    payor: [
+      { name: "Rates far beyond reasonable", keywords: ["far beyond.*reasonable", "beyond what is reasonable", "above-inflation", "above inflation", "excessive"] },
+      { name: "Stoking fear / negotiating tactic", keywords: ["stoking fear", "negotiating tactic", "fear.*tactic", "scare.*patient"] },
+      { name: "For-profit hospital chain", keywords: ["for-profit.*hospital", "Tenet.*for-profit", "for-profit owner"] },
+      { name: "State-based vs national contract", keywords: ["state-based", "national deal", "market-competitive"] },
+      { name: "Cigna margin pressure / stock drop", keywords: ["margin pressure", "stock.*17%", "stock.*fell", "Express Scripts", "MLR.*84\\.8", "pharmacy.*benefit"] },
+      { name: "Holiday timing anger", keywords: ["holiday", "Christmas", "Dec 31", "year-end", "ruining Christmas", "holiday.*anxiety"] },
+      { name: "Downcoding / ghost network", keywords: ["downcoding", "E/M", "R49", "ghost network", "\\$5\\.7M", "AMA pushback"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved via the national Tenet/Cigna multi-year agreement confirmed December 31, 2025 — no actual disruption occurred for Piedmont patients, but the 11-month negotiation and holiday-season brinkmanship generated significant community anxiety in York County.",

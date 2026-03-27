@@ -850,6 +850,26 @@ export default {
     signalRead: "UHC's national complaint index remains elevated (2.14x median) driven by multi-state provider disputes. The 75% higher denial rate cited by HHHS aligns with broader provider complaints. Pattern of simultaneous disputes with HCA, Prisma, UNC, and M Health suggests systemic UHC strategy rather than HHHS-specific issue.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "1.3M patients affected", keywords: ["1\\.3 million", "1,300,000", "patients? affected", "lose.*access", "lose.*in-network"] },
+      { name: "75% higher denial rate", keywords: ["75%", "denial rate", "denial.*higher", "denials"] },
+      { name: "Patient harm stories", keywords: ["pregnant", "expecting mother", "DuPont", "lupus", "Krejci", "cancer patient", "terrified", "scared", "heartbreaking"] },
+      { name: "14 hospitals at stake", keywords: ["14 hospitals", "2,500 beds", "19,500 employees", "regional impact"] },
+      { name: "Affiliate hospital exits", keywords: ["Helen Keller", "Highlands", "exits.*network", "leaves.*network", "Shoals", "Scottsboro"] },
+      { name: "Rural access crisis", keywords: ["rural", "few alternatives", "limited alternatives", "where do we go", "scrambl"] },
+      { name: "UHC dispute pattern", keywords: ["pattern", "HCA", "Prisma", "UNC", "M Health", "growing list", "another.*standoff"] },
+      { name: "Community anchor / public hospital", keywords: ["anchor institution", "public hospital", "community", "19,500 employees", "PEEHIP", "SEIB", "public employee"] },
+    ],
+    payor: [
+      { name: "Rates 20%+ above state average", keywords: ["20%.*higher", "above.*average", "state average", "higher than.*Alabama"] },
+      { name: "25%+ rate increase demand", keywords: ["25%.*increase", "rate increase", "rate hike", "demanded"] },
+      { name: "Affordability for members", keywords: ["affordab", "keep care affordable", "cost.*member", "cost.*patient"] },
+      { name: "UHC committed to resolution", keywords: ["committed.*agreement", "committed.*reach", "good faith", "remain.*committed"] },
+      { name: "Alternative providers available", keywords: ["alternative.*provider", "robust.*provider", "other.*provider", "options"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved via agreement on November 13 — one day before the contract termination deadline — and was finalized November 20 as a multi-year deal. Two affiliate hospitals (Helen Keller, Highlands) experienced actual network exits during the dispute, creating concrete patient harm that strengthened HHHS's negotiating position.",

@@ -691,6 +691,27 @@ export default {
     signalRead: "Cigna's complaint index is modestly elevated (1.42x median). The short duration of the public dispute limited complaint accumulation. Providence's strategy of resolving Cigna first, then isolating Aetna, minimized regulatory exposure on this front.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "$1.2B loss vs Cigna $6.7B earnings", keywords: ["\\$1\\.2B", "1\\.2 billion", "operating loss", "\\$6\\.7B", "6\\.7B", "\\$9B.*dividend", "9B.*buyback"] },
+      { name: "Costs up 26% since 2019", keywords: ["26%", "costs up 26", "cost.*since 2019", "cost.*risen", "20%.*pandemic"] },
+      { name: "FTI cost data / third-party validation", keywords: ["FTI", "hospital cost.*outpac", "reimbursement.*lag", "third-party", "divergence"] },
+      { name: "Patient access / network disruption", keywords: ["lose.*access", "network exit", "disruption", "scrambling for care", "lose.*hospital"] },
+      { name: "Swedish brand impact", keywords: ["Swedish", "Swedish Health", "Swedish Medical", "Swedish.*brand"] },
+      { name: "MyChart / direct patient messaging", keywords: ["MyChart", "patient portal", "direct.*channel", "contact Cigna"] },
+      { name: "Speed of resolution", keywords: ["four weeks", "under 4 weeks", "quickly", "speed", "prevented.*escalation"] },
+      { name: "Sequential strategy / isolate Aetna", keywords: ["Cigna.*first", "resolved.*first", "isolat.*Aetna", "35,000.*Aetna", "holdout", "divide-and-conquer"] },
+    ],
+    payor: [
+      { name: "Affordable quality care", keywords: ["affordable", "quality care", "affordable.*care", "commitment.*affordable"] },
+      { name: "Prior Oregon resolution precedent", keywords: ["Oregon resolution", "prior.*resolution", "2023.*resolution", "willingness.*negotiate"] },
+      { name: "Concurrent Providence disputes", keywords: ["concurrent", "multiple.*disput", "Aetna.*Blue Shield.*UHC", "maybe Providence.*problem", "Providence.*the problem"] },
+      { name: "Regulatory environment / AG", keywords: ["\\$157\\.8M", "157\\.8M", "AG.*enforcement", "Attorney General", "regulat", "OIC"] },
+      { name: "Providence financial distress", keywords: ["\\$1\\.2B.*loss", "financial pressur", "operating loss.*mount", "health plan sale", "restructur"] },
+      { name: "Employer / union impact", keywords: ["City of Seattle", "UNITE HERE", "employer.*advis", "hospitality worker"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "Providence resolved the Cigna dispute in under four weeks of public tension (Aug 8, before Sept 1 deadline), then strategically used the resolution to isolate Aetna as the lone holdout. A short-lived dispute with no quantified patient disruption.",

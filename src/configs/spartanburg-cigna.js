@@ -928,6 +928,27 @@ export default {
     signalRead: "Cigna's national complaint index is elevated (1.72x median) driven by simultaneous disputes with multiple health systems across the Southeast and Mid-Atlantic. The 40% increase in network complaints reflects Cigna's aggressive posture on rate negotiations as hospital costs have risen 20% since 2020 while Cigna rates rose ~3%. This is the SECOND Spartanburg Regional disruption in four years — pattern erodes employer confidence.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "Cigna is the outlier", keywords: ["outlier", "stark contrast", "other.*national insurer", "bcbs.*aetna.*agreed", "only cigna"] },
+      { name: "Rural access / only hospital", keywords: ["only hospital", "rural", "cherokee", "union county", "no.*alternative", "no nearby", "sole provider"] },
+      { name: "Repeat disruption (2nd time)", keywords: ["second.*time", "2020", "18.*month", "round two", "second cycle", "again"] },
+      { name: "Level I Trauma Center", keywords: ["level i trauma", "level 1 trauma", "trauma center", "emergency"] },
+      { name: "Rising costs / underpayment", keywords: ["labor.*supply cost", "rising.*cost", "20%.*since 2020", "3%.*rate", "underpay", "wage index"] },
+      { name: "Cancer patients at Gibbs", keywords: ["gibbs cancer", "cancer.*patient", "active treatment", "cancer center"] },
+      { name: "700+ physicians / 6 campuses", keywords: ["700\\+? physician", "six.*campus", "6 hospital", "facilities"] },
+      { name: "Bon Secours simultaneous exit", keywords: ["bon secours", "st\\. francis", "dual.*system", "two.*system", "simultaneously"] },
+    ],
+    payor: [
+      { name: "23% rate hike", keywords: ["23%", "rate increase", "rate hike", "four times.*inflation"] },
+      { name: "Most expensive provider", keywords: ["most expensive", "expensive.*provider", "expensive.*area"] },
+      { name: "Employer cost impact", keywords: ["employer", "local employer", "raise cost", "affordab", "employees.*families"] },
+      { name: "SRHS is serial disputant", keywords: ["serial disputant", "prior.*aetna", "also had.*dispute"] },
+      { name: "Medicare contracts intact", keywords: ["medicare.*in-network", "medicare.*remain", "commercial.*only"] },
+      { name: "Access to affordable care", keywords: ["affordable.*care", "quality.*affordable", "protecting.*affordab"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved with a multi-year agreement in February 2025 after a 6-week out-of-network gap (Jan 1 – mid-Feb). This was the second Cigna network disruption for SRHS in four years, following an 18-month gap from June 2020 to January 2022.",

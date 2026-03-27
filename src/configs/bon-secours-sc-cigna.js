@@ -1029,6 +1029,27 @@ export default {
     signalRead: "Cigna's complaint index is moderately elevated (1.45x median), driven by multi-state provider disputes with Bon Secours Mercy Health (VA, OH, SC) and parallel disputes with Spartanburg Regional, MUSC Health, and UNC Health in the Carolinas. The simultaneous exit of two major Upstate SC health systems from Cigna's network signals systemic reimbursement tensions. Cigna's sale of its Medicare business to HCSC creates additional transition-related complaints.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "No rate increase in 6+ years", keywords: ["no rate increase", "six years", "6 years", "not.*rate increase", "not keeping pace"] },
+      { name: "High claim denials / delayed care", keywords: ["claim denial", "denial rate", "life-sustaining", "delays.*care", "delay.*life"] },
+      { name: "Cigna sold Medicare to HCSC", keywords: ["HCSC", "sold.*Medicare", "\\$3\\.7B", "3\\.7 billion", "corporate decision", "sold.*business"] },
+      { name: "~500 MA patients affected (SC)", keywords: ["500.*patient", "500.*MA", "Medicare Advantage.*SC", "find new coverage"] },
+      { name: "Multi-state / systemic Cigna pattern", keywords: ["multi-state", "VA.*OH.*SC", "system-wide", "multiple market", "pattern", "common denominator"] },
+      { name: "Dual SC exits (Spartanburg parallel)", keywords: ["spartanburg", "dual.*exit", "two.*health system", "upstate SC", "both.*bon secours.*spartanburg"] },
+      { name: "How to Take Action campaign", keywords: ["how to take action", "take action", "call cigna", "patient advocacy", "pressure.*cigna", "social media.*campaign"] },
+      { name: "Greenville market / patient choice", keywords: ["greenville", "prisma", "two-system market", "patient choice", "key alternative", "one hospital"] },
+    ],
+    payor: [
+      { name: "27-30% rate increase demand", keywords: ["27%", "27-30%", "30%.*rate", "significant rate increase", "rate increase.*5 year"] },
+      { name: "Bon Secours choosing to leave", keywords: ["choosing to leave", "leave our network", "unless.*agree", "intention to leave"] },
+      { name: "Affordability / employer cost", keywords: ["affordab", "employer.*cost", "premium.*raise", "inflation", "cost.*families"] },
+      { name: "Call your card / reactive messaging", keywords: ["call.*number.*card", "alternative.*in-network", "in-network provider"] },
+      { name: "Multi-year deal = resolution", keywords: ["multi-year", "remain in-network", "pleased.*agreement", "protecting affordability"] },
+      { name: "MA sale context omitted", keywords: ["did not address", "omitted", "corporate decision.*exit"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute had two phases: (1) Cigna MA termination in SC effective Jan 1, 2025, affecting ~500 patients, driven by Cigna's sale of its Medicare business to HCSC; and (2) a multi-state commercial contract dispute resolved April 1, 2025, via 24-hour extension and multi-year deal. No actual disruption to commercial patients occurred, but the MA patients were forced to switch plans.",

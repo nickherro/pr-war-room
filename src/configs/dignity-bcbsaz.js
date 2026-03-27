@@ -1286,6 +1286,28 @@ export default {
     signalRead: "BCBSAZ complaint index is below national median (0.92x), reflecting its regional footprint and generally positive member satisfaction. The 32% increase in network complaints is directly attributable to the Dignity dispute. Congressional intervention is unusual for a state-level dispute and signals political severity. Dignity's simultaneous Aetna dispute created perception of pattern aggressiveness.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "Barrow Neuro Institute at risk", keywords: ["Barrow", "neurolog", "neuro care", "specialized"] },
+      { name: "Patient scramble / disruption", keywords: ["scramble", "panic", "8 months pregnant", "pregnant patient", "cancer patient", "treatment delay"] },
+      { name: "Below-inflation rate request", keywords: ["single.digit", "below.*inflation", "cost of care", "rising cost", "fair contract"] },
+      { name: "8 hospitals / tens of thousands", keywords: ["8 hospital", "tens of thousands", "Chandler Regional", "Mercy Gilbert", "St\\. Joseph"] },
+      { name: "YRMC / rural access", keywords: ["YRMC", "Yavapai", "Prescott", "rural", "only.*hospital", "monopoly"] },
+      { name: "Congressional intervention", keywords: ["Sinema", "Kelly", "Crane", "congressional", "bipartisan.*letter", "senator"] },
+      { name: "6-week disruption / real harm", keywords: ["6.week", "out.of.network", "actual disruption", "unnecessary disruption", "Gualdoni"] },
+    ],
+    payor: [
+      { name: "$49M offer rejected", keywords: ["\\$49M", "\\$49 million", "49 million", "37%.*more"] },
+      { name: "Dignity's $153M profit", keywords: ["\\$153M", "153.*profit", "profit.*patient", "AZ DHS"] },
+      { name: "YRMC cost outlier", keywords: ["4th highest.cost", "twice.*average.*Phoenix", "three times.*Tucson", "highest.cost hospital"] },
+      { name: "Accepted final offer / capitulated", keywords: ["accept.*final offer", "accept.*offer", "Dignity.*blink", "capitulat"] },
+      { name: "azbluefacts.com narrative hub", keywords: ["azbluefacts", "setting the record straight", "Kehaly", "data.driven"] },
+      { name: "Fighting everyone / pattern", keywords: ["fighting everyone", "common denominator", "Aetna.*simultaneously", "dual threat", "two front"] },
+      { name: "Maricopa County employer pressure", keywords: ["Maricopa County", "county employ", "government.*workforce", "workers.*comp"] },
+      { name: "CommonSpirit / $33B parent", keywords: ["CommonSpirit", "\\$33B", "33.*billion", "national system", "corporate giant"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved mid-March 2024 after 6 weeks of actual out-of-network status — a rare case where patients experienced real disruption, not just threatened disruption. Resolution framing of Dignity 'accepting AZ Blue's final offer' strongly favored BCBSAZ across media and political channels.",

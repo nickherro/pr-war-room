@@ -1347,6 +1347,29 @@ export default {
     signalRead: "BCBSM's complaint index is moderately elevated (1.42x median). The 33% increase in network complaints reflects growing member frustration with network disruptions across Michigan. BCBS's nonprofit status and CEO compensation ($6.9M) create amplified reputational risk on social media despite being reduced from predecessor levels.",
   },
 
+  // Talking points for message discipline analysis
+  talkingPoints: {
+    provider: [
+      { name: "300K patients at risk", keywords: ["300,000", "300K", "300k", "patients at risk", "lose access", "lock out", "locked out", "drop.*plans", "stop taking"] },
+      { name: "Patient harm stories", keywords: ["crohn", "pregnant", "disabled", "life-threatening", "genetic disorder", "children", "baby", "panicking", "families worried"] },
+      { name: "Lowest reimbursement rates", keywords: ["lowest reimbursement", "third-lowest", "22% below", "22% lower", "below other.*insurer", "well below"] },
+      { name: "Academic medical center / only option", keywords: ["academic medical center", "only academic", "sickest of the sick", "complex cases", "specialty", "mott"] },
+      { name: "BCBS rate cut framing", keywords: ["30% payment cut", "30% cut", "singular digit", "modest.*increase", "really modest"] },
+      { name: "95% capacity / expansion necessity", keywords: ["95% capacity", "85% is quality", "\\$2B expansion", "investment.*care", "need investment"] },
+      { name: "BCBS market power / monopoly", keywords: ["70% market", "market power", "near-monopoly", "monopoly", "dominant.*share"] },
+      { name: "Institutional credibility", keywords: ["board of regents", "university president", "interim president", "grasso", "inaccuracies", "untrue claims"] },
+    ],
+    payor: [
+      { name: "44% rate hike / affordability", keywords: ["44%", "affordability", "affordable", "unaffordable", "rate increase", "rate hike", "about affordability"] },
+      { name: "Financial distress / losses", keywords: ["\\$246M loss", "246M", "loss.*year", "consecutive loss", "financial", "bottom line", "1,300 jobs", "eliminated.*jobs"] },
+      { name: "Big 3 isolation (Corewell & HFH signed)", keywords: ["corewell", "henry ford", "big 3", "big three", "value-based", "sole holdout", "new era", "partnership"] },
+      { name: "MM locking out patients", keywords: ["michigan medicine.*decision", "lock.*out", "blocking", "mm.*decision", "threatens to block"] },
+      { name: "CEO compensation / nonprofit criticism", keywords: ["\\$6.9M", "6.9M", "compensation", "ceo.*pay", "nonprofit.*ceo", "tricia keith"] },
+      { name: "DMC can absorb patients", keywords: ["dmc", "absorb.*patient", "detroit medical center"] },
+      { name: "Common procedures overpriced", keywords: ["100% more", "common procedures", "overcharge", "cost.*more.*peer"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute is ongoing with a July 1, 2026 termination deadline. Michigan Medicine holds a strong narrative advantage driven by patient stories, academic medical center positioning, and BCBS's 70% market power vulnerability. BCBS's strongest card is that both Corewell and Henry Ford Health signed value-based deals — making MM the sole 'Big 3' holdout.",

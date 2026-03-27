@@ -1000,6 +1000,27 @@ export default {
     signalRead: "Anthem/Elevance complaint index is moderately elevated (1.42x median) reflecting multi-state provider disputes. The 26% increase in network complaints tracks with Anthem's disputes with OSU, OhioHealth, and Bon Secours Mercy in Ohio. Ohio's lack of a mandatory cooling-off period leaves patients more exposed than in states like New York or Connecticut.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "135K patient emails", keywords: ["135,000", "135K", "135k", "patient email", "patient notification", "mass notification"] },
+      { name: "45% cost increase / underpaid", keywords: ["45%", "costs rose 45", "underpaid", "failing to keep pace", "cost.*deliver.*care"] },
+      { name: "Elevance $77.9B profits", keywords: ["\\$77\\.9", "77\\.9B", "record profit", "Elevance", "profit.*5 year"] },
+      { name: "Cancer patients / The James", keywords: ["cancer", "The James", "James Cancer", "oncolog", "chemotherapy", "NCI-designated", "Hoa McManus", "breast cancer"] },
+      { name: "Patient harm stories", keywords: ["Thea Flittner", "Type 1 diabet", "high-risk pregnancy", "pregnant", "mid-treatment", "uncertain"] },
+      { name: "Unlike other insurers", keywords: ["unlike other", "other insurance providers", "other insurers agreed", "Anthem refused", "outlier"] },
+      { name: "OSU as community institution", keywords: ["largest employer", "cultural institution", "Buckeye", "state institution", "community institution"] },
+      { name: "Medicare Advantage gap / seniors", keywords: ["Medicare Advantage", "20,000", "28,000", "senior", "MA patient", "left behind", "two-tier"] },
+    ],
+    payor: [
+      { name: "3x inflation / $185M cost", keywords: ["3x inflation", "three times", "\\$185M", "185 million", "185M", "boost.*cost"] },
+      { name: "Affordability framing", keywords: ["affordable care", "affordability", "affordable", "raise costs", "increase.*cost"] },
+      { name: "90-day continuity of care", keywords: ["90-day", "continuity of care", "transition", "complex visit", "3\\+ complex", "John.*Warner"] },
+      { name: "Open enrollment disruption", keywords: ["open enrollment", "enrollment season", "switch plan", "plan selection"] },
+      { name: "Anti-insurer environment / Thompson", keywords: ["Brian Thompson", "UHC CEO", "assassination", "anti-insurer", "hostile.*environment"] },
+      { name: "Holiday timing pressure", keywords: ["holiday", "Christmas", "New Year", "worst timing", "year-end", "holiday season"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resulted in a last-minute commercial contract deal on December 30, but Medicare Advantage patients (~20,000) lost in-network access on January 1. The PR battle was dominated by OSU's framing, amplified by the post-Thompson anti-insurer environment.",

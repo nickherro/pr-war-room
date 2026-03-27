@@ -74,6 +74,26 @@ export default {
     "KRCR-TV (Redding)": 1.1,
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "Patient harm / vulnerable stories", keywords: ["elderly", "widower", "single mother", "chronically ill", "senior", "loses wife", "anxiety grow"] },
+      { name: "Healthcare limbo / scramble", keywords: ["healthcare limbo", "scramble", "lose coverage", "lose.*access", "at risk", "left scrambling"] },
+      { name: "Multi-insurer dispute framing", keywords: ["BCBS.AZ", "Partnership", "two.*insurer", "fighting everyone", "multiple.*contract", "simultaneously"] },
+      { name: "Aetna termination / deadline", keywords: ["expire.*month", "April 1", "March 31", "terminate", "contract.*end", "no longer.*network"] },
+      { name: "Yolo County / rural impact", keywords: ["Yolo", "Woodland", "16,?000", "64,?000", "low.income", "rural"] },
+      { name: "Prescott / YRMG access", keywords: ["Prescott", "YRMG", "Yavapai", "Yavapai Regional"] },
+      { name: "Resolution / retroactive deal", keywords: ["reach.*agreement", "new.*contract", "multi.year", "retroactive", "resolve", "relieve.*worries"] },
+    ],
+    payor: [
+      { name: "Dignity playing hardball", keywords: ["hard.?ball", "Dignity.*terminate", "Dignity.*end", "Dignity.*fail"] },
+      { name: "Cost / rate dispute", keywords: ["rising cost", "rate", "cost of care", "affordable", "pricing"] },
+      { name: "Aetna network status", keywords: ["no longer.*network", "out.of.network", "coverage.*expire", "dropping", "termination effective"] },
+      { name: "Patient notification / guidance", keywords: ["fact check", "notif", "member.*alert", "plan sponsor", "employer.*plan"] },
+      { name: "Stalled negotiations", keywords: ["stall", "fail.*negotiate", "impasse", "break.*down", "no.*deal"] },
+      { name: "Central Coast / multi-state", keywords: ["Central Coast", "SLO", "San Luis Obispo", "Santa Cruz", "CA.*AZ.*NV", "multi.state"] },
+    ],
+  },
+
   executiveSummary: {
     statement:
       "Dignity Health leveraged patient-centered framing and local media saturation to maintain narrative advantage throughout a 25-day out-of-network gap. The dispute's resolution via retroactive multi-year contract suggests Aetna conceded on key rate terms. Notably, this dispute occurred simultaneously with Dignity's BCBS-AZ and Partnership HealthPlan breakdowns, amplifying the narrative that insurers — not Dignity — were responsible for disruptions. The presence of named, vulnerable patient stories (elderly widower, single mothers, chronically ill) proved decisive in local media framing.",

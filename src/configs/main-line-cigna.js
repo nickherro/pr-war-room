@@ -983,6 +983,26 @@ export default {
     signalRead: "Cigna's complaint index is elevated (1.62x median) driven by multi-state provider disputes and its strategic retreat from Medicare Advantage markets. The 45% increase in network complaints reflects Cigna's national pattern of below-market reimbursement — MLH, Jefferson Health, Ballad Health, CommonSpirit, and others have all publicly challenged Cigna's rates. Post-Thompson anti-insurer sentiment amplifies regulatory risk.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "Rates frozen since 2016", keywords: ["2016", "rates.*set.*2016", "haven't been updated", "eight year", "8 year"] },
+      { name: "Four community hospitals at stake", keywords: ["four hospital", "four suburban", "Lankenau", "Bryn Mawr", "Paoli", "Riddle", "community hospital"] },
+      { name: "Financial distress / 200 layoffs", keywords: ["200.*layoff", "200.*staff", "\\$125M.*loss", "\\$61M.*loss", "operating loss", "restructuring", "financial struggle"] },
+      { name: "65% Medicare/Medicaid patients", keywords: ["65%", "Medicare.*Medicaid", "government payer", "below cost"] },
+      { name: "Cigna $247B revenue contrast", keywords: ["\\$247", "247.*billion", "27%.*revenue", "billions.*profit", "record.*revenue", "Cigna.*profit"] },
+      { name: "Medicare Advantage exit / seniors", keywords: ["Medicare Advantage", "seniors", "MA.*patient", "General Enrollment", "elderly"] },
+      { name: "Cigna national dispute pattern", keywords: ["pattern", "Ballad Health", "CommonSpirit", "Jefferson Health.*Cigna", "multiple.*Cigna", "national trend"] },
+      { name: "CEO Lynch legacy / fair reimbursement", keywords: ["Lynch", "fair reimbursement", "cost of.*care.*deliver", "20 year"] },
+    ],
+    payor: [
+      { name: "Robust alternative providers", keywords: ["robust.*provider", "alternative.*provider", "providers in the area"] },
+      { name: "Affordability / good faith", keywords: ["affordab", "good faith", "keeping care affordable"] },
+      { name: "MLH rate demands unreasonable", keywords: ["rate.*demand", "rate.*increase", "hike"] },
+      { name: "MLH chose to exit", keywords: ["MLH.*chose", "Main Line.*decision", "threatens to go"] },
+      { name: "Anti-insurer sentiment is unfair", keywords: ["anti-insurer", "Thompson", "sentiment"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The commercial dispute resolved via last-minute deal just before the February 15 deadline. Medicare Advantage patients lost access January 1, 2025 — an outcome that was never resolved. The PR narrative overwhelmingly favored Main Line Health.",

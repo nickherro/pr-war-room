@@ -117,131 +117,88 @@ function NarrativeVelocity({ entries, config }) {
 }
 
 // === MESSAGE DISCIPLINE ===
-// Shows distinct messaging strategies and consistency on each
+// Measures how consistently each side hammers their core talking points
 
 function MessageDiscipline({ entries, config }) {
-  const { colors, providerKey, payorKey, providerShort, payorShort, providerName, payorName } = config;
+  const { colors, providerKey, payorKey, providerShort, payorShort } = config;
+  const talkingPoints = config.talkingPoints;
 
   const analysis = useMemo(() => {
-    if (entries.length < 5) return null;
+    if (!talkingPoints || entries.length < 5) return null;
 
-    const analyzeSide = (sideKey, oppositeKey) => {
-      const sideEntries = entries.filter((e) =>
-        e.frameAdoption === sideKey || e.blameDirection === oppositeKey
-      );
-      if (sideEntries.length === 0) return null;
+    const matchEntries = (points, sideEntries) => {
+      const total = sideEntries.length;
+      if (total === 0) return { points: [], coveredPct: 0, total: 0 };
 
-      // Identify distinct messaging strategies from the data
-      const strategies = [];
+      const results = points.map((tp) => {
+        const regexes = tp.keywords.map((k) => new RegExp(k, "i"));
+        const matched = sideEntries.filter((e) =>
+          regexes.some((r) => r.test(e.headline))
+        );
+        return {
+          name: tp.name,
+          count: matched.length,
+          pct: Math.round((matched.length / total) * 100),
+        };
+      });
 
-      // 1. Patient story messaging
-      const patientEntries = sideEntries.filter((e) => e.patientStory);
-      if (patientEntries.length > 0) {
-        strategies.push({
-          name: "Patient stories",
-          count: patientEntries.length,
-          pct: Math.round((patientEntries.length / sideEntries.length) * 100),
-          desc: `${patientEntries.length} entries use patient/consumer narratives`,
+      // How many entries hit at least one talking point
+      const coveredEntries = new Set();
+      points.forEach((tp) => {
+        const regexes = tp.keywords.map((k) => new RegExp(k, "i"));
+        sideEntries.forEach((e, idx) => {
+          if (regexes.some((r) => r.test(e.headline))) coveredEntries.add(idx);
         });
-      }
+      });
 
-      // 2. Earned media (independent coverage)
-      const earnedEntries = sideEntries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType));
-      if (earnedEntries.length > 0) {
-        strategies.push({
-          name: "Earned media coverage",
-          count: earnedEntries.length,
-          pct: Math.round((earnedEntries.length / sideEntries.length) * 100),
-          desc: `${earnedEntries.length} entries via independent news/TV/radio`,
-        });
-      }
-
-      // 3. Owned media (press releases, statements)
-      const ownedEntries = sideEntries.filter((e) => e.sourceType === "owned");
-      if (ownedEntries.length > 0) {
-        strategies.push({
-          name: "Owned media / statements",
-          count: ownedEntries.length,
-          pct: Math.round((ownedEntries.length / sideEntries.length) * 100),
-          desc: `${ownedEntries.length} direct press releases or statements`,
-        });
-      }
-
-      // 4. Social amplification
-      const socialEntries = sideEntries.filter((e) => e.sourceType === "social" || e.channel === "social");
-      if (socialEntries.length > 0) {
-        strategies.push({
-          name: "Social amplification",
-          count: socialEntries.length,
-          pct: Math.round((socialEntries.length / sideEntries.length) * 100),
-          desc: `${socialEntries.length} entries via social channels`,
-        });
-      }
-
-      // 5. Stakeholder / institutional voices
-      const stakeEntries = sideEntries.filter((e) => e.channel === "stakeholder" || e.channel === "employer");
-      if (stakeEntries.length > 0) {
-        strategies.push({
-          name: "Institutional / stakeholder voices",
-          count: stakeEntries.length,
-          pct: Math.round((stakeEntries.length / sideEntries.length) * 100),
-          desc: `${stakeEntries.length} third-party or employer entries`,
-        });
-      }
-
-      // 6. High-reach placements
-      const highReach = sideEntries.filter((e) => e.reachEstimate === "high");
-      if (highReach.length > 0) {
-        strategies.push({
-          name: "High-reach placements",
-          count: highReach.length,
-          pct: Math.round((highReach.length / sideEntries.length) * 100),
-          desc: `${highReach.length} entries in high-visibility outlets`,
-        });
-      }
-
-      // Sort by count descending
-      strategies.sort((a, b) => b.count - a.count);
-
-      // Discipline = how much of coverage is in the top 2 strategies
-      const top2 = strategies.slice(0, 2).reduce((s, st) => s + st.count, 0);
-      const score = Math.round((top2 / sideEntries.length) * 100);
-
-      return { strategies, score, total: sideEntries.length };
+      return {
+        points: results.sort((a, b) => b.count - a.count),
+        coveredPct: Math.round((coveredEntries.size / total) * 100),
+        total,
+      };
     };
+
+    const provEntries = entries.filter((e) =>
+      e.frameAdoption === providerKey || e.blameDirection === payorKey
+    );
+    const payEntries = entries.filter((e) =>
+      e.frameAdoption === payorKey || e.blameDirection === providerKey
+    );
 
     return {
-      provider: analyzeSide(providerKey, payorKey),
-      payor: analyzeSide(payorKey, providerKey),
+      provider: matchEntries(talkingPoints.provider || [], provEntries),
+      payor: matchEntries(talkingPoints.payor || [], payEntries),
     };
-  }, [entries, config]);
+  }, [entries, config, talkingPoints]);
 
   if (!analysis) return null;
 
   const DisciplineCard = ({ data, color, name }) => {
-    if (!data) return null;
+    if (!data || data.total === 0) return null;
+    const maxCount = Math.max(...data.points.map((p) => p.count), 1);
     return (
       <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>{name}</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color, fontFamily: MONO }}>{data.score}%</div>
+          <div>
+            <span style={{ fontSize: 24, fontWeight: 700, color, fontFamily: MONO }}>{data.coveredPct}%</span>
+            <span style={{ fontSize: 10, color: colors.textMuted, fontFamily: MONO, marginLeft: 4 }}>on-message</span>
+          </div>
         </div>
-        <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>
-          {data.score >= 70 ? "Highly focused" : data.score >= 50 ? "Moderately focused" : "Scattered"} across {data.total} entries
+        <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 12 }}>
+          {data.coveredPct >= 70 ? "Highly disciplined" : data.coveredPct >= 45 ? "Moderately disciplined" : "Scattered messaging"} — {data.total} entries analyzed
         </div>
-        <div style={{ height: 6, background: colors.bg, borderRadius: 3, overflow: "hidden", marginBottom: 14 }}>
-          <div style={{ height: "100%", width: `${data.score}%`, background: color, borderRadius: 3 }} />
-        </div>
-        {data.strategies.map((st, i) => (
-          <div key={i} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: colors.text }}>{st.name}</span>
-              <span style={{ fontSize: 11, fontFamily: MONO, fontWeight: 600, color }}>{st.pct}%</span>
+        {data.points.map((tp, i) => (
+          <div key={i} style={{ marginBottom: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
+              <span style={{ fontSize: 12, color: colors.text, fontWeight: tp.count > 0 ? 600 : 400 }}>{tp.name}</span>
+              <span style={{ fontSize: 10, fontFamily: MONO, fontWeight: 600, color: tp.count > 0 ? color : colors.textMuted }}>
+                {tp.count > 0 ? `${tp.count} hits (${tp.pct}%)` : "—"}
+              </span>
             </div>
-            <div style={{ height: 4, background: colors.bg, borderRadius: 2, overflow: "hidden", marginBottom: 2 }}>
-              <div style={{ height: "100%", width: `${st.pct}%`, background: color, opacity: 0.6, borderRadius: 2 }} />
+            <div style={{ height: 4, background: colors.bg, borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${(tp.count / maxCount) * 100}%`, background: color, opacity: tp.count > 0 ? 0.7 : 0.1, borderRadius: 2 }} />
             </div>
-            <div style={{ fontSize: 10, color: colors.textMuted }}>{st.desc}</div>
           </div>
         ))}
       </div>
@@ -255,7 +212,7 @@ function MessageDiscipline({ entries, config }) {
           MESSAGE DISCIPLINE
         </div>
         <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-          What messaging strategies does each side use, and how consistently? Higher = more concentrated on top tactics.
+          How consistently does each side stay on their core talking points? Matches entry headlines against known messaging themes.
         </div>
       </div>
       <div style={{ display: "flex", gap: 16 }}>
@@ -266,131 +223,6 @@ function MessageDiscipline({ entries, config }) {
   );
 }
 
-// === COUNTER-NARRATIVE EFFECTIVENESS ===
-
-function CounterNarrative({ entries, config, overrides }) {
-  const { colors, providerKey, payorKey, providerShort, payorShort } = config;
-
-  const events = useMemo(() => {
-    if (entries.length < 10) return [];
-    const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
-
-    const moves = sorted.filter((e) =>
-      e.sourceType === "owned" ||
-      (e.reachEstimate === "high" && e.frameAdoption !== "balanced") ||
-      (e.channel === "stakeholder" && e.blameDirection !== "both")
-    );
-
-    const getCompositeAt = (cutoffDate, windowDays) => {
-      const cutoff = new Date(cutoffDate).getTime();
-      const start = cutoff - windowDays * 86400000;
-      const windowEntries = sorted.filter((e) => {
-        const t = new Date(e.date).getTime();
-        return t > start && t <= cutoff;
-      });
-      if (windowEntries.length < 2) return null;
-      let favSum = 0;
-      windowEntries.forEach((e) => {
-        if (e.frameAdoption === providerKey || e.sentiment === `negative_${payorKey}` || e.blameDirection === payorKey) favSum += 1;
-        else if (e.frameAdoption === payorKey || e.sentiment === `negative_${providerKey}` || e.blameDirection === providerKey) favSum -= 1;
-      });
-      return (favSum / windowEntries.length) * 100;
-    };
-
-    const seen = new Set();
-    const results = [];
-    moves.forEach((e) => {
-      const side = e.frameAdoption === providerKey || e.blameDirection === payorKey ? "provider" : "payor";
-      const key = `${e.date}-${side}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-
-      const before = getCompositeAt(e.date, 7);
-      const afterDate = new Date(e.date);
-      afterDate.setDate(afterDate.getDate() + 7);
-      const after = getCompositeAt(afterDate.toISOString().slice(0, 10), 7);
-
-      if (before === null || after === null) return;
-      const shift = after - before;
-      const effective = side === "provider" ? shift > 5 : shift < -5;
-
-      results.push({
-        date: e.date,
-        source: e.source,
-        headline: e.headline,
-        side,
-        sideName: side === "provider" ? providerShort : payorShort,
-        sideColor: side === "provider" ? colors.providerColor : colors.payorColor,
-        shift,
-        effective,
-      });
-    });
-
-    return results.sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift)).slice(0, 12);
-  }, [entries, config]);
-
-  if (events.length === 0) return null;
-
-  const effectiveProv = events.filter((e) => e.side === "provider" && e.effective).length;
-  const totalProv = events.filter((e) => e.side === "provider").length;
-  const effectivePay = events.filter((e) => e.side === "payor" && e.effective).length;
-  const totalPay = events.filter((e) => e.side === "payor").length;
-
-  const shiftDescription = (e) => {
-    const abs = Math.abs(e.shift);
-    const toward = e.shift > 0 ? providerShort : payorShort;
-    if (abs < 3) return { text: "No meaningful shift", color: colors.textMuted };
-    if (abs < 10) return { text: `Slight shift toward ${toward}`, color: e.effective ? "#16A34A" : "#D97706" };
-    if (abs < 25) return { text: `Moderate shift toward ${toward}`, color: e.effective ? "#16A34A" : "#DC2626" };
-    return { text: `Strong shift toward ${toward}`, color: e.effective ? "#16A34A" : "#DC2626" };
-  };
-
-  return (
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: 13, letterSpacing: 1.5, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
-          COUNTER-NARRATIVE EFFECTIVENESS
-        </div>
-        <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-          When each side makes a PR move, does the narrative actually shift in their favor over the next 7 days?
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-        <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: "12px 16px", textAlign: "center" }}>
-          <div style={{ fontSize: 10, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO }}>{providerShort} MOVES</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: colors.providerColor, fontFamily: MONO }}>{effectiveProv}/{totalProv}</div>
-          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative in their favor</div>
-        </div>
-        <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: "12px 16px", textAlign: "center" }}>
-          <div style={{ fontSize: 10, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO }}>{payorShort} MOVES</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: colors.payorColor, fontFamily: MONO }}>{effectivePay}/{totalPay}</div>
-          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative in their favor</div>
-        </div>
-      </div>
-
-      <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "70px 1fr 180px 36px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 9, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
-          <div>DATE</div><div>PR MOVE</div><div>7-DAY RESULT</div><div></div>
-        </div>
-        {events.map((e, i) => {
-          const desc = shiftDescription(e);
-          return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "70px 1fr 180px 36px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 11, alignItems: "center" }}>
-              <div style={{ fontFamily: MONO, fontSize: 10, color: colors.textMuted }}>{e.date.slice(5)}</div>
-              <div>
-                <span style={{ color: e.sideColor, fontWeight: 600, fontSize: 10, fontFamily: MONO }}>{e.sideName}</span>{" "}
-                <span style={{ color: colors.text, fontSize: 11 }}>{e.headline.length > 55 ? e.headline.slice(0, 55) + "…" : e.headline}</span>
-              </div>
-              <div style={{ fontSize: 11, color: desc.color, fontWeight: 600 }}>{desc.text}</div>
-              <div style={{ fontSize: 14, textAlign: "center" }}>{e.effective ? "✓" : "✗"}</div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 // === MEDIA FATIGUE DETECTOR ===
 
@@ -563,7 +395,6 @@ export default function DeepAnalysis({ entries, config, weightOverrides }) {
     <div style={{ padding: "24px 20px", background: colors.bg, minHeight: "60vh" }}>
       <NarrativeVelocity entries={entries} config={config} />
       <MessageDiscipline entries={entries} config={config} />
-      <CounterNarrative entries={entries} config={config} overrides={weightOverrides} />
       <MediaFatigue entries={entries} config={config} />
     </div>
   );

@@ -1231,6 +1231,28 @@ export default {
     signalRead: "BCBSTX's network complaints are elevated (1.85x national median) driven by simultaneous disputes with UTSW/THR, Ascension Texas, and Memorial Hermann. The 50% year-over-year increase in network complaints reflects BCBSTX's aggressive posture across multiple Texas health systems. TDI network adequacy waiver limits create regulatory pressure to maintain major system contracts.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "ACO coercion / structural control", keywords: ["ACO", "coercing.*physician", "unfavorable.*ACO", "structural control", "physician contracting", "McCarthy"] },
+      { name: "Modest increase / affordability hypocrisy", keywords: ["modest increase", "lower than.*premium", "premium increase.*employer", "hypocrit"] },
+      { name: "100K+ patients at risk", keywords: ["100,?000", "100K", "patients.*affected", "patients.*caught", "lose.*access", "out of network"] },
+      { name: "Pattern of BCBSTX disputes", keywords: ["UTSW", "Texas Health", "THR", "Ascension", "pattern", "multiple.*system", "statewide", "keeps dropping"] },
+      { name: "Houston community anchor / 17 hospitals", keywords: ["17 hospitals", "260.*care sites", "34,?000 employees", "Houston.*largest", "non-profit", "community"] },
+      { name: "2022 precedent / demonstrated willingness", keywords: ["2022", "precedent", "10 days", "lapsed.*10", "surgery.*mortgage", "happened before"] },
+      { name: "Unpaid claims / payment disputes", keywords: ["\\$3M.*unpaid", "\\$30M.*lawsuit", "unpaid.*emergency", "payment dispute", "claim denial"] },
+      { name: "Good faith / fair terms framing", keywords: ["good faith", "collaborative intent", "fair and reasonable", "meaningful discussion", "unnecessary disruption"] },
+    ],
+    payor: [
+      { name: "Affordable rates for members", keywords: ["affordable.*rate", "affordable.*care", "quality care.*affordable", "protect.*member", "access.*affordable"] },
+      { name: "BCBSTX scale / 7M+ members", keywords: ["7M", "7 million", "largest.*provider.*benefit", "52%.*market", "market share"] },
+      { name: "MH choosing to terminate", keywords: ["MH.*choosing", "memorial hermann.*terminat", "issued.*notice.*termination", "formal.*termination"] },
+      { name: "Working closely / willing partner", keywords: ["working closely", "hope.*sign", "hopes to sign", "willing", "collaborative"] },
+      { name: "Continuity of care protections", keywords: ["continuity of care", "critical.*patient", "stay in network.*care"] },
+      { name: "Ascension/UTSW resolved = good faith", keywords: ["ascension.*resolved", "UTSW.*resolved", "successful.*resolution", "good-faith.*bargaining"] },
+      { name: "Employer notifications / transparency", keywords: ["employer.*notification", "producer update", "broker.*notification", "member notice", "30 days before"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute is ongoing as of March 26, 2026, with the April 1 commercial/HMO/Marketplace termination deadline approaching. Medicare Advantage access was already terminated January 1, 2026. Memorial Hermann (17 hospitals, 260+ care sites, $7.6B revenue, 34K employees) is Houston's largest non-profit health system. BCBSTX (52% Texas market share, 7M+ members) is the state's dominant insurer. This is their second major contract dispute in 4 years (2022 dispute lapsed for 10 days before resolution). The stakes are massive: 100,000+ directly affected patients, 1M+ Houston-area BCBS members facing potential network adequacy degradation.",

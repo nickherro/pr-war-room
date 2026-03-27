@@ -1259,6 +1259,27 @@ export default {
     signalRead: "BCBSTX faced implicit regulatory pressure: TDI's new network adequacy rules require time/distance compliance and waiver requests for gaps. Losing BSW's 51-hospital, 800-facility footprint would have created insurmountable network adequacy deficiencies in Central and rural Texas, making formal regulatory action nearly inevitable if the split occurred. This structural leverage favored BSW.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "51 hospitals / 800 sites at risk", keywords: ["51 hospital", "800\\+? (?:patient care |care )?site", "largest.*system", "7,?300 physician"] },
+      { name: "Post-pandemic cost pressure", keywords: ["post-pandemic", "cost increase", "\\$1\\.2B revenue", "\\$1\\.41B.*expense", "financial pressure", "unsustainable reimbursement"] },
+      { name: "Patient access / continuity", keywords: ["lose access", "lose coverage", "continuity of care", "patient advocate", "patient concern", "what that means for patient"] },
+      { name: "HealthSelect / state employees", keywords: ["HealthSelect", "state employee", "state worker", "ERS", "500,?000", "retiree"] },
+      { name: "Termination threat / deadline", keywords: ["terminate", "end.*agreement", "July 1", "October 1", "contract end", "cut ties"] },
+      { name: "Central Texas impact", keywords: ["Waco", "Temple", "Bryan", "College Station", "Central Texas", "Hillcrest", "Tarrant"] },
+      { name: "Resolution / deal reached", keywords: ["reach.*agreement", "reach.*deal", "finalize", "keep.*in.network", "extension", "new contract"] },
+    ],
+    payor: [
+      { name: "Significant rate increase demand", keywords: ["significantly increase", "increase what we pay", "want too much", "rate increase", "raise premium"] },
+      { name: "25% market share / 8M members", keywords: ["25%", "8 million", "market share", "more than double"] },
+      { name: "Member notification / employer channel", keywords: ["member notification", "letter.*member", "employer", "HR department", "self-funded", "benefits consultant"] },
+      { name: "Ascension precedent / brinkmanship", keywords: ["Ascension", "precedent", "11th.hour", "brinksmanship", "negotiation theater", "boy who cried wolf"] },
+      { name: "Network change framing", keywords: ["drop.*BSW", "could drop", "remove.*network", "network change"] },
+      { name: "BSW financials / profit", keywords: ["\\$15\\.5B revenue", "\\$2B.*profit", "operating income.*25%", "fiscal 2024"] },
+      { name: "Simultaneous TX crises", keywords: ["Cook Children", "Steward.*bankrupt", "simultaneous", "systemic access"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute played out over nearly five months (May–Sep 2024) with two deadlines — July 1 and October 1. BSW's termination notice, BCBSTX's 11th-hour extension, and the eventual resolution with one business day to spare all follow the exact pattern of BCBSTX's 2023 Ascension dispute. No actual disruption occurred. The narrative was more balanced than typical provider-payor disputes because BCBSTX's 'they want too much' framing gained traction in business press, while BSW's post-pandemic cost pressure argument dominated local TV and NPR. The HealthSelect/state employee angle was the most politically sensitive dimension.",

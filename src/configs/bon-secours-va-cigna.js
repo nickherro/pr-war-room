@@ -973,6 +973,27 @@ export default {
     signalRead: "Cigna's complaint index is moderately elevated (1.42x median) reflecting multi-state Bon Secours Mercy Health disputes simultaneously in Virginia, Ohio, and South Carolina. The 57% increase in network complaints year-over-year reflects systematic reimbursement tensions. Virginia's 2024 continuity of care law reduced but did not eliminate patient risk.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "No rate increase in 6+ years", keywords: ["no rate increase", "six years", "6 years", "not.*rate increase", "not adequate", "not keeping pace", "below fair market"] },
+      { name: "30,000 patients / 8 hospitals at risk", keywords: ["30,?000", "30K", "30k", "8 hospitals", "eight hospitals", "lose.*in-network"] },
+      { name: "Patient advocacy / How to Take Action", keywords: ["how to take action", "take action", "call cigna", "tell them.*keep", "contact.*employer", "file.*complaint", "bureau of insurance"] },
+      { name: "Hampton Roads / rural dependency", keywords: ["hampton roads", "southampton", "maryview", "mary immaculate", "rural", "limited.*alternative", "where do i go"] },
+      { name: "Multi-state Cigna pattern (VA, OH, SC)", keywords: ["multi-state", "VA.*OH.*SC", "ohio.*sister", "mercy health", "system-wide", "multiple market"] },
+      { name: "Catholic mission / charity framing", keywords: ["catholic", "sisters.*bon secours", "charity", "mission", "health ministry", "non-profit"] },
+      { name: "2023 Anthem precedent / fights and wins", keywords: ["\\$93M", "93 million", "anthem.*2023", "sued.*anthem", "anthem.*precedent", "fights and wins"] },
+      { name: "Employer-sponsored / self-funded pressure", keywords: ["employer.*sponsor", "self-funded", "employer.*plan", "university of richmond", "employer.*pressure"] },
+    ],
+    payor: [
+      { name: "Significant / 27%+ rate increase demand", keywords: ["27%", "significant rate increase", "more than 27", "30%.*rate", "rate increase.*multiple market"] },
+      { name: "Detrimental to customers / affordability", keywords: ["detrimental.*customer", "affordab", "raise.*cost", "local customer", "families"] },
+      { name: "Bon Secours choosing to leave", keywords: ["choosing to leave", "leave our network", "intention to leave", "notified.*intention"] },
+      { name: "Save Our Healthcare counter-campaign", keywords: ["save our healthcare", "corporate chain", "prioritizing profit", "counter-messag"] },
+      { name: "24-hour extension / resolution", keywords: ["24-hour", "extension", "multi-year deal", "pleased.*agreement", "remain in-network"] },
+      { name: "Declined to disclose terms", keywords: ["declined.*answer", "declined.*question", "neither side.*disclosed", "contract terms"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved via last-minute deal on April 1 after a 24-hour extension past the March 31 deadline — no actual disruption occurred, but eight months of uncertainty created significant patient anxiety across Richmond and Hampton Roads.",

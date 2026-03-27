@@ -1458,6 +1458,26 @@ export default {
     signalRead: "Missouri's regulatory gap — DCI lacks authority over self-funded and many commercial plans — left 90,000 patients without recourse. The Senate hearing was an extraordinary intervention that substituted political pressure for regulatory enforcement. Anthem's complaint index reflects multi-state provider disputes.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "90,000 patients affected", keywords: ["90,000", "90K", "thousands.*patient", "patients.*affected"] },
+      { name: "Anthem never negotiated", keywords: ["never negotiated", "same.*economic value", "refused.*negotiate", "stopped negotiat"] },
+      { name: "Anthem rates 10-20% below peers", keywords: ["10-20%.*lower", "below.*other insurer", "lower.*than.*other", "below.*peer"] },
+      { name: "Rural access crisis", keywords: ["rural", "3 hour", "three hour", "Cairo", "only.*major provider", "no alternative", "limited.*option"] },
+      { name: "Construction workers / union impact", keywords: ["construction worker", "LiUNA", "Local 955", "union", "15,000", "laborers", "morally repugnant"] },
+      { name: "UHC deal as contrast", keywords: ["United.*extend", "UnitedHealthcare.*deal", "UHC.*deal", "UHC.*agreed", "outlier"] },
+      { name: "Student / vulnerable populations", keywords: ["student", "Maneater", "\\$700", "foregone healthcare", "vaccination", "open-heart", "autism", "Lynch syndrome"] },
+      { name: "Senate hearing / political pressure", keywords: ["Senate", "O'Laughlin", "Crawford", "hearing", "legislat", "Governor", "Kehoe"] },
+    ],
+    payor: [
+      { name: "39% rate increase demand", keywords: ["39%", "rate increase", "rate hike", "proposed.*increase"] },
+      { name: "CPI+1% / reasonable offer", keywords: ["CPI", "CPI\\+1", "3\\.3%", "reasonable.*offer", "doubled.*offer"] },
+      { name: "MU Health overcharges", keywords: ["overcharge", "above.*market", "higher.*rate"] },
+      { name: "Continuity of care protections", keywords: ["continuity.*care", "transition", "exception", "policy exception"] },
+      { name: "Anthem working in good faith", keywords: ["good faith", "progress.*made", "initial progress", "working.*resolve"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resulted in 3.5 months of actual out-of-network status (April 1 – July 15) affecting 90,000 patients — far longer than most provider-payor disputes. Resolution required direct intervention by the Missouri Senate President Pro Tem and Governor. The deal was retroactive to April 1, with 3.5% annual increases through 2028.",

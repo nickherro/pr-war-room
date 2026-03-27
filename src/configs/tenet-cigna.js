@@ -1081,6 +1081,28 @@ export default {
     signalRead: "Cigna's national complaint index is elevated (1.87x median) driven by PXDX algorithm denial controversy, multi-state provider disputes, and rising claim denial rates. The 39% increase in network complaints reflects Cigna's aggressive reimbursement posture across hospital systems (Tenet, BJC, Piedmont). Arizona's 21% denial rate (above 19% national average) adds state-specific regulatory risk.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "64 hospitals / 7 states scale", keywords: ["64 hospital", "370 asc", "2,000 provider", "7 state", "multi-state", "national"] },
+      { name: "'Unsure-ance' campaign", keywords: ["unsure-ance", "unsureance", "health unsureance", "partial network"] },
+      { name: "Cigna 10% premium growth", keywords: ["10%.*premium", "premium.*growth", "revenue.*growth.*member", "profitab"] },
+      { name: "PXDX algorithm denials", keywords: ["pxdx", "algorithm", "auto-deny", "300,000 claims", "1\\.2 seconds", "propublica"] },
+      { name: "Patient access / holiday stress", keywords: ["patient.*access", "jeopardy", "holiday", "christmas", "healthcare stress"] },
+      { name: "AG investigation / regulatory", keywords: ["attorney general", "kris mayes", "consumer fraud", "ag.*investigation", "claim denial"] },
+      { name: "Local hospital brands", keywords: ["baptist health", "abrazo", "hospitals of providence", "piedmont medical", "st\\. francis", "palm beach"] },
+      { name: "Litigation history / 19 hospitals sued", keywords: ["19.*hospital.*sued", "lawsuit", "litigation", "emergency.*reimburs", "financial misconduct"] },
+    ],
+    payor: [
+      { name: "Tenet = for-profit chain", keywords: ["for-profit", "national.*chain", "shareholder", "business ahead of people"] },
+      { name: "Stoking fear / scare tactics", keywords: ["stoking fear", "scare tactic", "negotiating tactic", "fear.*patient"] },
+      { name: "Rates far beyond reasonable", keywords: ["far beyond.*reasonable", "unreasonable.*rate", "excessive.*rate"] },
+      { name: "State-based contracts", keywords: ["state-based", "state.*contract", "national deal"] },
+      { name: "413K Arizona enrollees", keywords: ["413,?000", "413K", "arizona.*enrollee"] },
+      { name: "EPISD / employer disruption", keywords: ["episd", "el paso", "school.*employee", "public.*employee"] },
+      { name: "Save Our Healthcare counter", keywords: ["save our healthcare", "counter-site", "counter.*campaign"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved via 11th-hour deal on December 31, 2025 — no actual disruption occurred, but Cigna sustained significant PR damage across 7 states over 11 months of failed negotiations.",

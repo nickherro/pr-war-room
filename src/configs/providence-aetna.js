@@ -1186,6 +1186,27 @@ export default {
     signalRead: "Aetna's complaint index is moderately elevated (1.72x median). Multi-state Providence disputes (WA, NorCal, OR) plus parallel UW Medicine conflict suggest systematic Aetna approach to Pacific Northwest provider rates. Oregon's 11-month out-of-network gap is among the longest in recent provider-insurer disputes nationally. 85%+ of Aetna's Oregon members are in self-funded employer plans, amplifying employer-channel pressure.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "35K WA patients at risk", keywords: ["35,000", "35K", "35k", "patients at risk", "patients face", "lose.*coverage", "lose.*access"] },
+      { name: "$1.2B loss vs Aetna profits", keywords: ["\\$1\\.2B", "1\\.2 billion", "operating loss", "\\$3\\.7B", "3\\.7B", "operating income", "\\$858M.*shareholder"] },
+      { name: "For-profit vs nonprofit contrast", keywords: ["for-profit insurer", "nonprofit.*provider", "reap benefits", "costs skyrocket", "Greg Hoffman"] },
+      { name: "Costs up 26% since 2019", keywords: ["26%", "costs up 26", "cost.*since 2019", "cost.*risen"] },
+      { name: "Cigna-first isolation strategy", keywords: ["Cigna.*first", "resolved Cigna", "isolat.*Aetna", "holdout", "divide-and-conquer", "sequential"] },
+      { name: "Oregon patient stories (cancer)", keywords: ["Bob Dragoon", "stomach cancer", "34.*cancer", "mother of two", "halted", "treatment.*halted", "appointments.*halted"] },
+      { name: "Other insurers agreed / Aetna outlier", keywords: ["other insurer.*agreed", "Aetna has not", "step up", "share in.*cost", "every other insurer"] },
+      { name: "11-month Oregon disruption", keywords: ["11.month", "11 month", "nearly.*year", "unprecedented duration", "longest"] },
+    ],
+    payor: [
+      { name: "Unreasonable rate increases", keywords: ["unreasonable rate", "unreasonable.*increase", "price increase.*higher.*market", "above.*market rate"] },
+      { name: "Employer cost framing", keywords: ["raise costs.*employer", "employer.*cost", "self-funded", "out-of-pocket", "raise premium"] },
+      { name: "85% self-funded employer plans", keywords: ["85%", "self-funded", "ASO", "employer plan"] },
+      { name: "Labor Day / holiday timing", keywords: ["Labor Day", "holiday weekend", "Sept 1", "scramble"] },
+      { name: "Multi-state concurrent disputes", keywords: ["multi-state", "WA.*NorCal.*OR", "concurrent", "three state", "multiple.*dispute"] },
+      { name: "Regulatory pressure / OIC", keywords: ["OIC", "Insurance Commissioner", "briefing memo", "regulat", "regulatory concern"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The Providence-Aetna dispute played out across three states with dramatically different outcomes: WA resolved in 5 days (Sept 2024), NorCal resolved pre-deadline (Sept 2024), but Oregon endured nearly 11 months out-of-network (Jan–Dec 2025) — one of the longest major provider-insurer disruptions in recent memory.",

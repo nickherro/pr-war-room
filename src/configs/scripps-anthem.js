@@ -984,6 +984,27 @@ export default {
     signalRead: "Anthem's complaint index is elevated (1.87x median) driven by network access disruptions in California. The 55% increase in network complaints reflects the Scripps split's impact on 125,000+ policyholders. DMHC enforcement entries and Covered California's special enrollment signal regulatory concern without formal intervention.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "125K patients at risk", keywords: ["125,000", "125K", "125k", "patients.*notified", "lose access", "network exit", "leave.*network"] },
+      { name: "Patient harm stories", keywords: ["angel coronel", "brain.*rehab", "lisa schmidt", "ehlers-danlos", "rare disease", "pregnant", "oncology", "ulcerative colitis", "kirsten lozano"] },
+      { name: "Delay, deny, don't pay", keywords: ["delay.*deny", "don't pay", "prior auth.*revers", "800\\+? instances", "\\$34.*million", "denied claims", "2,300 claims"] },
+      { name: "Hospital deserts / underpayment", keywords: ["hospital desert", "underpay", "squeeze.*hospital", "systematic.*underpayment", "reimburse"] },
+      { name: "Van Gorder / CEO messaging", keywords: ["van gorder", "vanguard", "ugly few years", "insurance.*cartels", "kaufman"] },
+      { name: "Community embeddedness", keywords: ["5 hospital", "30 clinic", "3,000 physician", "san diego.*healthcare", "north county", "carlsbad", "encinitas"] },
+      { name: "Union & political pressure", keywords: ["ufcw", "local 135", "blakespear", "dmhc", "10,000 union", "covered california", "special enrollment"] },
+      { name: "Extension not resolution", keywords: ["extension.*not.*new", "not a new agreement", "ceasefire", "underlying.*unresolved", "sept 2026"] },
+    ],
+    payor: [
+      { name: "Excessive rate demands", keywords: ["excessive.*rate", "unsustainable", "rate increase", "fair and competitive", "cost.*employer"] },
+      { name: "Scripps chose to leave", keywords: ["scripps.*decision", "scripps.*leave", "chose to leave", "scripps.*drop"] },
+      { name: "Affordability for families", keywords: ["affordab", "families", "employers.*cost", "drive up cost"] },
+      { name: "Anthem offered fair rate", keywords: ["fair.*rate", "competitive.*rate", "offered.*increase"] },
+      { name: "For-profit healthcare criticism", keywords: ["both sides profit", "for-profit", "brinksmanship"] },
+      { name: "Medicare Advantage exits", keywords: ["medicare advantage", "MA plan", "reimburse.*shortfall"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resulted in a 4-month out-of-network period (Jan 1 – May 6, 2025) before an extension agreement retroactive to Jan 1. This is not a new contract — the underlying economic dispute remains unresolved through Sept 2026.",

@@ -1022,6 +1022,27 @@ export default {
     signalRead: "Cigna's national dispute count escalated 160% from 51 (2022) to 133 (2024), indicating a corporate strategy of aggressive rate negotiations across its provider network. AHN is part of a systemic pattern that also includes UNC Health (NC), Piedmont Medical (SC), and others. Pittsburgh's UPMC-Highmark duopoly amplifies disruption risk for any network change, making Cigna's negotiating posture particularly high-stakes in this market.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "Fair & equitable reimbursement", keywords: ["fair and equitable", "fair.*reimbursement", "equitable.*rate", "sustainable.*rate"] },
+      { name: "$147M loss / financial hardship", keywords: ["\\$147M", "147M.*loss", "\\$674M", "674M.*loss", "\\$1\\.3B.*invest", "1\\.3 billion", "hundreds of millions"] },
+      { name: "20,000 patients at risk", keywords: ["20,?000", "20K", "patients.*lose", "lose.*access", "14 hospitals"] },
+      { name: "Repeat dispute / pattern offender", keywords: ["second time", "not again", "back-to-back", "repeat", "2023.*2025", "two years"] },
+      { name: "Cigna national dispute escalation", keywords: ["51.*2022", "133.*2024", "160%", "dispute.*escalat", "systemic pattern", "dozens of providers"] },
+      { name: "UPMC duopoly / limited alternatives", keywords: ["UPMC", "duopoly", "limited.*alternative", "constrained market", "cannot.*switch", "limited.*option"] },
+      { name: "$1.3B community investment", keywords: ["\\$1\\.3B", "\\$1B.*expansion", "allegheny general.*expansion", "invested.*western PA", "community.*investment"] },
+      { name: "Patient anxiety / community impact", keywords: ["scramble", "anxious", "anxiety", "people.*health", "difficult.*find.*doctor", "please keep in mind"] },
+    ],
+    payor: [
+      { name: "Unreasonably high rates", keywords: ["unreasonably high", "unreasonable.*rate", "significantly increase cost"] },
+      { name: "Employer cost impact", keywords: ["employer.*pay", "local companies", "directly impact", "families.*cost", "rate.*impact.*compan"] },
+      { name: "AHN dropping Cigna framing", keywords: ["AHN.*drop", "dropping.*cigna", "pay more.*if.*drop"] },
+      { name: "Affordable quality care", keywords: ["affordable.*care", "quality.*affordable", "affordable.*quality", "in reach for people"] },
+      { name: "Cigna Medicare divestiture", keywords: ["Medicare.*HCSC", "sold.*Medicare", "divestiture", "Medicare.*not.*impact"] },
+      { name: "3-year deal = stability", keywords: ["3-year", "three-year", "long-term", "stability", "through.*2028"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "Two-round dispute (2023 and 2025) resolved with progressively longer terms — 1-year stopgap in 2023, 3-year deal through June 2028 in 2025 — suggesting the underlying rate gap was eventually addressed. No actual network disruption occurred in either round, but cumulative patient anxiety and media coverage favored AHN's position.",

@@ -1540,6 +1540,28 @@ export default {
     signalRead: "Anthem's national complaint index is elevated (1.85x median) driven by claims processing failures documented in Maine's May 2025 examination (72,315 claims ordered reprocessed). The 40% increase in network complaints reflects Anthem's pattern of provider disputes in Maine — the 2022 MaineHealth/Anthem dispute over $70M+ in overdue payments is a direct precedent. Ghost network lawsuits in NY and CT add to systemic concerns.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "30K+ patients at risk / rural access", keywords: ["30,000", "30K", "tens of thousands", "patients at risk", "lose access", "switch doctors", "drive hours", "forced to drive", "only.*provider", "only.*caregiver", "no.*alternative"] },
+      { name: "Rural monopoly / sole provider", keywords: ["rural", "northern.*maine", "eastern.*maine", "only major", "sole provider", "no realistic alternative", "dover-foxcroft", "presque isle", "4-hour trip"] },
+      { name: "Below-inflation reimbursement", keywords: ["1\\.5%", "less than 1\\.5", "7\\.5%", "health services inflation", "below inflation", "reimbursement.*increase", "disproportionate"] },
+      { name: "Anthem profit vs provider squeeze", keywords: ["10% profit", "profit margin", "record profit", "Anthem.*profit", "profit.*increase"] },
+      { name: "Pattern offender / MaineHealth precedent", keywords: ["2022", "MaineHealth", "pattern", "repeat", "72,315", "reprocess", "claims.*ordered", "ghost network"] },
+      { name: "In-network billing promise", keywords: ["in-network rate", "hold.*bill", "treat.*in-network", "billing.*hold", "bill.*in.network", "patient.protective"] },
+      { name: "CEO open letter / mediation", keywords: ["Tim Dentry", "open letter", "undermining mediation", "mediation", "egregiously misrepresenting", "Suzanne Spruce"] },
+      { name: "Governor / legislative intervention", keywords: ["Governor Mills", "75 legislat", "lawmakers", "bipartisan", "unacceptable", "extension", "30-day"] },
+    ],
+    payor: [
+      { name: "30% rate increase / $218M cost", keywords: ["30%", "\\$218", "218 million", "rate increase", "rate hike", "drastically increase"] },
+      { name: "5% offer rejected", keywords: ["5%", "5 percent", "offered.*increase", "commercial business"] },
+      { name: "NLH walked away from mediation", keywords: ["walked away", "walking away", "broke off", "ending.*talks", "ending.*negotiations", "refused.*mediat"] },
+      { name: "Quality requirements", keywords: ["quality requirement", "eliminate.*quality"] },
+      { name: "Patient confusion / conflicting messages", keywords: ["recipe for.*confusion", "conflicting", "patient confusion", "incorrect charges", "in or out"] },
+      { name: "Affordability / employer cost", keywords: ["affordable", "affordability", "employer.*cost", "prices.*charge", "patients and.*employers"] },
+      { name: "UMaine chose Anthem", keywords: ["UMaine", "University of Maine", "highest evaluation", "largest network", "lowest premium"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute lasted five months (June-November 2025), included two missed deadlines, Governor intervention, a 30-day extension, and five days of actual out-of-network status before a 3-year retroactive deal was reached. The prolonged public battle damaged both sides but Anthem bore disproportionate blame due to rural access concerns and a pattern of Maine provider disputes.",

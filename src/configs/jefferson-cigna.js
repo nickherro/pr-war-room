@@ -812,6 +812,26 @@ export default {
     signalRead: "Cigna's national complaint index is elevated (1.72x median) driven by multi-state provider disputes. The 27% increase in network complaints reflects a pattern of hardball negotiations with major health systems nationally, including Hartford HealthCare, Hackensack Meridian, UNC, and others.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "3% vs 20% reimbursement gap", keywords: ["3%", "20%", "Hospital Wage Index", "CPI-U", "reimbursement.*since 2020"] },
+      { name: "32 hospitals / 700+ locations", keywords: ["32 hospital", "700\\+", "700 location", "largest.*health system"] },
+      { name: "$196M operating loss", keywords: ["\\$196M", "196.*million", "operating loss", "financial pressure"] },
+      { name: "Dr. Pribitkin TikTok / physician advocate", keywords: ["Pribitkin", "TikTok", "physician.*advocate", "Chief Physician", "CPE"] },
+      { name: "Hyperlocal media saturation", keywords: ["Patch", "Glenside Local", "Bucks County Herald", "MontCo Today", "hyperlocal", "suburban"] },
+      { name: "Patient stories / family impact", keywords: ["Rosenberg", "mammogram", "breast cancer", "pediatric", "children.*pediatrician", "family.*healthcare"] },
+      { name: "Cigna national dispute pattern", keywords: ["pattern", "Hartford", "Hackensack", "UNC", "Tenet", "Baptist", "Bon Secours", "Piedmont"] },
+      { name: "Retroactive coverage victory", keywords: ["retroactive", "back.*network", "multi-year agreement", "resolution"] },
+    ],
+    payor: [
+      { name: "Unreasonable rate hike", keywords: ["unreasonable.*rate", "rate hike", "raise.*cost", "health costs"] },
+      { name: "Fair and competitive rates", keywords: ["fair.*competitive", "fair.*rate", "competitive.*rate"] },
+      { name: "Alternative providers available", keywords: ["alternative.*provider", "robust.*provider", "LVHN.*separate", "LVHN.*unaffected"] },
+      { name: "Employer/affordability framing", keywords: ["employer", "affordab", "families", "raise.*cost.*employer"] },
+      { name: "Jefferson chose to leave", keywords: ["chose.*leave", "Jefferson.*decision", "chose.*out.*network"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute lasted 20 days (Mar 15–Apr 4) and resolved with a multi-year agreement retroactive to March 15 — meaning no patients were ultimately billed at out-of-network rates. Jefferson's deliberate PR pressure campaign, anchored by Dr. Pribitkin's TikTok video and a wall of hyperlocal media coverage, forced Cigna back to the table.",

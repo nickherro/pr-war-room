@@ -1560,6 +1560,28 @@ export default {
     signalRead: "Anthem's complaint index is elevated (1.87x median) driven by network disruption affecting 200K+ patients across NYC metro. The 73% increase in network complaints reflects concentrated patient anxiety from losing access to NYC's largest hospital system. Mt Sinai's organized campaign directing patients to file DFS complaints is amplifying regulatory signal beyond organic volume.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "$450M unpaid claims", keywords: ["\\$450", "450M", "450 million", "unpaid claims", "\\$300M", "300M.*owed"] },
+      { name: "Patient harm stories", keywords: ["tourette", "pituitary", "lupus", "cancer.*mid-therapy", "oncologist", "cardiac arrest", "chronic illness", "deep brain stimulation"] },
+      { name: "200K+ patients affected", keywords: ["200,?000", "200K", "200k", "patients affected", "lose.*access", "health care refugee"] },
+      { name: "32BJ direct contract / bypass Anthem", keywords: ["32BJ", "SEIU", "direct.*contract", "bypass.*anthem", "intermediary", "100K.*workers", "100,000"] },
+      { name: "Organized patient mobilization", keywords: ["keepmountsinai", "choosemountsinai", "DFS complaint", "call.*anthem", "contact.*HR", "call-to-action"] },
+      { name: "Anthem profits vs. underpayment", keywords: ["\\$5\\.7B", "5\\.7 billion", "profit", "for-profit.*insurer", "subsidize.*margins"] },
+      { name: "Multi-platform PR campaign", keywords: ["podcast", "setting the record straight", "campaign site", "social campaign", "facebook.*instagram", "owned media"] },
+      { name: "Employer / HR channel pressure", keywords: ["employer", "HR.*professional", "network adequacy", "willis towers", "mercer", "aon.*SVP", "benefits.*consultant"] },
+    ],
+    payor: [
+      { name: "50% rate hike demand", keywords: ["50%", "rate increase", "rate hike", "\\$1 billion", "billion.*annually", "increased.*spending"] },
+      { name: "95.4% claims paid on time", keywords: ["95\\.4%", "claims paid", "within 15 days", "paid.*on time"] },
+      { name: "Mt Sinai pattern of dropping insurers", keywords: ["dropped.*UHC", "dropped.*oxford", "dropped.*molina", "pattern.*dropping", "serial.*termination"] },
+      { name: "Myths vs Facts / FAQ rebuttal", keywords: ["myths.*facts", "FAQ", "ready contract", "what you need to know"] },
+      { name: "Continuity of care offered", keywords: ["continuity of care", "90-day", "serious condition", "in-network extension"] },
+      { name: "Other NYC systems stayed", keywords: ["every other.*hospital", "NYU.*langone", "northwell", "columbia", "presbyterian.*silent", "works with us"] },
+      { name: "Physician direct contracting", keywords: ["physician.*direct", "individual.*physician", "breaking ranks", "divide and conquer", "recruit.*doctor"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "Mt Sinai exited Anthem's network on March 4, 2026 after months of failed negotiations — the dispute remains unresolved, with 200K+ patients affected and no agreement in sight.",

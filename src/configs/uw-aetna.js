@@ -917,6 +917,28 @@ export default {
     signalRead: "Aetna's WA network adequacy is under sustained pressure from multiple provider disputes (Providence in WA/OR, now UW Medicine). The Aetna segment's $924M loss in 2024 creates corporate incentive to hold rates down, but repeated network gaps — especially one lasting 33 days — threaten employer retention in the WA market. Medicare Advantage enrollees are the most vulnerable population, with limited mid-year switching options.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "53K patients affected", keywords: ["53,000", "53K", "thousands.*patient", "patients face", "patients.*scramble"] },
+      { name: "Lowest rates of any payor", keywords: ["lowest.*rate", "lowest.*commercial", "lowest.*payor", "fair.*sustainable"] },
+      { name: "Harborview / only trauma center", keywords: ["harborview", "level i trauma", "level 1 trauma", "trauma center", "safety.?net", "only.*trauma"] },
+      { name: "Fred Hutch cancer access", keywords: ["fred hutch", "cancer.*center", "rare cancer", "sharon zimmerman", "choose my life"] },
+      { name: "33-day actual gap", keywords: ["33.?day", "june 1.*july 3", "month.?long gap", "actual.*gap", "actual.*disruption"] },
+      { name: "CVS/Aetna $924M loss", keywords: ["\\$924M", "924.*million", "cvs.*loss", "aetna.*loss", "cost.?cutting", "segment.*loss"] },
+      { name: "Providence precedent / pattern", keywords: ["providence", "pattern", "serial", "pacific n", "pnw.*provider", "wa.*or.*dispute"] },
+      { name: "Employer revolt (Boeing/Costco)", keywords: ["boeing", "costco", "amazon", "dump aetna", "nearly useless", "switching.*aetna", "employer.*alternative"] },
+    ],
+    payor: [
+      { name: "Unreasonable rate demands", keywords: ["unreasonable.*rate", "inflated.*pricing", "demand.*rate", "raise.*premium"] },
+      { name: "Negotiating in good faith", keywords: ["good faith", "negotiating.*fair", "fair terms"] },
+      { name: "Boeing retirees exempt", keywords: ["boeing.*retiree", "ppo esa", "exempt", "boeing.*exempt"] },
+      { name: "Alternative providers available", keywords: ["alternative.*provider", "alternative.*available", "other.*provider"] },
+      { name: "Protecting member costs", keywords: ["cost.*member", "premium.*member", "affordab", "raise.*cost"] },
+      { name: "UW Medicine scare tactics", keywords: ["scare tactic", "dangerous.*greedy", "backfir"] },
+      { name: "UNITE HERE / union workers", keywords: ["unite here", "hospitality", "trust.*member", "union.*member"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "Unlike most high-profile provider-payor disputes that resolve before the deadline, the UW Medicine-Aetna gap lasted a full 33 days (June 1–July 3, 2025). Patients experienced real disruption — delayed appointments, cancelled visits, scrambled referrals — not just anxiety. The retroactive contract (through Jan 1, 2027) papers over the billing gap but does not undo delayed care or eroded patient trust in Aetna's network reliability.",

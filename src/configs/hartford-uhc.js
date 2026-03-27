@@ -807,6 +807,28 @@ export default {
     signalRead: "UHC's national complaint index is elevated (2.14x median) driven by multi-state provider disputes simultaneously. The HHC dispute occurred alongside MSK (NY) and M Health Fairview (MN) — pattern evidence of aggressive UHC network strategy. CT's 7.8% healthcare cost growth (highest ever) provides context for both sides' positions.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "608K members at risk", keywords: ["608,?000", "608K", "members at risk", "thousands.*patient"] },
+      { name: "7 hospitals / 500 locations", keywords: ["7 hospital", "500 location", "2nd.largest", "statewide"] },
+      { name: "Patient harm stories", keywords: ["post-concussion", "\\$10,?000.*out.of.pocket", "\\$10K", "Kristen Whitney Daniels", "colorectal cancer", "cancer treatment.*taken away"] },
+      { name: "UHC below CT benchmark", keywords: ["1\\.8%", "2\\.9%", "below.*benchmark", "below inflation", "below.market"] },
+      { name: "Care for Connecticut", keywords: ["care for Connecticut", "your care.*priority", "protect.*access", "patient.*first"] },
+      { name: "Congressional pressure / Medicare Advantage", keywords: ["Larson", "Blumenthal", "Courtney", "congressional", "Medicare Advantage", "MA plan"] },
+      { name: "UHC pattern of disputes", keywords: ["MSK", "M Health Fairview", "pattern", "simultaneously", "three.*system", "aggressive.*strategy"] },
+      { name: "Deadline brinkmanship", keywords: ["midnight", "deadline", "March 31", "last.minute", "just past midnight", "expire.*tonight"] },
+    ],
+    payor: [
+      { name: "~20% rate hike / $185-200M", keywords: ["20%.*rate", "20%.*hike", "\\$185", "\\$200M", "185.*200"] },
+      { name: "HHC already 20% above average", keywords: ["20%.*above.*average", "above.*UHC.*average", "already.*overpaid"] },
+      { name: "Employer cost pass-through (65%+)", keywords: ["65%", "self.insured", "employer.*cost", "\\$500K", "\\$1\\.3.*6\\.3M", "pass.through"] },
+      { name: "CT healthcare cost crisis (7.8%)", keywords: ["7\\.8%", "highest.*ever", "cost.*growth", "cost.*crisis"] },
+      { name: "Offered 1.8%/yr as fair", keywords: ["1\\.8%.*fair", "fair.*competitive", "offered.*1\\.8"] },
+      { name: "Brinkmanship / both sides", keywords: ["brinkmanship", "consumers.*no voice", "Kathleen Holt", "OHA"] },
+      { name: "Employer impact data", keywords: ["9 business", "\\$500K\\+", "worst.case", "\\$1\\.3", "\\$6\\.3M", "employer impact"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved via early-morning deal on April 1 — just past the March 31 midnight deadline. No actual disruption occurred, but significant political and regulatory fallout including federal congressional intervention and new state legislation.",

@@ -1250,6 +1250,28 @@ export default {
     signalRead: "Aetna's complaint index is moderately elevated (1.42x median). The NC State Health Plan's inherited $507M deficit and upcoming TPA transition create structural tension with all providers. Treasurer Briner's aggressive public posture against Duke is unusual and reflects political dynamics unique to government-run plans.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "No rate increase in 4 years", keywords: ["no rate increase", "4 year", "four year", "refused to negotiate"] },
+      { name: "Below-inflation request", keywords: ["below inflation", "below.inflation", "small impact.*premium"] },
+      { name: "70K members / 22K PCP at risk", keywords: ["70,?000", "70K", "22,?000", "22K", "Triangle member", "list Duke as.*PCP"] },
+      { name: "Cancer patient stories", keywords: ["cancer", "melanoma", "devastated", "Elizabeth Taylor", "Duke Cancer Center"] },
+      { name: "State employee access", keywords: ["state employee", "state worker", "public school teacher", "university", "743K", "NC State Health Plan"] },
+      { name: "OOP cost doubling ($5,900-$11,800)", keywords: ["\\$5,?900", "\\$11,?800", "out.of.pocket.*double", "OOP.*double"] },
+      { name: "CEO departure / leadership", keywords: ["Albanese", "depart.*Kaiser", "Owens", "leadership.*vacuum", "COO"] },
+      { name: "Radio ad / patient mobilization", keywords: ["radio ad", "direct letter", "call Aetna", "scare tactic", "urging patient"] },
+    ],
+    payor: [
+      { name: "Duke is greedy / tone deaf", keywords: ["greedy", "tone deaf", "incredibly tone deaf", "profit before people"] },
+      { name: "Duke's $4.3B investments", keywords: ["\\$4\\.3B", "\\$4\\.3 billion", "\\$566M", "\\$202M", "operating income", "strong.*balance sheet"] },
+      { name: "SHP $507M deficit", keywords: ["\\$507M", "507.*deficit", "inherited deficit", "underfunded"] },
+      { name: "Taxpayer protection", keywords: ["taxpayer", "premium.*hike", "cost.*taxpayer", "fiscal.*conservative"] },
+      { name: "Treasurer Briner attacks", keywords: ["Briner", "Treasurer", "more than fine", "existing rates"] },
+      { name: "$150M+ legislative funding", keywords: ["\\$150M", "\\$100M", "General Assembly", "250.*million", "SHP funding"] },
+      { name: "NC highest healthcare costs", keywords: ["highest.*cost.*nation", "unreasonable.*rate", "Aetna.*cost"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resolved October 3, 2025 — 17 days before the October 20 network exit deadline. The agreement won't force 2027 premium increases, giving both sides a political win.",

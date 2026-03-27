@@ -1115,6 +1115,27 @@ export default {
     signalRead: "Cigna's complaint index is elevated (1.72x median) driven by prior auth burden and network disruption in NC. The 40% increase in network complaints reflects growing provider dissatisfaction with Cigna's denial practices and downcoding. The 12-day actual coverage gap is rare — most disputes resolve pre-deadline — and generated sustained media cycles that compounded Cigna's reputational damage in the state.",
   },
 
+  talkingPoints: {
+    provider: [
+      { name: "65K patients at risk", keywords: ["65,000", "60,000", "65K", "60K", "patients at risk", "lose.*access", "out.?of.?network"] },
+      { name: "Patient harm stories", keywords: ["pederson", "stanley", "baby", "meningitis", "becky pezzoni", "cancer survivor", "jon markle", "diabetic", "zack roscoe"] },
+      { name: "Prior auth / 30% denial rate", keywords: ["prior auth", "30%.*denial", "denial rate", "downcod", "denied.*coverage", "delayed payment"] },
+      { name: "Copay shock ($25 to $468)", keywords: ["\\$25.*\\$468", "\\$30.*\\$165", "copay.*jump", "ot copay", "out-of-pocket"] },
+      { name: "12-day actual gap", keywords: ["12.?day", "coverage gap", "dec 1.*dec 12", "actual.*gap", "actual.*disruption"] },
+      { name: "Rural NC / mountain communities", keywords: ["rural", "avery", "watauga", "mountain", "boone", "no alternative", "only.*system"] },
+      { name: "Open enrollment pressure", keywords: ["open enrollment", "consider alternative", "switching.*cigna", "enrollment.*close"] },
+      { name: "Apex municipal defection", keywords: ["apex", "mayor gilbert", "town.*apex", "850 employee", "vosburg", "municipal"] },
+    ],
+    payor: [
+      { name: "Above market rate demands", keywords: ["above market", "well above", "market level", "rate demand"] },
+      { name: "Affordability for employers", keywords: ["affordab", "employer", "families", "cost.*increase", "premium"] },
+      { name: "Offered contract extension", keywords: ["offered.*extension", "contract extension", "extension.*offered"] },
+      { name: "Cigna protecting access", keywords: ["quality.*affordable", "affordable.*care", "access.*care", "committed.*access"] },
+      { name: "NC pattern / UNC serial disputes", keywords: ["duke.*aetna", "wakemed", "nc pattern", "recurring.*dispute", "serial"] },
+      { name: "Continuity of care offered", keywords: ["continuity of care", "hospitalized", "active.?treatment", "pregnant"] },
+    ],
+  },
+
   // Executive summary
   executiveSummary: {
     statement: "The dispute resulted in a 12-day actual coverage gap (Dec 1-12) affecting 65,000 Cigna commercial members — unlike most provider-payor disputes which resolve at the deadline. Retroactive coverage to Dec 1 mitigated patient financial harm, but the gap itself was a significant PR defeat for Cigna in North Carolina.",
