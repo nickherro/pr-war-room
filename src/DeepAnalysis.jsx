@@ -46,18 +46,16 @@ function WeeklyCoverage({ entries, config }) {
 
       // Source types
       const uniqueSources = new Set(weekEntries.map((e) => e.source));
-      const highTierSources = new Set(weekEntries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType)).map((e) => e.source));
       let newCount = 0;
       uniqueSources.forEach((s) => {
         if (!seenSources.has(s)) { newCount++; seenSources.add(s); }
       });
-      const highTier = highTierSources.size;
       const returning = Math.max(0, uniqueSources.size - newCount);
 
       return {
         label: w.label,
         provFav, payFav, neutral,
-        highTier, returning, newSources: newCount,
+        returning, newSources: newCount,
         uniqueSources: uniqueSources.size,
         total: weekEntries.length,
       };
@@ -111,7 +109,7 @@ function WeeklyCoverage({ entries, config }) {
   if (data.weeks.length < 2) return null;
 
   const maxVol = Math.max(...data.weeks.map((d) => d.provFav + d.payFav + d.neutral), 1);
-  const maxSrc = Math.max(...data.weeks.map((d) => d.highTier + d.returning + d.newSources), 1);
+  const maxSrc = Math.max(...data.weeks.map((d) => d.returning + d.newSources), 1);
 
   const statusLabel = (ratio) => ratio > 1.3 ? "ACCELERATING" : ratio < 0.7 ? "DECELERATING" : "STEADY";
   const statusColor = (ratio) => ratio > 1.3 ? "#DC2626" : ratio < 0.7 ? "#16A34A" : colors.accent;
@@ -209,25 +207,19 @@ function WeeklyCoverage({ entries, config }) {
               return (
                 <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${colors.border}`, borderRadius: 6, padding: "8px 10px", fontFamily: MONO, fontSize: 10, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
                   <div style={{ fontWeight: 700, marginBottom: 2 }}>{d.uniqueSources} unique sources</div>
-                  <div style={{ color: colors.providerColor }}>{d.highTier} high-tier</div>
                   <div style={{ color: colors.accent }}>{d.returning} returning</div>
                   <div style={{ color: "#16A34A" }}>{d.newSources} new</div>
                 </div>
               );
             }}
           />
-          <Bar dataKey="highTier" stackId="src" fill={colors.providerColor} opacity={0.8} />
-          <Bar dataKey="returning" stackId="src" fill={colors.accent} opacity={0.4} />
+          <Bar dataKey="returning" stackId="src" fill={colors.accent} opacity={0.5} />
           <Bar dataKey="newSources" stackId="src" fill="#16A34A" opacity={0.7} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
       <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 4, marginBottom: 16, fontSize: 9, fontFamily: MONO, color: colors.textMuted }}>
         <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-          <span style={{ width: 8, height: 8, background: colors.providerColor, opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
-          High-tier
-        </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-          <span style={{ width: 8, height: 8, background: colors.accent, opacity: 0.4, borderRadius: 2, display: "inline-block" }} />
+          <span style={{ width: 8, height: 8, background: colors.accent, opacity: 0.5, borderRadius: 2, display: "inline-block" }} />
           Returning
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
