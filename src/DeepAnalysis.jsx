@@ -54,24 +54,6 @@ function WeeklyCoverage({ entries, config }) {
       };
     });
 
-    // Velocity status (only active weeks)
-    const activeVol = weeks.filter((w) => w.total > 0);
-    const vMid = Math.floor(activeVol.length / 2);
-    const vFirst = activeVol.slice(0, vMid);
-    const vSecond = activeVol.slice(vMid);
-    const vFirstAvg = vFirst.length > 0 ? vFirst.reduce((s, d) => s + d.total, 0) / vFirst.length : 0;
-    const vSecondAvg = vSecond.length > 0 ? vSecond.reduce((s, d) => s + d.total, 0) / vSecond.length : 0;
-    const vRatio = vFirstAvg > 0 ? vSecondAvg / vFirstAvg : vSecondAvg > 0 ? 2 : 1;
-
-    // Fatigue status (only active weeks)
-    const activeSrc = weeks.filter((w) => w.uniqueSources > 0);
-    const fMid = Math.floor(activeSrc.length / 2);
-    const fFirst = activeSrc.slice(0, fMid);
-    const fSecond = activeSrc.slice(fMid);
-    const fFirstAvg = fFirst.length > 0 ? fFirst.reduce((s, w) => s + w.uniqueSources, 0) / fFirst.length : 0;
-    const fSecondAvg = fSecond.length > 0 ? fSecond.reduce((s, w) => s + w.uniqueSources, 0) / fSecond.length : 0;
-    const fRatio = fFirstAvg > 0 ? fSecondAvg / fFirstAvg : 1;
-
     // Top sources
     const sourceCount = {};
     const sourceFirst = {};
@@ -91,23 +73,13 @@ function WeeklyCoverage({ entries, config }) {
         dropped: new Date(sourceLast[source]) < new Date(sorted[sorted.length - 1].date.slice(0, 7) + "-01"),
       }));
 
-    return {
-      weeks,
-      velocity: { firstAvg: vFirstAvg, secondAvg: vSecondAvg, ratio: vRatio },
-      fatigue: { firstAvg: fFirstAvg, secondAvg: fSecondAvg, ratio: fRatio },
-      topSources,
-    };
+    return { weeks, topSources };
   }, [entries, config]);
 
   if (data.weeks.length < 2) return null;
 
   const maxVol = Math.max(...data.weeks.map((d) => d.provFav + d.payFav + d.neutral), 1);
   const maxSrc = Math.max(...data.weeks.map((d) => d.uniqueSources), 1);
-
-  const statusLabel = (ratio) => ratio > 1.3 ? "ACCELERATING" : ratio < 0.7 ? "DECELERATING" : "STEADY";
-  const statusColor = (ratio) => ratio > 1.3 ? "#DC2626" : ratio < 0.7 ? "#16A34A" : colors.accent;
-  const fatigueLabel = (ratio) => ratio < 0.5 ? "HIGH FATIGUE" : ratio < 0.8 ? "MODERATE" : ratio > 1.2 ? "GROWING" : "SUSTAINED";
-  const fatigueColor = (ratio) => ratio < 0.5 ? "#DC2626" : ratio < 0.8 ? "#D97706" : ratio > 1.2 ? "#16A34A" : colors.accent;
 
   const sharedXAxis = (hide) => (
     <XAxis
@@ -122,18 +94,8 @@ function WeeklyCoverage({ entries, config }) {
   return (
     <div>
       {/* Chart 1: Favorability by volume */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
-          WEEKLY COVERAGE BY FAVORABILITY
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 10, color: colors.textMuted, fontFamily: MONO }}>
-            {data.velocity.secondAvg.toFixed(1)}/wk vs {data.velocity.firstAvg.toFixed(1)}/wk prior
-          </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(data.velocity.ratio), fontFamily: MONO }}>
-            {statusLabel(data.velocity.ratio)}
-          </span>
-        </div>
+      <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700, marginBottom: 8 }}>
+        WEEKLY COVERAGE BY FAVORABILITY
       </div>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={data.weeks} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
@@ -175,18 +137,8 @@ function WeeklyCoverage({ entries, config }) {
       </div>
 
       {/* Chart 2: Source type by volume */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
-          UNIQUE SOURCES BY TYPE
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 10, color: colors.textMuted, fontFamily: MONO }}>
-            {data.fatigue.secondAvg.toFixed(1)} src/wk vs {data.fatigue.firstAvg.toFixed(1)} prior
-          </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: fatigueColor(data.fatigue.ratio), fontFamily: MONO }}>
-            {fatigueLabel(data.fatigue.ratio)}
-          </span>
-        </div>
+      <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700, marginBottom: 8 }}>
+        UNIQUE SOURCES PER WEEK
       </div>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={data.weeks} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
