@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import WarRoomDashboard from "./WarRoomDashboard.jsx";
 import ScoringSettings from "./ScoringSettings.jsx";
+import Homepage from "./Homepage.jsx";
 
 // Import all configs dynamically
 const configs = {};
@@ -18,6 +19,14 @@ const DASHBOARDS = Object.entries(configs).map(([key, config]) => ({
   config,
 }));
 
+const DASHBOARD_IDS = new Set(DASHBOARDS.map((d) => d.id));
+
+function getRouteFromPath() {
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, "");
+  if (path && DASHBOARD_IDS.has(path)) return path;
+  return null; // homepage
+}
+
 const STORAGE_KEY = "_scoring_overrides";
 
 function loadOverrides() {
@@ -25,7 +34,6 @@ function loadOverrides() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Invalidate stale overrides from old dimension model (frame/sentiment/blame/patientStory)
     if (parsed?.dimensionWeights && ("frame" in parsed.dimensionWeights || "sentiment" in parsed.dimensionWeights)) {
       localStorage.removeItem(STORAGE_KEY);
       return null;
@@ -45,11 +53,28 @@ function saveOverrides(overrides) {
 }
 
 export default function App({ onLogout }) {
-  const [active, setActive] = useState(DASHBOARDS[0]?.id || "bcbsm");
+  const [active, setActive] = useState(getRouteFromPath);
   const [showSettings, setShowSettings] = useState(false);
   const [weightOverrides, setWeightOverrides] = useState(loadOverrides);
 
-  const activeConfig = DASHBOARDS.find((d) => d.id === active)?.config;
+  // Sync browser back/forward
+  useEffect(() => {
+    const onPop = () => setActive(getRouteFromPath());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const navigate = useCallback((id) => {
+    const path = id ? `/${id}` : "/";
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, "", path);
+    }
+    setActive(id);
+    setShowSettings(false);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const activeConfig = active ? DASHBOARDS.find((d) => d.id === active)?.config : null;
 
   const handleSaveOverrides = (overrides) => {
     setWeightOverrides(overrides);
@@ -72,6 +97,50 @@ export default function App({ onLogout }) {
     flexShrink: 0,
   };
 
+  // Homepage view
+  if (!active) {
+    return (
+      <div style={{ position: "relative" }}>
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            padding: "8px 16px",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid #D8DDE6",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              letterSpacing: 2,
+              color: "rgba(0,0,0,0.35)",
+              fontFamily: "'JetBrains Mono', monospace",
+              fontWeight: 600,
+              marginRight: 12,
+              flexShrink: 0,
+            }}
+          >
+            MST
+          </span>
+          <div style={{ flex: 1 }} />
+          <button onClick={onLogout} style={navBtnStyle}>
+            LOGOUT
+          </button>
+        </div>
+        <Homepage dashboards={DASHBOARDS} weightOverrides={weightOverrides} onNavigate={navigate} />
+      </div>
+    );
+  }
+
+  // Dispute view
   return (
     <div style={{ position: "relative" }}>
       {/* Toggle bar */}
@@ -92,6 +161,7 @@ export default function App({ onLogout }) {
         }}
       >
         <span
+          onClick={() => navigate(null)}
           style={{
             fontSize: 10,
             letterSpacing: 2,
@@ -100,13 +170,15 @@ export default function App({ onLogout }) {
             fontWeight: 600,
             marginRight: 12,
             flexShrink: 0,
+            cursor: "pointer",
           }}
+          title="Back to all disputes"
         >
           MST
         </span>
         <select
           value={active}
-          onChange={(e) => { setActive(e.target.value); setShowSettings(false); }}
+          onChange={(e) => navigate(e.target.value)}
           style={{
             flex: 1,
             padding: "5px 8px",

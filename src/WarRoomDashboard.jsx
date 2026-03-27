@@ -35,7 +35,7 @@ function entryFavorability(entry, providerKey, payorKey) {
   return count > 0 ? signals / count : 0;
 }
 
-function computeScores(entries, config, overrides) {
+export function computeScores(entries, config, overrides) {
   const { providerKey, payorKey, sourceWeights } = config;
   const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
   const dw = { ...DEFAULT_DIMENSION_WEIGHTS, ...(overrides?.dimensionWeights || {}) };
@@ -113,7 +113,7 @@ function computeScores(entries, config, overrides) {
   };
 }
 
-function computeTrend(entries, config, overrides, mode = "decay") {
+export function computeTrend(entries, config, overrides, mode = "decay") {
   if (entries.length === 0) return [];
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const dateMap = {};
