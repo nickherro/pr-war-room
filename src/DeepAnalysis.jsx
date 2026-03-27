@@ -56,7 +56,7 @@ function NarrativeVelocity({ entries, config }) {
   const velocityColor = velocityRatio > 1.3 ? "#DC2626" : velocityRatio < 0.7 ? "#16A34A" : colors.accent;
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 13, letterSpacing: 1.5, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
@@ -206,7 +206,7 @@ function MessageDiscipline({ entries, config }) {
   };
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div>
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 13, letterSpacing: 1.5, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
           MESSAGE DISCIPLINE
@@ -215,7 +215,7 @@ function MessageDiscipline({ entries, config }) {
           How consistently does each side stay on their core talking points? Matches entry headlines against known messaging themes.
         </div>
       </div>
-      <div style={{ display: "flex", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <DisciplineCard data={analysis.provider} color={colors.providerColor} name={providerShort} />
         <DisciplineCard data={analysis.payor} color={colors.payorColor} name={payorShort} />
       </div>
@@ -260,10 +260,8 @@ function MediaFatigue({ entries, config }) {
         if (!seenSources.has(s)) { newCount++; seenSources.add(s); }
       });
 
-      // For stacked bar: other = unique - highTier - new (avoid double counting)
       const highTier = highTierSources.size;
-      const newSources = newCount;
-      const returning = Math.max(0, uniqueSources.size - newSources);
+      const otherTier = Math.max(0, uniqueSources.size - highTier);
 
       return {
         label: `${w.start.getMonth() + 1}/${w.start.getDate()}`,
@@ -271,8 +269,8 @@ function MediaFatigue({ entries, config }) {
         total: weekEntries.length,
         uniqueSources: uniqueSources.size,
         highTier,
-        newSources,
-        returning,
+        otherTier,
+        newSources: newCount,
       };
     });
 
@@ -309,10 +307,10 @@ function MediaFatigue({ entries, config }) {
   const fatigueLabel = fatigueRatio < 0.5 ? "HIGH FATIGUE" : fatigueRatio < 0.8 ? "MODERATE FATIGUE" : fatigueRatio > 1.2 ? "GROWING INTEREST" : "SUSTAINED";
   const fatigueColor = fatigueRatio < 0.5 ? "#DC2626" : fatigueRatio < 0.8 ? "#D97706" : fatigueRatio > 1.2 ? "#16A34A" : colors.accent;
 
-  const maxVal = Math.max(...data.weeks.map((w) => w.returning + w.newSources), 1);
+  const maxVal = Math.max(...data.weeks.map((w) => w.highTier + w.otherTier), 1);
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 13, letterSpacing: 1.5, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
@@ -350,18 +348,18 @@ function MediaFatigue({ entries, config }) {
               );
             }}
           />
-          <Bar dataKey="returning" stackId="sources" fill={colors.accent} opacity={0.5} radius={[0, 0, 0, 0]} />
-          <Bar dataKey="newSources" stackId="sources" fill="#16A34A" opacity={0.8} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="highTier" stackId="sources" fill={colors.providerColor} opacity={0.8} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="otherTier" stackId="sources" fill={colors.accent} opacity={0.35} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
       <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 6, fontSize: 10, fontFamily: MONO, color: colors.textMuted }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 10, background: colors.accent, opacity: 0.5, borderRadius: 2, display: "inline-block" }} />
-          Returning sources
+          <span style={{ width: 10, height: 10, background: colors.providerColor, opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
+          High-tier (news/TV/radio)
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 10, background: "#16A34A", opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
-          New sources
+          <span style={{ width: 10, height: 10, background: colors.accent, opacity: 0.35, borderRadius: 2, display: "inline-block" }} />
+          Other sources
         </span>
       </div>
 
@@ -392,10 +390,12 @@ export default function DeepAnalysis({ entries, config, weightOverrides }) {
   const { colors } = config;
 
   return (
-    <div style={{ padding: "24px 20px", background: colors.bg, minHeight: "60vh" }}>
-      <NarrativeVelocity entries={entries} config={config} />
-      <MessageDiscipline entries={entries} config={config} />
-      <MediaFatigue entries={entries} config={config} />
+    <div style={{ padding: "20px 16px", background: colors.bg, minHeight: "60vh" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, alignItems: "start" }}>
+        <NarrativeVelocity entries={entries} config={config} />
+        <MessageDiscipline entries={entries} config={config} />
+        <MediaFatigue entries={entries} config={config} />
+      </div>
     </div>
   );
 }
