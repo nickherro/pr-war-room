@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { computeScores, computeTrend, DEFAULT_DIMENSION_WEIGHTS, DEFAULT_SOURCE_TYPE_WEIGHTS } from "./WarRoomDashboard.jsx";
+import { getLogoUrl } from "./logos.jsx";
 
 const MONO = "'JetBrains Mono', monospace";
 const SERIF = "'Source Serif 4', Georgia, serif";
@@ -154,8 +155,19 @@ export default function PrintReport({ config, weightOverrides, onClose }) {
           <div style={{ fontSize: 9, letterSpacing: 3, color: "#93c4e3", fontFamily: MONO, fontWeight: 700, marginBottom: 6 }}>
             MARKET SENTIMENT TRACKER — CONFIDENTIAL
           </div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#053b57", lineHeight: 1.2 }}>
-            {config.title}
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              {getLogoUrl(config.providerKey) && (
+                <img src={getLogoUrl(config.providerKey)} alt="" style={{ width: 36, height: 36, borderRadius: 4, objectFit: "contain", border: "1px solid #c8dce8", background: "#fff" }} />
+              )}
+              <span style={{ fontSize: 13, color: "#93c4e3", fontFamily: MONO }}>vs</span>
+              {getLogoUrl(config.payorKey) && (
+                <img src={getLogoUrl(config.payorKey)} alt="" style={{ width: 36, height: 36, borderRadius: 4, objectFit: "contain", border: "1px solid #c8dce8", background: "#fff" }} />
+              )}
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#053b57", lineHeight: 1.2 }}>
+              {config.title}
+            </div>
           </div>
           <div style={{ fontSize: 13, color: "#5D7380", marginTop: 4 }}>
             {config.subtitle}

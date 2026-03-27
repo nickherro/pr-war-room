@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine, Tooltip, Legend, ResponsiveContainer, Label } from "recharts";
 import DeepAnalysis from "./DeepAnalysis.jsx";
 import PrintReport from "./PrintReport.jsx";
+import { OrgLogo } from "./logos.jsx";
 
 // === SHARED COMPUTATION LOGIC ===
 
@@ -1297,9 +1298,16 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
           </span>
           <span style={{ height: 1, flex: 1, background: colors.border }} />
         </div>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.2 }}>
-          Market Sentiment Tracker <span style={{ color: colors.textMuted, fontWeight: 400 }}>— {config.title}</span>
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <OrgLogo orgKey={config.providerKey} size={32} style={{ border: `1px solid ${colors.border}`, background: "#fff" }} />
+            <span style={{ fontSize: 12, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>vs</span>
+            <OrgLogo orgKey={config.payorKey} size={32} style={{ border: `1px solid ${colors.border}`, background: "#fff" }} />
+          </div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.2 }}>
+            Market Sentiment Tracker <span style={{ color: colors.textMuted, fontWeight: 400 }}>— {config.title}</span>
+          </h1>
+        </div>
         <p style={{ margin: "6px 0 0", fontSize: 12, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
           {config.subtitle} · {filtered.length} entries tracked
         </p>

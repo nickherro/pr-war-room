@@ -43,6 +43,8 @@ Deployed on Vercel (zero-config from GitHub main branch). SPA rewrite configured
 | `src/ScoringSettings.jsx` | Scoring weight configuration panel |
 | `src/Methodologies.jsx` | Full methodology page: scoring framework, trend modes, data aggregation |
 | `src/PrintReport.jsx` | Print-optimized PDF export of dashboard (via browser print dialog) |
+| `src/logos.jsx` | Logo lookup by providerKey/payorKey, OrgLogo component |
+| `public/logos/*.png` | Organization favicon/logos (30 files, sourced from Google favicons) |
 | `src/configs/*.js` | 26 dispute config files |
 
 ### Dashboard Features

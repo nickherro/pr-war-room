@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
 import { computeScores, computeTrend } from "./WarRoomDashboard.jsx";
+import { OrgLogo } from "./logos.jsx";
 
 const MONO = "'JetBrains Mono', monospace";
 const SERIF = "'Source Serif 4', Georgia, serif";
@@ -133,8 +134,14 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
             onMouseLeave={(e) => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.borderColor = "#D7E8F7"; }}
           >
             <div>
-              <div style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 600, color: "#053b57", marginBottom: 2 }}>
-                {d.config.providerShort} vs. {d.config.payorShort}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                  <OrgLogo orgKey={d.config.providerKey} size={20} style={{ border: "1px solid #D7E8F7", background: "#fff" }} />
+                  <OrgLogo orgKey={d.config.payorKey} size={20} style={{ border: "1px solid #D7E8F7", background: "#fff" }} />
+                </div>
+                <span style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 600, color: "#053b57" }}>
+                  {d.config.providerShort} vs. {d.config.payorShort}
+                </span>
               </div>
               <div style={{ fontSize: 11, color: "#93c4e3", fontFamily: MONO, display: "flex", alignItems: "center", gap: 6 }}>
                 {d.entryCount} entries
