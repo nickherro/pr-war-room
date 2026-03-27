@@ -113,7 +113,7 @@ export default function App({ onLogout }) {
             padding: "8px 16px",
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(12px)",
-            borderBottom: "1px solid #D8DDE6",
+            borderBottom: "1px solid #c8dce8",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
@@ -156,7 +156,7 @@ export default function App({ onLogout }) {
           padding: "8px 16px",
           background: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid #D8DDE6",
+          borderBottom: "1px solid #c8dce8",
           boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
         }}
       >
@@ -188,7 +188,7 @@ export default function App({ onLogout }) {
             borderRadius: 4,
             border: "1px solid rgba(0,0,0,0.15)",
             background: "rgba(0,0,0,0.03)",
-            color: "#1A1A2E",
+            color: "#053b57",
             cursor: "pointer",
             appearance: "auto",
             maxWidth: 320,
@@ -205,7 +205,7 @@ export default function App({ onLogout }) {
           style={{
             ...navBtnStyle,
             background: showSettings ? "rgba(0,0,0,0.08)" : "transparent",
-            color: weightOverrides ? "#3B82F6" : "rgba(0,0,0,0.4)",
+            color: weightOverrides ? "#f5841f" : "rgba(0,0,0,0.4)",
           }}
           title={weightOverrides ? "Custom scoring weights active" : "Scoring settings"}
         >
@@ -232,7 +232,7 @@ export default function App({ onLogout }) {
       {activeConfig ? (
         <WarRoomDashboard key={active} config={activeConfig} weightOverrides={weightOverrides} />
       ) : (
-        <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Dashboard not found</div>
+        <div style={{ padding: 40, textAlign: "center", color: "#5D7380" }}>Dashboard not found</div>
       )}
     </div>
   );

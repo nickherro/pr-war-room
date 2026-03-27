@@ -45,21 +45,21 @@ function AuthGate() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#F8F9FB',
+      background: '#f7fafc',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     }}>
       <form onSubmit={handleSubmit} style={{
         background: '#FFFFFF',
-        border: '1px solid #D8DDE6',
+        border: '1px solid #c8dce8',
         borderRadius: 12,
         padding: '48px 40px',
         width: 360,
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+        boxShadow: '0 2px 12px rgba(5,59,87,0.08)',
       }}>
-        <div style={{ color: '#1A1A2E', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', textAlign: 'center', marginBottom: 8, opacity: 0.5 }}>
+        <div style={{ color: '#053b57', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', textAlign: 'center', marginBottom: 8, opacity: 0.5 }}>
           Authorized Access Only
         </div>
         <input
@@ -72,9 +72,9 @@ function AuthGate() {
           style={{
             padding: '12px 16px',
             borderRadius: 6,
-            border: error ? '1px solid #e74c3c' : '1px solid #D8DDE6',
-            background: '#F5F7FA',
-            color: '#1A1A2E',
+            border: error ? '1px solid #e74c3c' : '1px solid #c8dce8',
+            background: '#f2f7fb',
+            color: '#053b57',
             fontSize: 15,
             outline: 'none',
           }}
@@ -88,9 +88,9 @@ function AuthGate() {
           style={{
             padding: '12px 16px',
             borderRadius: 6,
-            border: error ? '1px solid #e74c3c' : '1px solid #D8DDE6',
-            background: '#F5F7FA',
-            color: '#1A1A2E',
+            border: error ? '1px solid #e74c3c' : '1px solid #c8dce8',
+            background: '#f2f7fb',
+            color: '#053b57',
             fontSize: 15,
             outline: 'none',
           }}
@@ -107,7 +107,7 @@ function AuthGate() {
             padding: '12px 16px',
             borderRadius: 6,
             border: 'none',
-            background: '#06ABEB',
+            background: '#f5841f',
             color: '#fff',
             fontSize: 15,
             fontWeight: 600,

@@ -24,8 +24,8 @@ const SOURCE_TYPE_LABELS = {
 
 const S = {
   panel: {
-    background: "#FAFBFC",
-    border: "1px solid #D8DDE6",
+    background: "#f7fafc",
+    border: "1px solid #c8dce8",
     borderRadius: 8,
     padding: "20px 24px",
     maxWidth: 720,
@@ -35,7 +35,7 @@ const S = {
   header: {
     fontSize: 13,
     letterSpacing: 1.5,
-    color: "#64748B",
+    color: "#5D7380",
     fontFamily: MONO,
     fontWeight: 700,
     marginBottom: 16,
@@ -47,7 +47,7 @@ const S = {
   sectionTitle: {
     fontSize: 11,
     letterSpacing: 1.2,
-    color: "#64748B",
+    color: "#5D7380",
     fontFamily: MONO,
     fontWeight: 600,
     marginBottom: 10,
@@ -58,11 +58,11 @@ const S = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "6px 0",
-    borderBottom: "1px solid #EAEDF2",
+    borderBottom: "1px solid #D7E8F7",
   },
   label: {
     fontSize: 13,
-    color: "#1A1A2E",
+    color: "#053b57",
     fontFamily: SERIF,
   },
   input: {
@@ -72,10 +72,10 @@ const S = {
     fontFamily: MONO,
     fontWeight: 600,
     textAlign: "center",
-    border: "1px solid #D8DDE6",
+    border: "1px solid #c8dce8",
     borderRadius: 4,
     background: "#fff",
-    color: "#1A1A2E",
+    color: "#053b57",
   },
   dimTotal: {
     fontSize: 11,
@@ -96,7 +96,7 @@ const S = {
     fontWeight: 700,
     letterSpacing: 1,
     borderRadius: 4,
-    border: "1px solid #D8DDE6",
+    border: "1px solid #c8dce8",
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
@@ -205,11 +205,11 @@ export default function ScoringSettings({ config, overrides, onSave, onClose }) 
           </div>
         ))}
         <div style={{ ...S.row, borderBottom: "none", justifyContent: "flex-end", gap: 8 }}>
-          <span style={{ ...S.label, fontSize: 11, color: "#64748B" }}>Total:</span>
+          <span style={{ ...S.label, fontSize: 11, color: "#5D7380" }}>Total:</span>
           <span
             style={{
               ...S.dimTotal,
-              color: dimValid ? "#16A34A" : "#DC2626",
+              color: dimValid ? "#45bb89" : "#DC2626",
               background: dimValid ? "#F0FDF4" : "#FEF2F2",
             }}
           >
@@ -266,7 +266,7 @@ export default function ScoringSettings({ config, overrides, onSave, onClose }) 
                     <span style={{ ...S.label, fontWeight: isOverridden ? 600 : 400 }}>
                       {source}
                     </span>
-                    <span style={{ fontSize: 10, color: "#94A3B8", fontFamily: MONO, marginLeft: 6 }}>
+                    <span style={{ fontSize: 10, color: "#93c4e3", fontFamily: MONO, marginLeft: 6 }}>
                       {info.sourceType}
                       {info.configWeight !== undefined && ` · cfg: ${info.configWeight}`}
                     </span>
@@ -281,8 +281,8 @@ export default function ScoringSettings({ config, overrides, onSave, onClose }) 
                       onChange={(e) => handleSrc(source, e.target.value)}
                       style={{
                         ...S.input,
-                        borderColor: isOverridden ? "#3B82F6" : "#D8DDE6",
-                        background: isOverridden ? "#EFF6FF" : "#fff",
+                        borderColor: isOverridden ? "#f5841f" : "#c8dce8",
+                        background: isOverridden ? "#fff5ed" : "#fff",
                       }}
                     />
                     {isOverridden && (
@@ -299,7 +299,7 @@ export default function ScoringSettings({ config, overrides, onSave, onClose }) 
                           border: "none",
                           cursor: "pointer",
                           fontSize: 14,
-                          color: "#94A3B8",
+                          color: "#93c4e3",
                           padding: "0 2px",
                         }}
                         title="Reset to default"
@@ -322,17 +322,17 @@ export default function ScoringSettings({ config, overrides, onSave, onClose }) 
           disabled={!dimValid}
           style={{
             ...S.btn,
-            background: dimValid ? "#1A1A2E" : "#D8DDE6",
-            color: dimValid ? "#fff" : "#94A3B8",
+            background: dimValid ? "#053b57" : "#c8dce8",
+            color: dimValid ? "#fff" : "#93c4e3",
             cursor: dimValid ? "pointer" : "not-allowed",
           }}
         >
           APPLY
         </button>
-        <button onClick={handleReset} style={{ ...S.btn, background: "#fff", color: "#64748B" }}>
+        <button onClick={handleReset} style={{ ...S.btn, background: "#fff", color: "#5D7380" }}>
           RESET DEFAULTS
         </button>
-        <button onClick={onClose} style={{ ...S.btn, background: "#fff", color: "#64748B" }}>
+        <button onClick={onClose} style={{ ...S.btn, background: "#fff", color: "#5D7380" }}>
           CLOSE
         </button>
       </div>

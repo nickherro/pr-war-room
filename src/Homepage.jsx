@@ -17,7 +17,7 @@ function MiniTrend({ config, weightOverrides }) {
   const vals = data.map((d) => d.composite);
   const maxAbs = Math.max(Math.abs(Math.min(...vals)), Math.abs(Math.max(...vals)), 20);
   const lastVal = vals[vals.length - 1];
-  const lineColor = lastVal > 10 ? config.colors.providerColor : lastVal < -10 ? config.colors.payorColor : (config.colors.accent || "#6366F1");
+  const lineColor = lastVal > 10 ? config.colors.providerColor : lastVal < -10 ? config.colors.payorColor : "#2593d0";
 
   return (
     <ResponsiveContainer width={200} height={48}>
@@ -37,8 +37,8 @@ function MiniTrend({ config, weightOverrides }) {
 }
 
 function ScoreBadge({ value, config }) {
-  const color = value > 10 ? config.colors.providerColor : value < -10 ? config.colors.payorColor : (config.colors.accent || "#6366F1");
-  const bg = value > 10 ? `${config.colors.providerColor}18` : value < -10 ? `${config.colors.payorColor}18` : "rgba(99,102,241,0.08)";
+  const color = value > 10 ? config.colors.providerColor : value < -10 ? config.colors.payorColor : "#2593d0";
+  const bg = value > 10 ? `${config.colors.providerColor}18` : value < -10 ? `${config.colors.payorColor}18` : "rgba(37,147,208,0.08)";
   return (
     <div style={{
       fontFamily: MONO,
@@ -56,6 +56,13 @@ function ScoreBadge({ value, config }) {
   );
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  const [y, m, d] = dateStr.split("-");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
+}
+
 export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
   const scored = useMemo(() => {
     return dashboards.map((d) => {
@@ -64,20 +71,20 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
       const trend = computeTrend(entries, d.config, weightOverrides, "decay");
       const last = trend.length > 0 ? trend[trend.length - 1].composite : 0;
       return { ...d, composite: last, entryCount: entries.length };
-    }).sort((a, b) => Math.abs(b.composite) - Math.abs(a.composite));
+    }).sort((a, b) => (b.config.disputePublicDate || "").localeCompare(a.config.disputePublicDate || ""));
   }, [dashboards, weightOverrides]);
 
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 20px" }}>
       <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, color: "#94A3B8", fontFamily: MONO, fontWeight: 700, marginBottom: 6 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, color: "#93c4e3", fontFamily: MONO, fontWeight: 700, marginBottom: 6 }}>
           MARKET SENTIMENT TRACKER
         </div>
-        <div style={{ fontSize: 22, fontFamily: SERIF, fontWeight: 600, color: "#1A1A2E" }}>
+        <div style={{ fontSize: 22, fontFamily: SERIF, fontWeight: 600, color: "#053b57" }}>
           Active Dispute Inventory
         </div>
-        <div style={{ fontSize: 13, color: "#64748B", fontFamily: SERIF, marginTop: 4 }}>
-          {scored.length} disputes tracked · sorted by narrative intensity
+        <div style={{ fontSize: 13, color: "#5D7380", fontFamily: SERIF, marginTop: 4 }}>
+          {scored.length} disputes tracked · sorted by recency
         </div>
       </div>
 
@@ -85,17 +92,19 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
         {/* Header */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr 80px 200px",
+          gridTemplateColumns: "1fr 80px 100px 80px 200px",
           gap: 16,
           padding: "8px 16px",
           alignItems: "center",
           fontSize: 9,
           letterSpacing: 1.2,
-          color: "#94A3B8",
+          color: "#93c4e3",
           fontFamily: MONO,
           fontWeight: 700,
         }}>
           <span>DISPUTE</span>
+          <span style={{ textAlign: "center" }}>STATUS</span>
+          <span style={{ textAlign: "center" }}>PUBLIC DATE</span>
           <span style={{ textAlign: "center" }}>SCORE</span>
           <span style={{ textAlign: "center" }}>MOMENTUM</span>
         </div>
@@ -106,26 +115,44 @@ export default function Homepage({ dashboards, weightOverrides, onNavigate }) {
             onClick={() => onNavigate(d.id)}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 80px 200px",
+              gridTemplateColumns: "1fr 80px 100px 80px 200px",
               gap: 16,
               padding: "14px 16px",
               alignItems: "center",
-              background: "#FAFBFC",
-              border: "1px solid #EAEDF2",
+              background: "#ffffff",
+              border: "1px solid #D7E8F7",
               borderRadius: 6,
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#F1F5F9"; e.currentTarget.style.borderColor = "#CBD5E1"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#FAFBFC"; e.currentTarget.style.borderColor = "#EAEDF2"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#f2f7fb"; e.currentTarget.style.borderColor = "#93c4e3"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.borderColor = "#D7E8F7"; }}
           >
             <div>
-              <div style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 600, color: "#1A1A2E", marginBottom: 2 }}>
+              <div style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 600, color: "#053b57", marginBottom: 2 }}>
                 {d.config.providerShort} vs. {d.config.payorShort}
               </div>
-              <div style={{ fontSize: 11, color: "#94A3B8", fontFamily: MONO }}>
+              <div style={{ fontSize: 11, color: "#93c4e3", fontFamily: MONO }}>
                 {d.entryCount} entries
               </div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              {d.config.disputeStatus === "active" ? (
+                <span style={{
+                  fontSize: 9, fontFamily: MONO, fontWeight: 700, letterSpacing: 0.8,
+                  color: "#f5841f", background: "#fff5ed", border: "1px solid #f5841f",
+                  borderRadius: 3, padding: "2px 6px",
+                }}>ACTIVE</span>
+              ) : (
+                <span style={{
+                  fontSize: 9, fontFamily: MONO, fontWeight: 700, letterSpacing: 0.8,
+                  color: "#5D7380", background: "#f2f7fb", border: "1px solid #c8dce8",
+                  borderRadius: 3, padding: "2px 6px",
+                }}>RESOLVED</span>
+              )}
+            </div>
+            <div style={{ textAlign: "center", fontSize: 11, fontFamily: MONO, color: "#5D7380" }}>
+              {formatDate(d.config.disputePublicDate)}
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <ScoreBadge value={d.composite} config={d.config} />

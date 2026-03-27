@@ -13,6 +13,7 @@ export default {
   payorShort: "Aetna",
   providerKey: "dignity",
   payorKey: "aetna",
+  disputeStatus: "resolved",
   disputePublicDate: "2024-02-01",
   monitorStart: "2024-01-15",
   monitorEnd: "2024-05-24",
@@ -23,15 +24,15 @@ export default {
   colors: {
     bg: "#FAFAF8",
     surface: "#F1F0ED",
-    text: "#1A1A2E",
-    textMuted: "#64748B",
-    accent: "#465E85",
-    border: "#D8DDE6",
+    text: "#053b57",
+    textMuted: "#5D7380",
+    accent: "#5D7380",
+    border: "#c8dce8",
     providerColor: "#1B6B3A",   // Dignity green
     payorColor: "#7B2D8E",      // Aetna/CVS purple
   },
 
-  distColors: ["#1B6B3A", "#465E85", "#7B2D8E"],
+  distColors: ["#1B6B3A", "#5D7380", "#7B2D8E"],
 
   labels: {
     providerFrame: "Dignity Frame",

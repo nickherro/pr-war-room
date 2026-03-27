@@ -261,8 +261,8 @@ function SearchTrendsChart({ entries, config, overrides }) {
         <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
           <defs>
             <linearGradient id={gradientId + "_search"} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7C3AED" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#7C3AED" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="#2593d0" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#2593d0" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border} opacity={0.4} vertical={false} />
@@ -289,7 +289,7 @@ function SearchTrendsChart({ entries, config, overrides }) {
               return (
                 <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${colors.border}`, borderRadius: 6, padding: "6px 10px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
                   <div style={{ color: colors.textMuted }}>{d.date}</div>
-                  <div style={{ color: "#7C3AED", fontWeight: 700 }}>Interest: {d.interest}/100</div>
+                  <div style={{ color: "#2593d0", fontWeight: 700 }}>Interest: {d.interest}/100</div>
                 </div>
               );
             }}
@@ -300,7 +300,7 @@ function SearchTrendsChart({ entries, config, overrides }) {
             </ReferenceLine>
           )}
           <Area type="monotone" dataKey="interest" stroke="none" fill={`url(#${gradientId}_search)`} isAnimationActive={false} />
-          <Line type="monotone" dataKey="interest" stroke="#7C3AED" strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line type="monotone" dataKey="interest" stroke="#2593d0" strokeWidth={2} dot={false} isAnimationActive={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -363,7 +363,7 @@ function TrendChart({ entries, filterChannel, config, overrides, trendMode, setT
 
   if (chartData.length < 2) return null;
 
-  const chColorMap = { media: colors.payorColor || "#2F65A7", social: "#059669", stakeholder: "#D86018", employer: "#8B6914" };
+  const chColorMap = { media: colors.payorColor || "#2F65A7", social: "#45bb89", stakeholder: "#f5841f", employer: "#FEB925" };
   const chColor = chColorMap[filterChannel] || colors.accent;
   const chLabelMap = { media: "MEDIA", social: "SOCIAL", stakeholder: "STAKEHOLDER", employer: "EMPLOYER" };
   const isOverlay = filterChannel !== "all" && channelTrend;
@@ -499,8 +499,8 @@ function TrendChart({ entries, filterChannel, config, overrides, trendMode, setT
           <Tooltip content={<CustomTooltip />} />
           <ReferenceLine y={0} stroke={colors.textMuted} strokeWidth={1} opacity={0.5} />
           {firstPostDate && (
-            <ReferenceLine x={firstPostDate} stroke="#D86018" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
-              <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#D86018" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
+            <ReferenceLine x={firstPostDate} stroke="#f5841f" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.8}>
+              <Label value="DISPUTE PUBLIC" position="insideTopLeft" fill="#f5841f" fontSize={12} fontFamily="'JetBrains Mono', monospace" fontWeight={700} offset={6} />
             </ReferenceLine>
           )}
           <Bar dataKey="volume" fill="rgba(0,0,0,0.06)" radius={[2, 2, 0, 0]} barSize={10} yAxisId="vol" />
@@ -929,10 +929,10 @@ function DisputeTimeline({ config }) {
   const sorted = [...timeline].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const typeStyles = {
-    newsBreak: { color: "#E87722", label: "News Breaks" },
+    newsBreak: { color: "#f5841f", label: "News Breaks" },
     termination: { color: "#DC2626", label: "Termination Date" },
-    extension: { color: "#7C3AED", label: "Extension" },
-    agreement: { color: "#16A34A", label: "Agreement Reached" },
+    extension: { color: "#2593d0", label: "Extension" },
+    agreement: { color: "#45bb89", label: "Agreement Reached" },
     other: { color: colors.textMuted, label: "Other" },
   };
 
@@ -1175,7 +1175,7 @@ function EntryLogs({ entries, filterChannel, onDelete, config }) {
     const chEntries = entries.filter((e) => e.channel === ch).sort((a, b) => b.date.localeCompare(a.date));
     if (chEntries.length === 0) return null;
     const chLabel = ch === "media" ? "MEDIA" : ch === "social" ? "SOCIAL / FORUM" : ch === "stakeholder" ? "STAKEHOLDER" : "EMPLOYER";
-    const chColor = ch === "media" ? (colors.payorColor || "#2F65A7") : ch === "social" ? "#059669" : ch === "stakeholder" ? "#D86018" : "#8B6914";
+    const chColor = ch === "media" ? (colors.payorColor || "#2F65A7") : ch === "social" ? "#45bb89" : ch === "stakeholder" ? "#f5841f" : "#FEB925";
     const isOpen = isAll ? !!expanded[ch] : true;
 
     return (
@@ -1269,7 +1269,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
   const compositeColor = scores.composite > 15 ? colors.providerColor : scores.composite < -15 ? colors.payorColor : colors.accent;
   const compositeLabel = scores.composite > 15 ? providerName.toUpperCase() : scores.composite < -15 ? payorName.toUpperCase() : "CONTESTED";
 
-  const distColors = config.distColors || [colors.providerColor, "#465E85", colors.payorColor];
+  const distColors = config.distColors || [colors.providerColor, "#5D7380", colors.payorColor];
 
   return (
     <div
@@ -1434,7 +1434,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               entries.filter((e) => e.reachEstimate === "medium").length,
               entries.filter((e) => e.reachEstimate === "low").length,
             ]}
-            barColors={[distColors[0], "#465E85", distColors[2]]}
+            barColors={[distColors[0], "#5D7380", distColors[2]]}
             labels={["High", "Med", "Low"]}
             config={config}
           />
@@ -1445,7 +1445,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               filtered.filter((e) => ["news", "tv", "radio"].includes(e.sourceType) && e.frameAdoption !== "balanced").length,
               filtered.filter((e) => !["news", "tv", "radio"].includes(e.sourceType)).length,
             ]}
-            barColors={[distColors[0], "#465E85", distColors[2]]}
+            barColors={[distColors[0], "#5D7380", distColors[2]]}
             labels={["Deep", "Directed", "Echo"]}
             config={config}
           />
@@ -1456,7 +1456,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               filtered.filter((e) => !e.patientStory && e.sourceType === "owned").length,
               filtered.filter((e) => !e.patientStory && e.sourceType !== "owned").length,
             ]}
-            barColors={[distColors[0], "#D86018", "#465E85"]}
+            barColors={[distColors[0], "#f5841f", "#5D7380"]}
             labels={["Patient", "Owned", "Other"]}
             config={config}
           />
@@ -1467,7 +1467,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               filtered.filter((e) => ["opinion", "other"].includes(e.sourceType)).length,
               filtered.filter((e) => ["owned", "social"].includes(e.sourceType)).length,
             ]}
-            barColors={[distColors[0], "#465E85", distColors[2]]}
+            barColors={[distColors[0], "#5D7380", distColors[2]]}
             labels={["Independent", "Mixed", "Party"]}
             config={config}
           />
@@ -1478,7 +1478,7 @@ export default function WarRoomDashboard({ config, weightOverrides }) {
               filtered.filter((e) => e.channel === "employer").length,
               filtered.filter((e) => e.channel !== "stakeholder" && e.channel !== "employer").length,
             ]}
-            barColors={[distColors[0], "#8B6914", "#465E85"]}
+            barColors={[distColors[0], "#FEB925", "#5D7380"]}
             labels={["Stkhld", "Emplyr", "Other"]}
             config={config}
           />

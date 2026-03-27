@@ -1080,20 +1080,21 @@ export default {
   // Dates
   monitorStart: "July 1, 2025",
   monitorEnd: "December 31, 2025",
+  disputeStatus: "resolved",
   disputePublicDate: "2025-07-02",
 
   // Colors
   colors: {
     providerColor: "#4B9CD3",
     payorColor: "#E87722",
-    neutral: "#64748B",
+    neutral: "#5D7380",
     accent: "#4B9CD3",
-    bg: "#FFFFFF",
-    surface: "#F5F7FA",
-    surfaceHover: "#EDF0F5",
-    border: "#D8DDE6",
-    text: "#1A1A2E",
-    textMuted: "#64748B",
+    bg: "#ffffff",
+    surface: "#f2f7fb",
+    surfaceHover: "#e8f0f7",
+    border: "#c8dce8",
+    text: "#053b57",
+    textMuted: "#5D7380",
   },
   distColors: ["#4B9CD3", "#7A8FA8", "#E87722"],
   yAxisWidth: 78,

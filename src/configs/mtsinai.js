@@ -1525,20 +1525,21 @@ export default {
   // Dates
   monitorStart: "September 1, 2025",
   monitorEnd: "March 31, 2026",
+  disputeStatus: "active",
   disputePublicDate: "2025-10-15",
 
   // Colors
   colors: {
     providerColor: "#0284C7",
     payorColor: "#BE185D",
-    neutral: "#64748B",
+    neutral: "#5D7380",
     accent: "#0284C7",
-    bg: "#FFFFFF",
-    surface: "#F5F7FA",
-    surfaceHover: "#EDF0F5",
-    border: "#D8DDE6",
-    text: "#1A1A2E",
-    textMuted: "#64748B",
+    bg: "#ffffff",
+    surface: "#f2f7fb",
+    surfaceHover: "#e8f0f7",
+    border: "#c8dce8",
+    text: "#053b57",
+    textMuted: "#5D7380",
   },
   distColors: ["#0284C7", "#6B5B8D", "#BE185D"],
   yAxisWidth: 88,

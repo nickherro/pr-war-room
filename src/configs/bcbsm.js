@@ -1312,22 +1312,23 @@ export default {
   // Dates
   monitorStart: "January 1, 2026",
   monitorEnd: "March 26, 2026",
+  disputeStatus: "active",
   disputePublicDate: "2026-03-03",
 
   // Colors
   colors: {
     providerColor: "#00274C",
     payorColor: "#2F65A7",
-    neutral: "#64748B",
+    neutral: "#5D7380",
     accent: "#B8860B",
-    bg: "#FFFFFF",
-    surface: "#F5F7FA",
-    surfaceHover: "#EDF0F5",
-    border: "#D8DDE6",
-    text: "#1A1A2E",
-    textMuted: "#64748B",
+    bg: "#ffffff",
+    surface: "#f2f7fb",
+    surfaceHover: "#e8f0f7",
+    border: "#c8dce8",
+    text: "#053b57",
+    textMuted: "#5D7380",
   },
-  distColors: ["#00274C", "#465E85", "#2F65A7"],
+  distColors: ["#00274C", "#5D7380", "#2F65A7"],
   yAxisWidth: 78,
 
   // Data
