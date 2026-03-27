@@ -60,7 +60,7 @@ function computeScores(entries, config, overrides) {
   };
 }
 
-function computeTrend(entries, config, overrides) {
+function computeTrend(entries, config, overrides, mode = "decay") {
   if (entries.length === 0) return [];
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const dateMap = {};
@@ -69,12 +69,81 @@ function computeTrend(entries, config, overrides) {
     dateMap[e.date].push(e);
   });
   const dates = Object.keys(dateMap).sort();
+
+  if (mode === "cumulative") {
+    const points = [];
+    const cumulative = [];
+    dates.forEach((d) => {
+      cumulative.push(...dateMap[d]);
+      const s = computeScores(cumulative, config, overrides);
+      points.push({ date: d, composite: s.composite, count: cumulative.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+    });
+    return points;
+  }
+
+  if (mode === "rolling") {
+    // Rolling window — window size is 1/4 of the dispute duration (minimum 7 days)
+    const firstDate = new Date(dates[0]);
+    const lastDate = new Date(dates[dates.length - 1]);
+    const totalDays = Math.max(1, (lastDate - firstDate) / 86400000);
+    const windowDays = Math.max(7, Math.round(totalDays / 4));
+    const points = [];
+    dates.forEach((d) => {
+      const dTime = new Date(d).getTime();
+      const windowStart = dTime - windowDays * 86400000;
+      const windowEntries = sorted.filter((e) => {
+        const t = new Date(e.date).getTime();
+        return t > windowStart && t <= dTime;
+      });
+      if (windowEntries.length === 0) return;
+      const s = computeScores(windowEntries, config, overrides);
+      points.push({ date: d, composite: s.composite, count: windowEntries.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+    });
+    return points;
+  }
+
+  // Default: exponential decay (half-life = 30 days)
+  const HALF_LIFE = 30;
+  const LAMBDA = Math.LN2 / HALF_LIFE;
   const points = [];
-  const cumulative = [];
+  const allEntries = [];
   dates.forEach((d) => {
-    cumulative.push(...dateMap[d]);
-    const s = computeScores(cumulative, config, overrides);
-    points.push({ date: d, composite: s.composite, count: cumulative.length, dateCount: dateMap[d].length, frame: s.frameScore, sent: s.sentScore, blame: s.blameScore });
+    allEntries.push(...dateMap[d]);
+    const dTime = new Date(d).getTime();
+    const { providerKey, payorKey, sourceWeights } = config;
+    const stw = overrides?.sourceTypeWeights || DEFAULT_SOURCE_TYPE_WEIGHTS;
+    const dw = overrides?.dimensionWeights || DEFAULT_DIMENSION_WEIGHTS;
+    const mergedSW = overrides?.sourceWeights ? { ...sourceWeights, ...overrides.sourceWeights } : sourceWeights;
+
+    let totalW = 0;
+    let frameP = 0, framePy = 0;
+    let sentNP = 0, sentNPr = 0;
+    let blameP = 0, blamePr = 0;
+    let patW = 0;
+
+    allEntries.forEach((e) => {
+      const ageInDays = (dTime - new Date(e.date).getTime()) / 86400000;
+      const decay = Math.exp(-LAMBDA * ageInDays);
+      const baseW = getWeight(e, mergedSW, stw);
+      const w = baseW * decay;
+      totalW += w;
+      if (e.frameAdoption === providerKey) frameP += w;
+      if (e.frameAdoption === payorKey) framePy += w;
+      if (e.sentiment === `negative_${payorKey}` || e.sentiment === `positive_${providerKey}`) sentNP += w;
+      if (e.sentiment === `negative_${providerKey}` || e.sentiment === `positive_${payorKey}`) sentNPr += w;
+      if (e.blameDirection === payorKey) blameP += w;
+      if (e.blameDirection === providerKey) blamePr += w;
+      if (e.patientStory) patW += w;
+    });
+
+    if (totalW === 0) return;
+    const frameScore = ((frameP - framePy) / totalW) * 100;
+    const sentScore = ((sentNP - sentNPr) / totalW) * 100;
+    const blameScore = ((blameP - blamePr) / totalW) * 100;
+    const patientScore = (patW / totalW) * 100;
+    const composite = frameScore * dw.frame + sentScore * dw.sentiment + blameScore * dw.blame + patientScore * dw.patientStory;
+
+    points.push({ date: d, composite, count: allEntries.length, dateCount: dateMap[d].length, frame: frameScore, sent: sentScore, blame: blameScore });
   });
   return points;
 }
@@ -167,18 +236,25 @@ function SearchTrendsChart({ entries, config, overrides }) {
   );
 }
 
+const TREND_MODES = [
+  { key: "decay", label: "RECENCY-WEIGHTED", desc: "30-day half-life decay" },
+  { key: "cumulative", label: "CUMULATIVE", desc: "All-time running average" },
+  { key: "rolling", label: "ROLLING WINDOW", desc: "Proportional sliding window" },
+];
+
 function TrendChart({ entries, filterChannel, config, overrides }) {
   const { disputePublicDate, colors, gradientId } = config;
   const providerFavLabel = config.providerShort + " FAV";
   const payorFavLabel = config.payorShort + " FAV";
+  const [trendMode, setTrendMode] = useState("decay");
 
-  const allTrend = useMemo(() => computeTrend(entries, config, overrides), [entries, config, overrides]);
+  const allTrend = useMemo(() => computeTrend(entries, config, overrides, trendMode), [entries, config, overrides, trendMode]);
   const channelTrend = useMemo(() => {
     if (filterChannel === "all") return null;
     const channelEntries = entries.filter((e) => e.channel === filterChannel);
     if (channelEntries.length < 2) return null;
-    return computeTrend(channelEntries, config, overrides);
-  }, [entries, filterChannel, config, overrides]);
+    return computeTrend(channelEntries, config, overrides, trendMode);
+  }, [entries, filterChannel, config, overrides, trendMode]);
 
   const chartData = useMemo(() => {
     const source = filterChannel !== "all" ? entries.filter((e) => e.channel === filterChannel) : entries;
@@ -278,13 +354,35 @@ function TrendChart({ entries, filterChannel, config, overrides }) {
 
   return (
     <div style={{ marginTop: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 6 }}>
         <div style={{ fontSize: 13, letterSpacing: 1.5, color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
-          NARRATIVE MOMENTUM — CUMULATIVE COMPOSITE OVER TIME
+          NARRATIVE MOMENTUM — {TREND_MODES.find((m) => m.key === trendMode)?.label}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}>
+          {TREND_MODES.map((m) => (
+            <button
+              key={m.key}
+              onClick={() => setTrendMode(m.key)}
+              title={m.desc}
+              style={{
+                padding: "3px 8px",
+                fontSize: 9,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: trendMode === m.key ? 700 : 500,
+                letterSpacing: 0.8,
+                borderRadius: 3,
+                border: `1px solid ${trendMode === m.key ? colors.accent : "rgba(0,0,0,0.12)"}`,
+                background: trendMode === m.key ? colors.accent + "18" : "transparent",
+                color: trendMode === m.key ? colors.accent : colors.textMuted,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {m.label}
+            </button>
+          ))}
           {preCount > 0 && (
-            <span style={{ color: "rgba(0,0,0,0.3)", fontStyle: "italic" }}>
+            <span style={{ color: "rgba(0,0,0,0.3)", fontStyle: "italic", fontSize: 10 }}>
               {preCount} pre-public
             </span>
           )}
