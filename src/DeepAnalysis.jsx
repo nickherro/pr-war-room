@@ -1,14 +1,13 @@
 import { useMemo } from "react";
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const MONO = "'JetBrains Mono', monospace";
 const SERIF = "'Source Serif 4', Georgia, serif";
 
 // === NARRATIVE VELOCITY ===
-// Measures coverage acceleration/deceleration over time using weekly entry counts
 
 function NarrativeVelocity({ entries, config }) {
-  const { colors, providerShort, payorShort, disputePublicDate } = config;
+  const { colors, providerShort, payorShort } = config;
 
   const data = useMemo(() => {
     if (entries.length === 0) return [];
@@ -16,10 +15,9 @@ function NarrativeVelocity({ entries, config }) {
     const firstDate = new Date(sorted[0].date);
     const lastDate = new Date(sorted[sorted.length - 1].date);
 
-    // Build weekly buckets
     const weeks = [];
     const cur = new Date(firstDate);
-    cur.setDate(cur.getDate() - cur.getDay()); // align to Sunday
+    cur.setDate(cur.getDate() - cur.getDay());
     while (cur <= lastDate) {
       const weekStart = new Date(cur);
       const weekEnd = new Date(cur);
@@ -28,40 +26,32 @@ function NarrativeVelocity({ entries, config }) {
       cur.setDate(cur.getDate() + 7);
     }
 
-    let prevCount = 0;
     return weeks.map((w) => {
       const weekEntries = sorted.filter((e) => {
         const d = new Date(e.date);
         return d >= w.start && d <= w.end;
       });
-      const count = weekEntries.length;
       const provFav = weekEntries.filter((e) =>
         e.frameAdoption === config.providerKey || e.sentiment === `negative_${config.payorKey}` || e.blameDirection === config.payorKey
       ).length;
       const payFav = weekEntries.filter((e) =>
         e.frameAdoption === config.payorKey || e.sentiment === `negative_${config.providerKey}` || e.blameDirection === config.providerKey
       ).length;
-      const acceleration = count - prevCount;
-      prevCount = count;
-      const dateStr = `${w.start.getFullYear()}-${String(w.start.getMonth() + 1).padStart(2, "0")}-${String(w.start.getDate()).padStart(2, "0")}`;
-      return { date: dateStr, label: w.label, count, provFav, payFav, acceleration };
+      const neutral = weekEntries.length - provFav - payFav;
+      return { label: w.label, provFav, payFav, neutral: Math.max(0, neutral) };
     });
   }, [entries, config]);
 
   if (data.length < 2) return null;
 
-  const maxCount = Math.max(...data.map((d) => d.count), 1);
-  const maxAccel = Math.max(...data.map((d) => Math.abs(d.acceleration)), 1);
+  const maxCount = Math.max(...data.map((d) => d.provFav + d.payFav + d.neutral), 1);
 
-  // Compute velocity status using second-half vs first-half average
   const mid = Math.floor(data.length / 2);
   const firstHalf = data.slice(0, mid);
   const secondHalf = data.slice(mid);
-  const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, d) => s + d.count, 0) / firstHalf.length : 0;
-  const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, d) => s + d.count, 0) / secondHalf.length : 0;
-  const recentAvg = secondAvg;
-  const earlierAvg = firstAvg;
-  const velocityRatio = earlierAvg > 0 ? recentAvg / earlierAvg : recentAvg > 0 ? 2 : 1;
+  const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, d) => s + d.provFav + d.payFav + d.neutral, 0) / firstHalf.length : 0;
+  const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, d) => s + d.provFav + d.payFav + d.neutral, 0) / secondHalf.length : 0;
+  const velocityRatio = firstAvg > 0 ? secondAvg / firstAvg : secondAvg > 0 ? 2 : 1;
   const velocityLabel = velocityRatio > 1.3 ? "ACCELERATING" : velocityRatio < 0.7 ? "DECELERATING" : "STEADY";
   const velocityColor = velocityRatio > 1.3 ? "#DC2626" : velocityRatio < 0.7 ? "#16A34A" : colors.accent;
 
@@ -73,63 +63,61 @@ function NarrativeVelocity({ entries, config }) {
             NARRATIVE VELOCITY
           </div>
           <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-            Weekly coverage volume and acceleration — is the dispute gaining or losing attention?
+            Weekly coverage volume — is the dispute gaining or losing attention?
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 22, fontWeight: 700, color: velocityColor, fontFamily: MONO }}>{velocityLabel}</div>
           <div style={{ fontSize: 10, color: colors.textMuted, fontFamily: MONO }}>
-            Recent: {recentAvg.toFixed(1)}/wk vs Prior: {earlierAvg.toFixed(1)}/wk
+            Recent: {secondAvg.toFixed(1)}/wk vs Prior: {firstAvg.toFixed(1)}/wk
           </div>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={220}>
-        <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+        <BarChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border} opacity={0.4} vertical={false} />
           <XAxis dataKey="label" tick={{ fill: colors.textMuted, fontSize: 10, fontFamily: MONO }} axisLine={{ stroke: colors.border }} tickLine={false} />
-          <YAxis yAxisId="count" domain={[0, maxCount + 2]} tick={{ fill: colors.textMuted, fontSize: 10, fontFamily: MONO }} axisLine={false} tickLine={false} width={40} />
-          <YAxis yAxisId="accel" orientation="right" domain={[-maxAccel - 1, maxAccel + 1]} hide />
+          <YAxis domain={[0, maxCount + 2]} tick={{ fill: colors.textMuted, fontSize: 10, fontFamily: MONO }} axisLine={false} tickLine={false} width={30} />
           <Tooltip
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
               const d = payload[0].payload;
+              const total = d.provFav + d.payFav + d.neutral;
               return (
                 <div style={{ background: "rgba(255,255,255,0.97)", border: `1px solid ${colors.border}`, borderRadius: 6, padding: "8px 12px", fontFamily: MONO, fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
-                  <div style={{ color: colors.textMuted }}>Week of {d.date}</div>
-                  <div style={{ fontWeight: 700 }}>{d.count} entries ({d.provFav} {providerShort}-fav, {d.payFav} {payorShort}-fav)</div>
-                  <div style={{ color: d.acceleration > 0 ? "#DC2626" : d.acceleration < 0 ? "#16A34A" : colors.textMuted }}>
-                    Δ {d.acceleration > 0 ? "+" : ""}{d.acceleration} vs prior week
-                  </div>
+                  <div style={{ fontWeight: 700 }}>{total} entries</div>
+                  <div style={{ color: colors.providerColor }}>{d.provFav} {providerShort}-favorable</div>
+                  <div style={{ color: colors.payorColor }}>{d.payFav} {payorShort}-favorable</div>
+                  {d.neutral > 0 && <div style={{ color: colors.textMuted }}>{d.neutral} neutral</div>}
                 </div>
               );
             }}
           />
-          <ReferenceLine yAxisId="count" y={0} stroke={colors.textMuted} opacity={0.3} />
-          <Bar yAxisId="count" dataKey="provFav" stackId="vol" fill={colors.providerColor} opacity={0.7} radius={[0, 0, 0, 0]} />
-          <Bar yAxisId="count" dataKey="payFav" stackId="vol" fill={colors.payorColor} opacity={0.7} radius={[2, 2, 0, 0]} />
-          <Line yAxisId="accel" type="monotone" dataKey="acceleration" stroke={colors.accent} strokeWidth={2} dot={{ r: 3, fill: colors.bg, stroke: colors.accent, strokeWidth: 2 }} />
-        </ComposedChart>
+          <Bar dataKey="provFav" stackId="vol" fill={colors.providerColor} opacity={0.8} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="neutral" stackId="vol" fill={colors.accent} opacity={0.3} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="payFav" stackId="vol" fill={colors.payorColor} opacity={0.8} radius={[2, 2, 0, 0]} />
+        </BarChart>
       </ResponsiveContainer>
       <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 6, fontSize: 10, fontFamily: MONO, color: colors.textMuted }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 10, background: colors.providerColor, opacity: 0.7, borderRadius: 2, display: "inline-block" }} />
+          <span style={{ width: 10, height: 10, background: colors.providerColor, opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
           {providerShort}-favorable
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 10, background: colors.payorColor, opacity: 0.7, borderRadius: 2, display: "inline-block" }} />
-          {payorShort}-favorable
+          <span style={{ width: 10, height: 10, background: colors.accent, opacity: 0.3, borderRadius: 2, display: "inline-block" }} />
+          Neutral
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 16, height: 2, background: colors.accent, borderRadius: 1, display: "inline-block" }} />
-          Weekly acceleration
+          <span style={{ width: 10, height: 10, background: colors.payorColor, opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
+          {payorShort}-favorable
         </span>
       </div>
     </div>
   );
 }
 
-// === MESSAGE DISCIPLINE SCORE ===
-// Measures how consistently each side sticks to their core talking points
+// === MESSAGE DISCIPLINE ===
+// Shows distinct messaging strategies and consistency on each
 
 function MessageDiscipline({ entries, config }) {
   const { colors, providerKey, payorKey, providerShort, payorShort, providerName, payorName } = config;
@@ -137,89 +125,128 @@ function MessageDiscipline({ entries, config }) {
   const analysis = useMemo(() => {
     if (entries.length < 5) return null;
 
-    // Extract messaging themes from frame + blame + sentiment combinations
-    const provEntries = entries.filter((e) => e.frameAdoption === providerKey || e.blameDirection === payorKey);
-    const payEntries = entries.filter((e) => e.frameAdoption === payorKey || e.blameDirection === providerKey);
+    const analyzeSide = (sideKey, oppositeKey) => {
+      const sideEntries = entries.filter((e) =>
+        e.frameAdoption === sideKey || e.blameDirection === oppositeKey
+      );
+      if (sideEntries.length === 0) return null;
 
-    const extractThemes = (ents, side) => {
-      const themes = {};
-      ents.forEach((e) => {
-        // Build theme key from the combination of frame + blame + channel + patientStory
-        const parts = [];
-        if (e.frameAdoption === side) parts.push("frame");
-        if (e.patientStory) parts.push("patient");
-        if (e.channel === "stakeholder" || e.channel === "employer") parts.push("institutional");
-        if (e.sourceType === "owned") parts.push("owned");
-        else if (e.sourceType === "social") parts.push("social");
-        else parts.push("earned");
-        const key = parts.sort().join("+");
-        themes[key] = (themes[key] || 0) + 1;
-      });
-      return themes;
-    };
+      // Identify distinct messaging strategies from the data
+      const strategies = [];
 
-    const provThemes = extractThemes(provEntries, providerKey);
-    const payThemes = extractThemes(payEntries, payorKey);
+      // 1. Patient story messaging
+      const patientEntries = sideEntries.filter((e) => e.patientStory);
+      if (patientEntries.length > 0) {
+        strategies.push({
+          name: "Patient stories",
+          count: patientEntries.length,
+          pct: Math.round((patientEntries.length / sideEntries.length) * 100),
+          desc: `${patientEntries.length} entries use patient/consumer narratives`,
+        });
+      }
 
-    // Discipline = concentration. High discipline = few themes dominate
-    const calcDiscipline = (themes, total) => {
-      if (total === 0) return { score: 0, topThemes: [], entropy: 0 };
-      const sorted = Object.entries(themes).sort((a, b) => b[1] - a[1]);
-      const topN = sorted.slice(0, 3);
-      const topCount = topN.reduce((s, [, v]) => s + v, 0);
-      const concentration = topCount / total; // 0-1, higher = more disciplined
+      // 2. Earned media (independent coverage)
+      const earnedEntries = sideEntries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType));
+      if (earnedEntries.length > 0) {
+        strategies.push({
+          name: "Earned media coverage",
+          count: earnedEntries.length,
+          pct: Math.round((earnedEntries.length / sideEntries.length) * 100),
+          desc: `${earnedEntries.length} entries via independent news/TV/radio`,
+        });
+      }
 
-      // Shannon entropy (lower = more disciplined)
-      const probs = Object.values(themes).map((v) => v / total);
-      const entropy = -probs.reduce((s, p) => s + (p > 0 ? p * Math.log2(p) : 0), 0);
-      const maxEntropy = Math.log2(Object.keys(themes).length || 1);
-      const normalizedEntropy = maxEntropy > 0 ? entropy / maxEntropy : 0;
+      // 3. Owned media (press releases, statements)
+      const ownedEntries = sideEntries.filter((e) => e.sourceType === "owned");
+      if (ownedEntries.length > 0) {
+        strategies.push({
+          name: "Owned media / statements",
+          count: ownedEntries.length,
+          pct: Math.round((ownedEntries.length / sideEntries.length) * 100),
+          desc: `${ownedEntries.length} direct press releases or statements`,
+        });
+      }
 
-      return {
-        score: Math.round(concentration * 100),
-        topThemes: topN.map(([k, v]) => ({ theme: k, count: v, pct: Math.round((v / total) * 100) })),
-        entropy: normalizedEntropy,
-        uniqueThemes: Object.keys(themes).length,
-        total,
-      };
+      // 4. Social amplification
+      const socialEntries = sideEntries.filter((e) => e.sourceType === "social" || e.channel === "social");
+      if (socialEntries.length > 0) {
+        strategies.push({
+          name: "Social amplification",
+          count: socialEntries.length,
+          pct: Math.round((socialEntries.length / sideEntries.length) * 100),
+          desc: `${socialEntries.length} entries via social channels`,
+        });
+      }
+
+      // 5. Stakeholder / institutional voices
+      const stakeEntries = sideEntries.filter((e) => e.channel === "stakeholder" || e.channel === "employer");
+      if (stakeEntries.length > 0) {
+        strategies.push({
+          name: "Institutional / stakeholder voices",
+          count: stakeEntries.length,
+          pct: Math.round((stakeEntries.length / sideEntries.length) * 100),
+          desc: `${stakeEntries.length} third-party or employer entries`,
+        });
+      }
+
+      // 6. High-reach placements
+      const highReach = sideEntries.filter((e) => e.reachEstimate === "high");
+      if (highReach.length > 0) {
+        strategies.push({
+          name: "High-reach placements",
+          count: highReach.length,
+          pct: Math.round((highReach.length / sideEntries.length) * 100),
+          desc: `${highReach.length} entries in high-visibility outlets`,
+        });
+      }
+
+      // Sort by count descending
+      strategies.sort((a, b) => b.count - a.count);
+
+      // Discipline = how much of coverage is in the top 2 strategies
+      const top2 = strategies.slice(0, 2).reduce((s, st) => s + st.count, 0);
+      const score = Math.round((top2 / sideEntries.length) * 100);
+
+      return { strategies, score, total: sideEntries.length };
     };
 
     return {
-      provider: calcDiscipline(provThemes, provEntries.length),
-      payor: calcDiscipline(payThemes, payEntries.length),
+      provider: analyzeSide(providerKey, payorKey),
+      payor: analyzeSide(payorKey, providerKey),
     };
   }, [entries, config]);
 
   if (!analysis) return null;
 
-  const themeLabel = (t) => t.replace(/\+/g, " + ").replace(/frame/, "narrative frame").replace(/patient/, "patient story").replace(/institutional/, "institutional voice").replace(/owned/, "owned media").replace(/social/, "social channel").replace(/earned/, "earned media");
-
-  const DisciplineCard = ({ side, data, color, name }) => (
-    <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>{name}</div>
-        <div style={{ fontSize: 28, fontWeight: 700, color, fontFamily: MONO }}>{data.score}%</div>
-      </div>
-      <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 8 }}>
-        {data.uniqueThemes} distinct messaging patterns across {data.total} entries
-      </div>
-      <div style={{ height: 8, background: colors.bg, borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
-        <div style={{ height: "100%", width: `${data.score}%`, background: color, borderRadius: 4, transition: "width 0.3s ease" }} />
-      </div>
-      <div style={{ fontSize: 10, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO, marginBottom: 6 }}>TOP MESSAGING PATTERNS</div>
-      {data.topThemes.map((t, i) => (
-        <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${colors.border}`, fontSize: 12 }}>
-          <span style={{ color: colors.text }}>{themeLabel(t.theme)}</span>
-          <span style={{ fontFamily: MONO, fontWeight: 600, color }}>{t.pct}% ({t.count})</span>
+  const DisciplineCard = ({ data, color, name }) => {
+    if (!data) return null;
+    return (
+      <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <div style={{ fontSize: 11, letterSpacing: 1.2, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>{name}</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color, fontFamily: MONO }}>{data.score}%</div>
         </div>
-      ))}
-      <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 8, lineHeight: 1.6 }}>
-        {data.score >= 70 ? "High discipline — concentrated, consistent messaging." :
-         data.score >= 50 ? "Moderate discipline — somewhat scattered messaging." :
-         "Low discipline — fragmented across many themes."}
+        <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>
+          {data.score >= 70 ? "Highly focused" : data.score >= 50 ? "Moderately focused" : "Scattered"} across {data.total} entries
+        </div>
+        <div style={{ height: 6, background: colors.bg, borderRadius: 3, overflow: "hidden", marginBottom: 14 }}>
+          <div style={{ height: "100%", width: `${data.score}%`, background: color, borderRadius: 3 }} />
+        </div>
+        {data.strategies.map((st, i) => (
+          <div key={i} style={{ marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: colors.text }}>{st.name}</span>
+              <span style={{ fontSize: 11, fontFamily: MONO, fontWeight: 600, color }}>{st.pct}%</span>
+            </div>
+            <div style={{ height: 4, background: colors.bg, borderRadius: 2, overflow: "hidden", marginBottom: 2 }}>
+              <div style={{ height: "100%", width: `${st.pct}%`, background: color, opacity: 0.6, borderRadius: 2 }} />
+            </div>
+            <div style={{ fontSize: 10, color: colors.textMuted }}>{st.desc}</div>
+          </div>
+        ))}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -228,19 +255,18 @@ function MessageDiscipline({ entries, config }) {
           MESSAGE DISCIPLINE
         </div>
         <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-          How consistently does each side stick to their core messaging patterns? Higher = more focused.
+          What messaging strategies does each side use, and how consistently? Higher = more concentrated on top tactics.
         </div>
       </div>
       <div style={{ display: "flex", gap: 16 }}>
-        <DisciplineCard side={providerKey} data={analysis.provider} color={colors.providerColor} name={providerShort} />
-        <DisciplineCard side={payorKey} data={analysis.payor} color={colors.payorColor} name={payorShort} />
+        <DisciplineCard data={analysis.provider} color={colors.providerColor} name={providerShort} />
+        <DisciplineCard data={analysis.payor} color={colors.payorColor} name={payorShort} />
       </div>
     </div>
   );
 }
 
 // === COUNTER-NARRATIVE EFFECTIVENESS ===
-// Maps key PR moves to the composite trend and measures response impact
 
 function CounterNarrative({ entries, config, overrides }) {
   const { colors, providerKey, payorKey, providerShort, payorShort } = config;
@@ -249,14 +275,12 @@ function CounterNarrative({ entries, config, overrides }) {
     if (entries.length < 10) return [];
     const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
 
-    // Identify "PR moves" — owned media entries or high-reach entries with strong framing
     const moves = sorted.filter((e) =>
       e.sourceType === "owned" ||
       (e.reachEstimate === "high" && e.frameAdoption !== "balanced") ||
       (e.channel === "stakeholder" && e.blameDirection !== "both")
     );
 
-    // For each move, compute composite before and after (5-day window)
     const getCompositeAt = (cutoffDate, windowDays) => {
       const cutoff = new Date(cutoffDate).getTime();
       const start = cutoff - windowDays * 86400000;
@@ -265,7 +289,6 @@ function CounterNarrative({ entries, config, overrides }) {
         return t > start && t <= cutoff;
       });
       if (windowEntries.length < 2) return null;
-      // Simple favorability average
       let favSum = 0;
       windowEntries.forEach((e) => {
         if (e.frameAdoption === providerKey || e.sentiment === `negative_${payorKey}` || e.blameDirection === payorKey) favSum += 1;
@@ -274,7 +297,6 @@ function CounterNarrative({ entries, config, overrides }) {
       return (favSum / windowEntries.length) * 100;
     };
 
-    // Deduplicate by date + side
     const seen = new Set();
     const results = [];
     moves.forEach((e) => {
@@ -299,8 +321,6 @@ function CounterNarrative({ entries, config, overrides }) {
         side,
         sideName: side === "provider" ? providerShort : payorShort,
         sideColor: side === "provider" ? colors.providerColor : colors.payorColor,
-        before,
-        after,
         shift,
         effective,
       });
@@ -316,6 +336,15 @@ function CounterNarrative({ entries, config, overrides }) {
   const effectivePay = events.filter((e) => e.side === "payor" && e.effective).length;
   const totalPay = events.filter((e) => e.side === "payor").length;
 
+  const shiftDescription = (e) => {
+    const abs = Math.abs(e.shift);
+    const toward = e.shift > 0 ? providerShort : payorShort;
+    if (abs < 3) return { text: "No meaningful shift", color: colors.textMuted };
+    if (abs < 10) return { text: `Slight shift toward ${toward}`, color: e.effective ? "#16A34A" : "#D97706" };
+    if (abs < 25) return { text: `Moderate shift toward ${toward}`, color: e.effective ? "#16A34A" : "#DC2626" };
+    return { text: `Strong shift toward ${toward}`, color: e.effective ? "#16A34A" : "#DC2626" };
+  };
+
   return (
     <div style={{ marginBottom: 28 }}>
       <div style={{ marginBottom: 12 }}>
@@ -323,7 +352,7 @@ function CounterNarrative({ entries, config, overrides }) {
           COUNTER-NARRATIVE EFFECTIVENESS
         </div>
         <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-          When each side makes a PR move, does it actually shift the narrative? Measures 7-day pre/post favorability change.
+          When each side makes a PR move, does the narrative actually shift in their favor over the next 7 days?
         </div>
       </div>
 
@@ -331,46 +360,42 @@ function CounterNarrative({ entries, config, overrides }) {
         <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: "12px 16px", textAlign: "center" }}>
           <div style={{ fontSize: 10, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO }}>{providerShort} MOVES</div>
           <div style={{ fontSize: 24, fontWeight: 700, color: colors.providerColor, fontFamily: MONO }}>{effectiveProv}/{totalProv}</div>
-          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative favorably</div>
+          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative in their favor</div>
         </div>
         <div style={{ flex: 1, background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, padding: "12px 16px", textAlign: "center" }}>
           <div style={{ fontSize: 10, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO }}>{payorShort} MOVES</div>
           <div style={{ fontSize: 24, fontWeight: 700, color: colors.payorColor, fontFamily: MONO }}>{effectivePay}/{totalPay}</div>
-          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative favorably</div>
+          <div style={{ fontSize: 10, color: colors.textMuted }}>shifted narrative in their favor</div>
         </div>
       </div>
 
       <div style={{ background: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "80px 1fr 60px 60px 70px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 9, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
-          <div>DATE</div><div>PR MOVE</div><div>BEFORE</div><div>AFTER</div><div>IMPACT</div>
+        <div style={{ display: "grid", gridTemplateColumns: "70px 1fr 180px 36px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 9, letterSpacing: 1, color: colors.textMuted, fontFamily: MONO, fontWeight: 700 }}>
+          <div>DATE</div><div>PR MOVE</div><div>7-DAY RESULT</div><div></div>
         </div>
-        {events.map((e, i) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "80px 1fr 60px 60px 70px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 11, alignItems: "center" }}>
-            <div style={{ fontFamily: MONO, fontSize: 10, color: colors.textMuted }}>{e.date.slice(5)}</div>
-            <div>
-              <span style={{ color: e.sideColor, fontWeight: 600, fontSize: 10, fontFamily: MONO }}>{e.sideName}</span>{" "}
-              <span style={{ color: colors.text, fontSize: 11 }}>{e.headline.length > 60 ? e.headline.slice(0, 60) + "…" : e.headline}</span>
+        {events.map((e, i) => {
+          const desc = shiftDescription(e);
+          return (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "70px 1fr 180px 36px", gap: 8, padding: "8px 12px", borderBottom: `1px solid ${colors.border}`, fontSize: 11, alignItems: "center" }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, color: colors.textMuted }}>{e.date.slice(5)}</div>
+              <div>
+                <span style={{ color: e.sideColor, fontWeight: 600, fontSize: 10, fontFamily: MONO }}>{e.sideName}</span>{" "}
+                <span style={{ color: colors.text, fontSize: 11 }}>{e.headline.length > 55 ? e.headline.slice(0, 55) + "…" : e.headline}</span>
+              </div>
+              <div style={{ fontSize: 11, color: desc.color, fontWeight: 600 }}>{desc.text}</div>
+              <div style={{ fontSize: 14, textAlign: "center" }}>{e.effective ? "✓" : "✗"}</div>
             </div>
-            <div style={{ fontFamily: MONO, fontSize: 11, color: colors.textMuted }}>{e.before > 0 ? "+" : ""}{e.before.toFixed(0)}</div>
-            <div style={{ fontFamily: MONO, fontSize: 11, color: colors.textMuted }}>{e.after > 0 ? "+" : ""}{e.after.toFixed(0)}</div>
-            <div style={{
-              fontFamily: MONO, fontSize: 11, fontWeight: 700,
-              color: e.effective ? "#16A34A" : "#DC2626",
-            }}>
-              {e.shift > 0 ? "+" : ""}{e.shift.toFixed(0)} {e.effective ? "✓" : "✗"}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
 // === MEDIA FATIGUE DETECTOR ===
-// Tracks unique source coverage per week — are outlets losing interest?
 
 function MediaFatigue({ entries, config }) {
-  const { colors, providerShort, payorShort } = config;
+  const { colors } = config;
 
   const data = useMemo(() => {
     if (entries.length < 5) return { weeks: [], sources: [] };
@@ -389,36 +414,36 @@ function MediaFatigue({ entries, config }) {
       cur.setDate(cur.getDate() + 7);
     }
 
-    // Track unique sources per week
-    const weekData = weeks.map((w, i) => {
+    const seenSources = new Set();
+    const weekData = weeks.map((w) => {
       const weekEntries = sorted.filter((e) => {
         const d = new Date(e.date);
         return d >= w.start && d <= w.end;
       });
       const uniqueSources = new Set(weekEntries.map((e) => e.source));
       const highTierSources = new Set(weekEntries.filter((e) => ["news", "tv", "radio"].includes(e.sourceType)).map((e) => e.source));
+
+      let newCount = 0;
+      uniqueSources.forEach((s) => {
+        if (!seenSources.has(s)) { newCount++; seenSources.add(s); }
+      });
+
+      // For stacked bar: other = unique - highTier - new (avoid double counting)
+      const highTier = highTierSources.size;
+      const newSources = newCount;
+      const returning = Math.max(0, uniqueSources.size - newSources);
+
       return {
         label: `${w.start.getMonth() + 1}/${w.start.getDate()}`,
         date: `${w.start.getFullYear()}-${String(w.start.getMonth() + 1).padStart(2, "0")}-${String(w.start.getDate()).padStart(2, "0")}`,
         total: weekEntries.length,
         uniqueSources: uniqueSources.size,
-        highTier: highTierSources.size,
-        newSources: 0, // computed below
-        sources: [...uniqueSources],
+        highTier,
+        newSources,
+        returning,
       };
     });
 
-    // Compute new sources (first appearance)
-    const seenSources = new Set();
-    weekData.forEach((w) => {
-      let newCount = 0;
-      w.sources.forEach((s) => {
-        if (!seenSources.has(s)) { newCount++; seenSources.add(s); }
-      });
-      w.newSources = newCount;
-    });
-
-    // Top sources by coverage frequency
     const sourceCount = {};
     const sourceFirstWeek = {};
     const sourceLastWeek = {};
@@ -438,7 +463,6 @@ function MediaFatigue({ entries, config }) {
         dropped: new Date(sourceLastWeek[source]) < new Date(sorted[sorted.length - 1].date.slice(0, 7) + "-01"),
       }));
 
-    // Fatigue indicator
     const recentWeeks = weekData.slice(-3);
     const earlyWeeks = weekData.slice(0, 3);
     const recentUnique = recentWeeks.reduce((s, w) => s + w.uniqueSources, 0) / (recentWeeks.length || 1);
@@ -453,7 +477,7 @@ function MediaFatigue({ entries, config }) {
   const fatigueLabel = fatigueRatio < 0.5 ? "HIGH FATIGUE" : fatigueRatio < 0.8 ? "MODERATE FATIGUE" : fatigueRatio > 1.2 ? "GROWING INTEREST" : "SUSTAINED";
   const fatigueColor = fatigueRatio < 0.5 ? "#DC2626" : fatigueRatio < 0.8 ? "#D97706" : fatigueRatio > 1.2 ? "#16A34A" : colors.accent;
 
-  const maxVal = Math.max(...data.weeks.map((w) => Math.max(w.uniqueSources, w.highTier, w.newSources)), 1);
+  const maxVal = Math.max(...data.weeks.map((w) => w.returning + w.newSources), 1);
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -475,7 +499,7 @@ function MediaFatigue({ entries, config }) {
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={data.weeks} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+        <BarChart data={data.weeks} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border} opacity={0.4} vertical={false} />
           <XAxis dataKey="label" tick={{ fill: colors.textMuted, fontSize: 10, fontFamily: MONO }} axisLine={{ stroke: colors.border }} tickLine={false} />
           <YAxis domain={[0, maxVal + 2]} tick={{ fill: colors.textMuted, fontSize: 10, fontFamily: MONO }} axisLine={false} tickLine={false} width={30} />
@@ -494,22 +518,17 @@ function MediaFatigue({ entries, config }) {
               );
             }}
           />
-          <Bar dataKey="uniqueSources" fill={colors.accent} opacity={0.3} radius={[2, 2, 0, 0]} />
-          <Line type="monotone" dataKey="highTier" stroke={colors.providerColor} strokeWidth={2} dot={{ r: 3, fill: colors.bg, stroke: colors.providerColor, strokeWidth: 2 }} />
-          <Line type="monotone" dataKey="newSources" stroke="#16A34A" strokeWidth={2} strokeDasharray="4 3" dot={{ r: 3, fill: colors.bg, stroke: "#16A34A", strokeWidth: 2 }} />
-        </ComposedChart>
+          <Bar dataKey="returning" stackId="sources" fill={colors.accent} opacity={0.5} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="newSources" stackId="sources" fill="#16A34A" opacity={0.8} radius={[2, 2, 0, 0]} />
+        </BarChart>
       </ResponsiveContainer>
       <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 6, fontSize: 10, fontFamily: MONO, color: colors.textMuted }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 10, height: 10, background: colors.accent, opacity: 0.3, borderRadius: 2, display: "inline-block" }} />
-          Unique sources
+          <span style={{ width: 10, height: 10, background: colors.accent, opacity: 0.5, borderRadius: 2, display: "inline-block" }} />
+          Returning sources
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 16, height: 2, background: colors.providerColor, borderRadius: 1, display: "inline-block" }} />
-          High-tier sources
-        </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ width: 16, height: 2, background: "#16A34A", borderRadius: 1, display: "inline-block", borderTop: "1px dashed #16A34A" }} />
+          <span style={{ width: 10, height: 10, background: "#16A34A", opacity: 0.8, borderRadius: 2, display: "inline-block" }} />
           New sources
         </span>
       </div>
